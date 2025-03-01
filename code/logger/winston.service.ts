@@ -1,5 +1,6 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import { createLogger, transports, format, Logger } from 'winston';
+import { TMetaDataLogs } from './winston.types';
 
 @Injectable()
 export class WinstonService implements LoggerService {
@@ -13,7 +14,7 @@ export class WinstonService implements LoggerService {
           all: true,
         }),
         format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
-        format.printf(({ timestamp, level, message }) => {
+        format.printf(({ timestamp, level, message }: TMetaDataLogs) => {
           return `${timestamp} [${level}]: ${message}`;
         }),
       ),
