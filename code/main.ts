@@ -6,7 +6,9 @@ async function bootstrap() {
   const nest = await NestFactory.create(AppModule);
 
   nest.useLogger(nest.get(WinstonService));
-  await nest.listen(process.env.PORT || 3000);
+  const PORT = Number(process.env.PORT) || 3000;
+  await nest.listen(PORT);
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
 }
 
 bootstrap().catch((err: any) =>
