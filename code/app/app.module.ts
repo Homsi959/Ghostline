@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TelegramModule } from 'code/telegram/telegram.module';
+import { WinstonModule } from 'code/logger/winston.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { TelegramModule } from 'code/telegram/telegram.module';
       isGlobal: true,
     }),
     TelegramModule,
+    WinstonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

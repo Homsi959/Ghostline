@@ -1,8 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
+import { WinstonService } from './logger/winston.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  const nest = await NestFactory.create(AppModule);
+
+  nest.useLogger(nest.get(WinstonService));
+  await nest.listen(process.env.PORT || 3000);
 }
-bootstrap().catch((err: any) => console.error('Error during bootstrap:', err));
+
+bootstrap().catch((err: any) =>
+  console.error('Не удалось запустить сервер', err),
+);
