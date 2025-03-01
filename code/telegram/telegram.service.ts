@@ -27,7 +27,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
    * Метод, который вызывается после инициализации модуля.
    * Здесь настраивается бот и запускаются основные команды.
    */
-  async onModuleInit() {
+  onModuleInit() {
     // Получаем токен Telegram из конфигурации
     const token = this.config.get<string>(TELEGRAM_TOKEN);
 
@@ -51,7 +51,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     );
 
     try {
-      await this.bot.launch();
+      // await this.bot.launch();
       this.logger.log(`[TelegramService.onModuleInit] - Бот успешно запущен.`);
     } catch (error) {
       this.logger.error(
