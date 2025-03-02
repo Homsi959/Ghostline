@@ -1,14 +1,16 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import { createLogger, transports, format, Logger } from 'winston';
 import { TMetaDataLogs } from './winston.types';
+import { ConfigService } from '@nestjs/config';
+import { LOG_LEVEL_KEY } from 'code/common/constants';
 
 @Injectable()
 export class WinstonService implements LoggerService {
   private readonly logger: Logger;
 
-  constructor() {
+  constructor(private readonly config: ConfigService) {
     this.logger = createLogger({
-      level: 'info',
+      level: this.config.get(LOG_LEVEL_KEY),
       format: format.combine(
         format.colorize({
           all: true,
