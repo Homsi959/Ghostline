@@ -1,4 +1,8 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleDestroy,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Telegraf } from 'telegraf';
 
@@ -9,7 +13,9 @@ import { WinstonService } from 'code/logger/winston.service';
  * Сервис для работы с ботом Telegram.
  */
 @Injectable()
-export class TelegramService implements OnModuleInit, OnModuleDestroy {
+export class TelegramService
+  implements OnApplicationBootstrap, OnModuleDestroy
+{
   /**
    * Экземпляр бота Telegraf.
    */
@@ -30,7 +36,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
    * Метод, который вызывается после инициализации модуля.
    * Здесь настраивается бот и запускаются основные команды.
    */
-  onModuleInit() {
+  onApplicationBootstrap() {
     // Получаем токен Telegram из конфигурации
     const token = this.config.get<string>(TELEGRAM_TOKEN);
 
@@ -41,6 +47,10 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
       return;
     }
+
+    this.logger.error(
+      `[TelegramService.onModuleInit] - Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
+    );
 
     // Создаём новый экземпляр бота с полученным токеном
     this.bot = new Telegraf(token);
