@@ -48,8 +48,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
 
     // Настройка команды /start
     this.bot.start((ctx) => ctx.reply('Привет! Я твой NestJS-бот 🤖'));
-    // Настройка команды /help
 
+    // Настройка команды /help
     this.bot.help((ctx) =>
       ctx.reply('Список команд:\n/start - Запуск\n/help - Помощь'),
     );
