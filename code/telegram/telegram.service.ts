@@ -5,6 +5,9 @@ import { Telegraf } from 'telegraf';
 import { TELEGRAM_TOKEN } from 'code/common/constants';
 import { WinstonService } from 'code/logger/winston.service';
 
+/**
+ * Сервис для работы с ботом Telegram.
+ */
 @Injectable()
 export class TelegramService implements OnModuleInit, OnModuleDestroy {
   /**
