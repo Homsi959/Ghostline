@@ -18,21 +18,13 @@ import { WinstonService } from './logger/winston.service';
  * @throws {Error} Если сервер не удалось запустить.
  */
 async function bootstrap(): Promise<void> {
-  const nest = await NestFactory.create(AppModule, {
-    bufferLogs: true,
-  });
+  const nest = await NestFactory.create(AppModule);
 
   nest.useLogger(nest.get(WinstonService));
   const PORT = Number(process.env.PORT) || 4000;
-  await nest.listen(PORT);
+  console.log(`🚀🚀🚀 Сервер запущен на http://localhost:${PORT} 🚀🚀🚀`);
 
-  const server = nest.getHttpServer() as import('http').Server;
-  const address = server.address();
-  if (address && typeof address !== 'string') {
-    console.log(
-      `🚀🚀🚀 Сервер запущен на http://localhost:${address.port} 🚀🚀🚀`,
-    );
-  }
+  await nest.listen(PORT);
 }
 
 bootstrap().catch((err: Error) => {

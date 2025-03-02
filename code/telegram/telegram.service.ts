@@ -36,21 +36,17 @@ export class TelegramService
    * Метод, который вызывается после инициализации модуля.
    * Здесь настраивается бот и запускаются основные команды.
    */
-  onApplicationBootstrap() {
+  async onApplicationBootstrap() {
     // Получаем токен Telegram из конфигурации
     const token = this.config.get<string>(TELEGRAM_TOKEN);
 
     // Если токен отсутствует, логируем ошибку и выходим
     if (!token) {
       this.logger.error(
-        `[TelegramService.onModuleInit] - Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
+        `[TelegramService.onApplicationBootstrap] - Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
       );
       return;
     }
-
-    this.logger.error(
-      `[TelegramService.onModuleInit] - Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
-    );
 
     // Создаём новый экземпляр бота с полученным токеном
     this.bot = new Telegraf(token);
@@ -64,7 +60,7 @@ export class TelegramService
     );
 
     try {
-      // await this.bot.launch();
+      await this.bot.launch();
       this.logger.log(`[TelegramService.onModuleInit] - Бот успешно запущен.`);
     } catch (error) {
       this.logger.error(
