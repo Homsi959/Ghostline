@@ -2,6 +2,7 @@ import {
   Injectable,
   OnModuleDestroy,
   OnApplicationBootstrap,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Telegraf } from 'telegraf';
@@ -13,9 +14,7 @@ import { WinstonService } from 'code/logger/winston.service';
  * Сервис для работы с ботом Telegram.
  */
 @Injectable()
-export class TelegramService
-  implements OnApplicationBootstrap, OnModuleDestroy
-{
+export class TelegramService implements OnModuleInit, OnModuleDestroy {
   /**
    * Экземпляр бота Telegraf.
    */
@@ -36,14 +35,15 @@ export class TelegramService
    * Метод, который вызывается после инициализации модуля.
    * Здесь настраивается бот и запускаются основные команды.
    */
-  async onApplicationBootstrap() {
+  onModuleInit() {
     // Получаем токен Telegram из конфигурации
     const token = this.config.get<string>(TELEGRAM_TOKEN);
 
     // Если токен отсутствует, логируем ошибку и выходим
     if (!token) {
       this.logger.error(
-        `[TelegramService.onApplicationBootstrap] - Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
+        `[TelegramService.onApplicationBootstrap] - 
+          Отсутствует токен для Telegram. Пожалуйста, укажите его в .env файле.`,
       );
       return;
     }
@@ -53,18 +53,20 @@ export class TelegramService
 
     // Настройка команды /start
     this.bot.start((ctx) => ctx.reply('Привет! Я твой NestJS-бот 🤖'));
-
     // Настройка команды /help
+
     this.bot.help((ctx) =>
       ctx.reply('Список команд:\n/start - Запуск\n/help - Помощь'),
     );
 
     try {
-      await this.bot.launch();
-      this.logger.log(`[TelegramService.onModuleInit] - Бот успешно запущен.`);
-    } catch (error) {
+      void this.bot.launch();
+      this.logger.log(
+        `[TelegramService.onApplicationBootstrap] - Бот успешно запущен.`,
+      );
+    } catch (error: any) {
       this.logger.error(
-        `[TelegramService.onModuleInit] - Ошибка запуска бота: ${(error as Error).message}`,
+        `[TelegramService.onApplicationBootstrap] - Ошибка запуска бота: ${error}`,
       );
     }
   }
