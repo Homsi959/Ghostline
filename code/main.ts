@@ -23,7 +23,7 @@ async function bootstrap(): Promise<void> {
   nest.useLogger(nest.get(WinstonService));
   const PORT = Number(process.env.PORT) || 4000;
   console.log(
-    `\x1b[36m🚀🚀🚀 Сервер запущен на http://localhost:${PORT} 🚀🚀🚀\x1b[0m`,
+    `\x1b[36m\x1b[1m🚀🚀🚀 Сервер запущен на http://localhost:${PORT} 🚀🚀🚀\x1b[0m`,
   );
 
   await nest.listen(PORT);
