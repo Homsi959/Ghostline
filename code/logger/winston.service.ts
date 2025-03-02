@@ -10,7 +10,7 @@ export class WinstonService implements LoggerService {
 
   constructor(private readonly config: ConfigService) {
     this.logger = createLogger({
-      level: this.config.get(LOG_LEVEL_KEY),
+      level: this.config.get<string>(LOG_LEVEL_KEY),
       format: format.combine(
         format.colorize({
           all: true,
