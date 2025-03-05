@@ -4,6 +4,7 @@ import { Telegraf } from 'telegraf';
 
 import { TELEGRAM_TOKEN } from 'code/common/constants';
 import { WinstonService } from 'code/logger/winston.service';
+import { UsersRepository } from 'code/database/repository/users.repository';
 
 /**
  * Сервис для работы с ботом Telegram.
@@ -24,13 +25,14 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private config: ConfigService, // Получаем доступ к конфигурационным данным
     private readonly logger: WinstonService, // Логирование ошибок и событий
+    private readonly usersRepository: UsersRepository, // Сервис для работы с базой данных пользователей
   ) {}
 
   /**
    * Метод, который вызывается после инициализации модуля.
    * Здесь настраивается бот и запускаются основные команды.
    */
-  onModuleInit() {
+  async onModuleInit() {
     // Получаем токен Telegram из конфигурации
     const token = this.config.get<string>(TELEGRAM_TOKEN);
 
@@ -42,6 +44,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
       return;
     }
+
+    await this.usersRepository.createUser(1234567890);
 
     // Создаём новый экземпляр бота с полученным токеном
     this.bot = new Telegraf(token);
