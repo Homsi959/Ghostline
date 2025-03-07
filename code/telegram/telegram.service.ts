@@ -1,31 +1,28 @@
-import { Hears, Start, Update } from 'nestjs-telegraf';
-import { Context, Markup } from 'telegraf';
+import { Injectable } from '@nestjs/common';
 import { UsersRepository } from 'code/database/repository/users.repository';
+import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
+import { WinstonService } from 'code/logger/winston.service';
+import { Context, Markup } from 'telegraf';
 import { BUTTONS } from './telegram.buttons';
 import { MESSAGES } from './telegram.messages';
-import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 
-@Update()
-export class TelegramUpdate {
-  /**
-   * @param usersRepo - Репозиторий для управления данными пользователей.
-   * @param tgProfilesRepo - Репозиторий для управления данными профилей Telegram.
-   */
+@Injectable()
+export class TelegramService {
   constructor(
     private readonly usersRepo: UsersRepository,
     private readonly tgProfilesRepo: TelegramProfilesRepository,
+    private readonly logger: WinstonService,
   ) {}
 
   /**
-   * Метод, вызываемый при старте бота.
-   * Отправляет приветственное сообщение и отображает главное меню.
+   * Обрабатывает старт бота: создает пользователя и отправляет приветственное сообщение.
    * @param ctx - Контекст Telegraf
    */
-  @Start()
-  async start(ctx: Context) {
+  public async startBot(ctx: Context): Promise<void> {
     if ('message' in ctx.update) {
       const user = ctx.update.message.from;
       const { id } = user;
+
       // Сначала ищем, есть ли Telegram профиль
       const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
 
@@ -50,16 +47,14 @@ export class TelegramUpdate {
       MESSAGES.WELCOME,
       Markup.keyboard([BUTTONS.MAIN_MENU]).resize(),
     );
-    await this.getMenu(ctx);
+    await this.sendMenu(ctx);
   }
 
   /**
-   * Метод, вызываемый при нажатии кнопки "Главное меню".
-   * Отправляет информацию о сервере и отображает кнопки для покупки подписки, обновления статуса и перехода на канал.
+   * Отправляет главное меню с кнопками.
    * @param ctx - Контекст Telegraf
    */
-  @Hears(BUTTONS.MAIN_MENU)
-  async getMenu(ctx: Context) {
+  public async sendMenu(ctx: Context): Promise<void> {
     await ctx.reply(
       MESSAGES.SERVER_INFO,
       Markup.inlineKeyboard([
@@ -70,8 +65,29 @@ export class TelegramUpdate {
     );
   }
 
-  // @On('text')
-  // async getMessage(@Message('text') text: string, @Ctx() ctx: Context) {
-  //   console.log(text);
-  // }
+  /**
+   * Удаляет указанное сообщение по ID.
+   * @param ctx - Контекст Telegraf с сессией
+   * @param messageId - ID сообщения, которое необходимо удалить
+   */
+  private async deleteMessage(
+    ctx: Context,
+    messageId: number,
+  ): Promise<boolean> {
+    if (!messageId) return false;
+
+    try {
+      await ctx.deleteMessage(messageId);
+      this.logger.log(
+        `[TelegramService.deleteMessage] - Удалено сообщение с ID: ${messageId}`,
+      );
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `[TelegramService.deleteMessage] - Не удалось удалить сообщение с ID: ${messageId}`,
+        error,
+      );
+      return false;
+    }
+  }
 }

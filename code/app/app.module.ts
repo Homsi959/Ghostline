@@ -6,12 +6,14 @@ import { WinstonService } from 'code/logger/winston.service';
 import { DatabaseModule } from 'code/database/database.module';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { TELEGRAM_TOKEN } from 'code/common/constants';
-import { TelegramUpdate } from 'code/telegram/telegram.update';
+import { session } from 'telegraf';
+import { TelegramModule } from 'code/telegram/telegram.module';
 
 @Module({
   imports: [
     DatabaseModule,
     WinstonModule,
+    TelegramModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -20,14 +22,19 @@ import { TelegramUpdate } from 'code/telegram/telegram.update';
       inject: [ConfigService, WinstonService],
       useFactory: (configService: ConfigService, logger: WinstonService) => {
         const token = configService.get<string>(TELEGRAM_TOKEN);
+
         if (!token) {
           logger.error('TELEGRAM_TOKEN не найден в .env');
           throw new Error('TELEGRAM_TOKEN не найден в .env');
         }
-        return { token };
+
+        return {
+          token,
+          middlewares: [session()],
+        };
       },
     }),
   ],
-  providers: [AppService, TelegramUpdate],
+  providers: [AppService],
 })
 export class AppModule {}
