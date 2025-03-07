@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WinstonModule } from 'code/logger/winston.module';
 import { WinstonService } from 'code/logger/winston.service';
@@ -29,7 +28,6 @@ import { TelegramUpdate } from 'code/telegram/telegram.update';
       },
     }),
   ],
-  controllers: [AppController],
   providers: [AppService, TelegramUpdate],
 })
 export class AppModule {}
