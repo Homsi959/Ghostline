@@ -1,7 +1,7 @@
 import { Start, Hears, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { TelegramService } from './telegram.service';
-import { BUTTONS } from './telegram.buttons';
+import { BUTTONS } from './common/telegram.buttons';
 
 @Update()
 export class TelegramBotController {

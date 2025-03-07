@@ -3,8 +3,8 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context, Markup } from 'telegraf';
-import { BUTTONS } from './telegram.buttons';
-import { MESSAGES } from './telegram.messages';
+import { BUTTONS } from './common/telegram.buttons';
+import { MESSAGES } from './common/telegram.messages';
 
 @Injectable()
 export class TelegramService {
