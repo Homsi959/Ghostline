@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
-import { Context, Markup } from 'telegraf';
+import { Context, Markup, Scenes } from 'telegraf';
 import { BUTTONS } from './common/telegram.buttons';
 import { MESSAGES } from './common/telegram.messages';
 
@@ -19,27 +19,26 @@ export class TelegramService {
    * @param ctx - Контекст Telegraf
    */
   public async startBot(ctx: Context): Promise<void> {
-    if ('message' in ctx.update) {
-      const user = ctx.update.message.from;
-      const { id } = user;
+    if (!('message' in ctx.update)) return;
 
-      // Сначала ищем, есть ли Telegram профиль
-      const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
+    const user = ctx.update.message.from;
+    const { id } = user;
+    // Сначала ищем, есть ли Telegram профиль
+    const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
 
-      // Если нет, добавить нового пользователя в БД и Telegram профиль
-      if (!telegramID) {
-        const userID = await this.usersRepo.createUser();
+    // Если нет, добавить нового пользователя в БД и Telegram профиль
+    if (!telegramID) {
+      const userID = await this.usersRepo.createUser();
 
-        // Создать профиль только в случае, если есть id пользователя
-        if (userID) {
-          const telegramProfile = {
-            user_id: userID,
-            ...user,
-          };
+      // Создать профиль только в случае, если есть id пользователя
+      if (userID) {
+        const telegramProfile = {
+          user_id: userID,
+          ...user,
+        };
 
-          // Создание Telegram профиля
-          await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
-        }
+        // Создание Telegram профиля
+        await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
       }
     }
 
@@ -47,7 +46,8 @@ export class TelegramService {
       MESSAGES.WELCOME,
       Markup.keyboard([BUTTONS.MAIN_MENU]).resize(),
     );
-    await this.sendMenu(ctx);
+
+    // await this.sendMenu(ctx);
   }
 
   /**
