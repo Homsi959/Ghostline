@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { UsersRepository } from './repository/users.repository';
 import { DATABASE_TOKEN } from 'code/common/constants';
+import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
 
 @Global()
 @Module({
@@ -22,7 +23,8 @@ import { DATABASE_TOKEN } from 'code/common/constants';
       },
     },
     UsersRepository,
+    TelegramProfilesRepository,
   ],
-  exports: [UsersRepository, DATABASE_TOKEN],
+  exports: [UsersRepository, TelegramProfilesRepository, DATABASE_TOKEN],
 })
 export class DatabaseModule {}

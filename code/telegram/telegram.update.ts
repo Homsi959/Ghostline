@@ -3,10 +3,18 @@ import { Context, Markup } from 'telegraf';
 import { UsersRepository } from 'code/database/repository/users.repository';
 import { BUTTONS } from './telegram.buttons';
 import { MESSAGES } from './telegram.messages';
+import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 
 @Update()
 export class TelegramUpdate {
-  constructor(private readonly userRepository: UsersRepository) {}
+  /**
+   * @param usersRepo - Репозиторий для управления данными пользователей.
+   * @param tgProfilesRepo - Репозиторий для управления данными профилей Telegram.
+   */
+  constructor(
+    private readonly usersRepo: UsersRepository,
+    private readonly tgProfilesRepo: TelegramProfilesRepository,
+  ) {}
 
   /**
    * Метод, вызываемый при старте бота.
@@ -17,8 +25,25 @@ export class TelegramUpdate {
   async start(ctx: Context) {
     if ('message' in ctx.update) {
       const user = ctx.update.message.from;
+      const { id } = user;
+      // Сначала ищем, есть ли Telegram профиль
+      const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
 
-      await this.userRepository.createUser(user);
+      // Если нет, добавить нового пользователя в БД и Telegram профиль
+      if (!telegramID) {
+        const userID = await this.usersRepo.createUser();
+
+        // Создать профиль только в случае, если есть id пользователя
+        if (userID) {
+          const telegramProfile = {
+            user_id: userID,
+            ...user,
+          };
+
+          // Создание Telegram профиля
+          await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
+        }
+      }
     }
 
     await ctx.reply(
