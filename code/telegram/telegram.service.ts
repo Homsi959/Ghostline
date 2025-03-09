@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
-import { Context, Markup, Scenes } from 'telegraf';
-import { BUTTONS } from './common/telegram.buttons';
-import { MESSAGES } from './common/telegram.messages';
+import { Context } from 'telegraf';
 
 @Injectable()
 export class TelegramService {
@@ -41,28 +39,6 @@ export class TelegramService {
         await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
       }
     }
-
-    await ctx.reply(
-      MESSAGES.WELCOME,
-      Markup.keyboard([BUTTONS.MAIN_MENU]).resize(),
-    );
-
-    // await this.sendMenu(ctx);
-  }
-
-  /**
-   * Отправляет главное меню с кнопками.
-   * @param ctx - Контекст Telegraf
-   */
-  public async sendMenu(ctx: Context): Promise<void> {
-    await ctx.reply(
-      MESSAGES.SERVER_INFO,
-      Markup.inlineKeyboard([
-        [Markup.button.url('💎 Купить подписку', 'https://your-vpn-link.com')],
-        [Markup.button.callback('🔄 Обновить статус', 'update_status')],
-        [Markup.button.url('📢 Наш канал', 'https://t.me/YouFastVPN')],
-      ]),
-    );
   }
 
   /**

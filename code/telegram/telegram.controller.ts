@@ -23,7 +23,5 @@ export class TelegramBotController {
    * @param ctx - Контекст Telegraf
    */
   @Hears(BUTTONS.MAIN_MENU)
-  async getMenu(ctx: Context): Promise<void> {
-    await this.telegramService.sendMenu(ctx);
-  }
+  async getMenu(ctx: Context): Promise<void> {}
 }
