@@ -55,7 +55,7 @@ export class TelegramProfilesRepository {
       await this.db.query(query);
 
       this.logger.log(
-        `[TelegramRepository.createTelegramProfile] - Создан новый Telegram профиль с ID: ${user.id}`,
+        `[TelegramRepository.createTelegramProfile] - Создан новый Telegram профиль с ID: ${user.id}. Для пользователя с ID: ${user.user_id}`,
       );
       return true;
     } catch (error) {
@@ -88,7 +88,7 @@ export class TelegramProfilesRepository {
 
     try {
       const result = await this.db.query(query);
-      const foundTelegramID = result.rows[0] as number;
+      const foundTelegramID = result.rows[0].telegram_id as number;
 
       if (foundTelegramID) {
         this.logger.log(
