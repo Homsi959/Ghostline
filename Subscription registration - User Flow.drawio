@@ -1,0 +1,87 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36" version="26.1.0">
+  <diagram name="Page-1" id="M_tylob18ua0-KjRqnd7">
+    <mxGraphModel dx="1103" dy="690" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="vZWPY8DxlhU6_toqN6kN-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="vZWPY8DxlhU6_toqN6kN-1" target="vZWPY8DxlhU6_toqN6kN-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vZWPY8DxlhU6_toqN6kN-1" value="Начало&lt;div&gt;/start&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="190" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="vZWPY8DxlhU6_toqN6kN-2" target="W9fIwmnOrURJ5zs4m00E-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-12" value="Активировать бесплатно" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="W9fIwmnOrURJ5zs4m00E-11">
+          <mxGeometry x="-0.1402" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="vZWPY8DxlhU6_toqN6kN-2" target="W9fIwmnOrURJ5zs4m00E-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vZWPY8DxlhU6_toqN6kN-2" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Меню:&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Попробовать бесплатно&lt;/span&gt;&lt;/div&gt;&lt;div&gt;О сервисе&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="190" y="360" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-7" target="W9fIwmnOrURJ5zs4m00E-22">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="930" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-21" value="Активировать бесплатно на 7 дней" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="W9fIwmnOrURJ5zs4m00E-19">
+          <mxGeometry x="-0.0937" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-26" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-7" target="W9fIwmnOrURJ5zs4m00E-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-7" value="Вывод двух кнопок:&lt;br&gt;Активировать бесплатно на 7 дней&lt;br&gt;&lt;div&gt;Купить подписку&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="365" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-24" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-22" target="W9fIwmnOrURJ5zs4m00E-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-22" value="Активация подписки" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="380" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-23" target="W9fIwmnOrURJ5zs4m00E-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-23" value="Вы активировали подписку:&lt;div&gt;Кнопка показа страницы как создать соединение с любым устройством&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="530" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-25" target="W9fIwmnOrURJ5zs4m00E-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-25" value="Вывод кнопок:&lt;div&gt;1 месяц - 150 рублей&lt;/div&gt;&lt;div&gt;6 месяцев - 800&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="546.25" y="530" width="157.5" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-30" value="Создается чек на оплату. И человека переводит на сайт оплаты" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="503.75" y="710" width="242.5" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-30" target="W9fIwmnOrURJ5zs4m00E-23">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1000" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="W9fIwmnOrURJ5zs4m00E-36" target="W9fIwmnOrURJ5zs4m00E-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-36" value="Вывод страницы с описанием сервиса:&lt;div&gt;его преимущества и как он работает&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="540" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-38" value="Конец" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1201" y="555" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-40" value="Конец" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="745" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="W9fIwmnOrURJ5zs4m00E-42" value="НА ЛЮБОЙ СТРАНИЦЕ ЕСТЬ КНОПКА НАЗАД" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="170" width="270" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
