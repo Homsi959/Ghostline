@@ -1,4 +1,4 @@
-type TTelegramButton = {
+export type TTelegramButton = {
   text: string;
   action: string;
 };
