@@ -7,10 +7,12 @@ import { TButtons } from './types';
  * @param arr - Массив кнопок
  * @returns - Telegram клавиатура
  */
-export function buildInlineKeyboard(arr: TButtons[]) {
+export function buildInlineKeyboard(arr: TButtons[], columns: number = 1) {
   const keyboard = arr.map(({ text, action }) =>
     Markup.button.callback(text, action),
   );
 
-  return Markup.inlineKeyboard(keyboard);
+  return Markup.inlineKeyboard(keyboard, {
+    columns,
+  });
 }

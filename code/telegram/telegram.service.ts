@@ -34,22 +34,23 @@ export class TelegramService {
    * @throws Ошибку, если контекст отсутствует.
    */
   public async renderPage(context: Context, page: string): Promise<void> {
-    const { message, buttons } = telegramPages[page];
+    const { message, keyboardConfig } = telegramPages[page];
 
     if (!context) {
       this.logger.error(`[TelegramService.renderPage] - Контекст отсутствует`);
       throw new Error('Контекст отсутствует');
     }
 
+    const options = keyboardConfig
+      ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
+      : undefined;
+
     if (!context.callbackQuery) {
       // Отправляем новое сообщение, если метод вызван не через callback
-      await context.reply(message, buttons && buildInlineKeyboard(buttons));
+      await context.reply(message, options);
     } else {
       // Изменяем существующее сообщение, если метод вызван через callback
-      await context.editMessageText(
-        message,
-        buttons && buildInlineKeyboard(buttons),
-      );
+      await context.editMessageText(message, options);
     }
   }
 

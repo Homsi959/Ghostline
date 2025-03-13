@@ -110,17 +110,26 @@ export const BUTTONS: Record<string, TTelegramButton> = {
 export const telegramPages: TTelegramPages = {
   [PAGE_KEYS.MAIN_PAGE]: {
     message: MESSAGES.MAIN_PAGE,
-    buttons: [BUTTONS.SUBSCRIBING, BUTTONS.ABOUT_SERVICE],
+    keyboardConfig: {
+      buttons: [BUTTONS.SUBSCRIBING, BUTTONS.ABOUT_SERVICE],
+      columns: 2,
+    },
   },
   [PAGE_KEYS.SUBSCRIBING_PAGE]: {
     message: MESSAGES.SUBSCRIBING_PAGE,
-    buttons: [BUTTONS.ACTIVATE_FOR_7_DAYS, BUTTONS.BUY_SUBSCRIPTION],
+    keyboardConfig: {
+      buttons: [BUTTONS.ACTIVATE_FOR_7_DAYS, BUTTONS.BUY_SUBSCRIPTION],
+      columns: 2,
+    },
   },
   [PAGE_KEYS.ABOUT_SERVICE_PAGE]: {
     message: MESSAGES.ABOUT_SERVICE_PAGE,
   },
   [PAGE_KEYS.PURCHASE_OF_SUBSCRIPTION_PAGE]: {
     message: MESSAGES.PURCHASE_OF_SUBSCRIPTION_PAGE,
-    buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
+    keyboardConfig: {
+      buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
+      columns: 1,
+    },
   },
 };

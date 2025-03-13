@@ -3,10 +3,15 @@ export type TTelegramButton = {
   action: string;
 };
 
+type TTelegramButtonConfig = {
+  buttons: TTelegramButton[];
+  columns?: number;
+};
+
 type TTelegramPage = {
   message: string;
   // TODO добавить возомжность picture
-  buttons?: TTelegramButton[];
+  keyboardConfig?: TTelegramButtonConfig;
 };
 
 export type TTelegramPages = {
