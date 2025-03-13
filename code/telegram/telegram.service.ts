@@ -4,7 +4,7 @@ import { TelegramProfilesRepository } from 'code/database/repository/telegramPro
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'telegraf';
 import { buildInlineKeyboard, RenderPage } from 'code/common/utils';
-import { PAGE_KEYS, telegramPages } from './common/telegram.menu';
+import { PAGE_KEYS, telegramPages } from './common/telegram.pages';
 
 @Injectable()
 export class TelegramService {
@@ -19,11 +19,20 @@ export class TelegramService {
    * @param context - Контекст Telegraf
    */
   public async startBot(context: Context): Promise<void> {
-    await this.processCheckUser(context);
+    await this.ensureUserExists(context);
 
     await RenderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
+  /**
+   * Отображает указанную страницу в чате.
+   * Если метод вызывается не через callback, отправляет новое сообщение.
+   * В противном случае изменяет текст существующего сообщения.
+   *
+   * @param context - Контекст Telegraf, содержащий информацию о чате и пользователе.
+   * @param page - Ключ страницы, которую нужно отобразить.
+   * @throws Ошибку, если контекст отсутствует.
+   */
   public async renderPage(context: Context, page: string): Promise<void> {
     const { message, buttons } = telegramPages[page];
 
@@ -33,8 +42,10 @@ export class TelegramService {
     }
 
     if (!context.callbackQuery) {
+      // Отправляем новое сообщение, если метод вызван не через callback
       await context.reply(message, buttons && buildInlineKeyboard(buttons));
     } else {
+      // Изменяем существующее сообщение, если метод вызван через callback
       await context.editMessageText(
         message,
         buttons && buildInlineKeyboard(buttons),
@@ -42,26 +53,32 @@ export class TelegramService {
     }
   }
 
-  private async processCheckUser(context: Context) {
+  /**
+   * Проверяет, существует ли Telegram-профиль пользователя в БД.
+   * Если профиль отсутствует, создаёт нового пользователя и Telegram-профиль.
+   *
+   * @param context - Контекст Telegraf, содержащий информацию о пользователе.
+   */
+  private async ensureUserExists(context: Context): Promise<void> {
     if (!('message' in context.update)) return;
 
     const user = context.update.message.from;
     const { id } = user;
-    // Сначала ищем, есть ли Telegram профиль
+
+    // Проверяем, существует ли Telegram-профиль пользователя в БД
     const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
 
-    // Если нет, добавить нового пользователя в БД и Telegram профиль
+    // Если профиль отсутствует, создаём нового пользователя
     if (!telegramID) {
       const userID = await this.usersRepo.createUser();
 
-      // Создать профиль только в случае, если есть id пользователя
+      // Создаём Telegram-профиль только если удалось создать пользователя
       if (userID) {
         const telegramProfile = {
           user_id: userID,
           ...user,
         };
 
-        // Создание Telegram профиля
         await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
       }
     }

@@ -1,6 +1,6 @@
 import { Context, Markup } from 'telegraf';
 import { TButtons } from './types';
-import { telegramPages } from 'code/telegram/common/telegram.menu';
+import { telegramPages } from 'code/telegram/common/telegram.pages';
 
 /**
  * Конвертирует массив кнопок в Telegram клавиатуру
