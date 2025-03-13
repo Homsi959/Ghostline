@@ -126,6 +126,7 @@ export const telegramPages: TTelegramPages = {
   },
   [PAGE_KEYS.SUBSCRIBING_PAGE]: {
     message: MESSAGES.SUBSCRIBING_PAGE,
+    goBackButton: true,
     keyboardConfig: {
       buttons: [BUTTONS.ACTIVATE_FOR_7_DAYS, BUTTONS.BUY_SUBSCRIPTION],
       columns: 2,
