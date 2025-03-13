@@ -8,7 +8,7 @@ import { telegramPages } from 'code/telegram/common/telegram.menu';
  * @param arr - Массив кнопок
  * @returns - Telegram клавиатура
  */
-export function ConvertTGButtons(arr: TButtons[]) {
+export function buildInlineKeyboard(arr: TButtons[]) {
   const keyboard = arr.map(({ text, action }) =>
     Markup.button.callback(text, action),
   );
@@ -29,11 +29,11 @@ export async function RenderPage(
   }
 
   if (!context.callbackQuery) {
-    await context.reply(message, buttons && ConvertTGButtons(buttons));
+    await context.reply(message, buttons && buildInlineKeyboard(buttons));
   } else {
     await context.editMessageText(
       message,
-      buttons && ConvertTGButtons(buttons),
+      buttons && buildInlineKeyboard(buttons),
     );
   }
 }

@@ -3,8 +3,8 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'telegraf';
-import { RenderPage } from 'code/common/utils';
-import { PAGE_KEYS } from './common/telegram.menu';
+import { buildInlineKeyboard, RenderPage } from 'code/common/utils';
+import { PAGE_KEYS, telegramPages } from './common/telegram.menu';
 
 @Injectable()
 export class TelegramService {
@@ -24,10 +24,22 @@ export class TelegramService {
     await RenderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
-  public async renderPage(context: Context, page: string) {
-    const namePage = page.replace(/$/, '');
+  public async renderPage(context: Context, page: string): Promise<void> {
+    const { message, buttons } = telegramPages[page];
 
-    await RenderPage(context, namePage);
+    if (!context) {
+      this.logger.error(`[TelegramService.renderPage] - Контекст отсутствует`);
+      throw new Error('Контекст отсутствует');
+    }
+
+    if (!context.callbackQuery) {
+      await context.reply(message, buttons && buildInlineKeyboard(buttons));
+    } else {
+      await context.editMessageText(
+        message,
+        buttons && buildInlineKeyboard(buttons),
+      );
+    }
   }
 
   private async processCheckUser(context: Context) {
