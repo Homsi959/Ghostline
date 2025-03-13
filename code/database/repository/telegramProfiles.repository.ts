@@ -67,8 +67,6 @@ export class TelegramProfilesRepository {
     }
   }
 
-  async getUserByTelegramId(telegramId: number) {}
-
   /**
    * Находит пользователя в telegram_profiles
    *

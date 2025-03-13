@@ -1,5 +1,9 @@
+/**
+ * Тип данных для метаданных логов.
+ * Используется для формата сообщений в логах с метками времени, уровнем логирования и самим сообщением.
+ */
 export type TMetaDataLogs = {
-  timestamp: string;
-  level: string;
-  message: string;
+  timestamp: string; // Время, когда было записано сообщение
+  level: string; // Уровень логирования (например, info, error, warn)
+  message: string; // Содержание сообщения
 };

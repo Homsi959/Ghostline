@@ -6,6 +6,10 @@ import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from './common/telegram.pages';
 import { Context } from 'code/common/types';
 
+/**
+ * Сервис для работы с Telegram-ботом.
+ * Обрабатывает запросы от пользователей, управляет рендерингом страниц, сохраняет историю страниц в сессии, а также управляет данными пользователей.
+ */
 @Injectable()
 export class TelegramService {
   constructor(

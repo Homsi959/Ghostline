@@ -19,7 +19,7 @@ export class UsersRepository {
    *
    * @returns {number | undefined} - ID нового пользователя или undefined в случае неудачи.
    */
-   async createUser(): Promise<number | undefined> {
+  async createUser(): Promise<number | undefined> {
     try {
       const query = `INSERT INTO users
                     DEFAULT VALUES 

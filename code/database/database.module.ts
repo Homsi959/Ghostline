@@ -5,6 +5,10 @@ import { UsersRepository } from './repository/users.repository';
 import { DATABASE_TOKEN } from 'code/common/constants';
 import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
 
+/**
+ * Модуль, отвечающий за настройку и подключение к базе данных.
+ * Включает провайдеры для работы с базой данных и репозиториями.
+ */
 @Global()
 @Module({
   imports: [ConfigModule],

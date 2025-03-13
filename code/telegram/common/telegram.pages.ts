@@ -1,17 +1,21 @@
 import { TTelegramPages, TTelegramButton } from './telegram.types';
 
 /**
+ * Константы для работы с телеграм-страницами, кнопками и действиями.
+ */
+
+/**
  * Названия страниц
  */
 export const PAGE_KEYS = {
-  MAIN_PAGE: 'mainPage',
-  ABOUT_SERVICE_PAGE: 'aboutServicePage',
-  SUBSCRIBING_PAGE: 'subscribingPage',
-  PURCHASE_OF_SUBSCRIPTION_PAGE: 'purchaseOfSubscriptionPage',
+  MAIN_PAGE: 'mainPage', // Главная страница
+  ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
+  SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
+  PURCHASE_OF_SUBSCRIPTION_PAGE: 'purchaseOfSubscriptionPage', // Страница покупки подписки
 } as const;
 
 /**
- * Тексты сообщений
+ * Тексты сообщений для различных страниц
  */
 const MESSAGES = {
   MAIN_PAGE: `
@@ -69,14 +73,14 @@ const MESSAGES = {
  * Названия событий
  */
 export const ACTIONS_KEYS = {
-  ACTIVATE_FOR_7_DAYS: 'activateFor7Days',
-  BUY_FOR_1_MONTH: 'buyFor1Month',
-  BUY_FOR_6_MONTHS: 'buyFor6Months',
-  GO_BACK: 'goBack',
+  ACTIVATE_FOR_7_DAYS: 'activateFor7Days', // Активировать на 7 дней
+  BUY_FOR_1_MONTH: 'buyFor1Month', // Купить на 1 месяц
+  BUY_FOR_6_MONTHS: 'buyFor6Months', // Купить на 6 месяцев
+  GO_BACK: 'goBack', // Назад
 } as const;
 
 /**
- * Кнопки
+ * Кнопки для взаимодействия с пользователем
  */
 export const BUTTONS: Record<string, TTelegramButton> = {
   SUBSCRIBING: {
@@ -104,13 +108,13 @@ export const BUTTONS: Record<string, TTelegramButton> = {
     action: ACTIONS_KEYS.BUY_FOR_6_MONTHS,
   },
   GO_BACK: {
-    text: 'Назазд',
+    text: 'Назад',
     action: ACTIONS_KEYS.GO_BACK,
   },
 };
 
 /**
- * Телеграм-страницы для рендера
+ * Структура страниц для рендера в Telegram, включая сообщения и кнопки
  */
 export const telegramPages: TTelegramPages = {
   [PAGE_KEYS.MAIN_PAGE]: {

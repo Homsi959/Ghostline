@@ -4,6 +4,11 @@ import { WinstonService } from 'code/logger/winston.service';
 import { ACTIONS_KEYS } from './common/telegram.pages';
 import { Context } from 'code/common/types';
 
+/**
+ * Контроллер для обработки событий в Telegram-боте.
+ *
+ * @remarks Обрабатывает стартап бота, рендеринг страниц и действие "Назад".
+ */
 @Update()
 export class TelegramBotController {
   constructor(
@@ -41,6 +46,12 @@ export class TelegramBotController {
     await this.telegramService.renderPage(context, page);
   }
 
+  /**
+   * Обработчик действия "Назад".
+   * Проверяет наличие данных в callbackQuery и вызывает метод для отображения предыдущей страницы.
+   *
+   * @param context - Контекст, содержащий callbackQuery.
+   */
   @Action(ACTIONS_KEYS.GO_BACK)
   async goBackListener(context: Context) {
     if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
