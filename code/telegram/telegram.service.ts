@@ -124,6 +124,7 @@ export class TelegramService {
     }
 
     const prevPage = history[history.length - 2];
+
     await this.renderPage(context, prevPage);
   }
 
