@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppService } from './app.service';
 import { WinstonModule } from 'code/logger/winston.module';
 import { WinstonService } from 'code/logger/winston.service';
 import { DatabaseModule } from 'code/database/database.module';
@@ -35,6 +34,5 @@ import { TelegramModule } from 'code/telegram/telegram.module';
       },
     }),
   ],
-  providers: [AppService],
 })
 export class AppModule {}
