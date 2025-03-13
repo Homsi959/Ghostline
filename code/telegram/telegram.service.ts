@@ -3,7 +3,7 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'telegraf';
-import { buildInlineKeyboard, RenderPage } from 'code/common/utils';
+import { buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from './common/telegram.pages';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class TelegramService {
   public async startBot(context: Context): Promise<void> {
     await this.ensureUserExists(context);
 
-    await RenderPage(context, PAGE_KEYS.MAIN_PAGE);
+    await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
   /**
