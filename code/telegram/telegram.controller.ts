@@ -1,7 +1,8 @@
 import { Start, Update, Action } from 'nestjs-telegraf';
-import { Context } from 'telegraf';
 import { TelegramService } from './telegram.service';
 import { WinstonService } from 'code/logger/winston.service';
+import { ACTIONS_KEYS } from './common/telegram.pages';
+import { Context } from 'code/common/types';
 
 @Update()
 export class TelegramBotController {
@@ -38,5 +39,17 @@ export class TelegramBotController {
     const page = context.callbackQuery?.data;
 
     await this.telegramService.renderPage(context, page);
+  }
+
+  @Action(ACTIONS_KEYS.GO_BACK)
+  async goBackListener(context: Context) {
+    if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
+      this.logger.error(
+        `[TelegramBotController.renderPage] - Отсутствует data в callbackQuery`,
+      );
+      return;
+    }
+
+    await this.telegramService.goBackRender(context);
   }
 }

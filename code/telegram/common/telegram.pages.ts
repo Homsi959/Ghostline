@@ -68,7 +68,7 @@ const MESSAGES = {
 /**
  * Названия событий
  */
-const ACTIONS_KEYS = {
+export const ACTIONS_KEYS = {
   ACTIVATE_FOR_7_DAYS: 'activateFor7Days',
   BUY_FOR_1_MONTH: 'buyFor1Month',
   BUY_FOR_6_MONTHS: 'buyFor6Months',

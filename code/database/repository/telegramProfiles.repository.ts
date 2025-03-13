@@ -21,7 +21,7 @@ export class TelegramProfilesRepository {
    * @param user - Пользователь Telegram.
    * @returns {boolean} - Успешность создания пользователя.
    */
-  public async createTelegramProfile(user: TUser): Promise<boolean> {
+  async createTelegramProfile(user: TUser): Promise<boolean> {
     const query = {
       name: 'create-telegram_profile',
       text: `
@@ -67,7 +67,7 @@ export class TelegramProfilesRepository {
     }
   }
 
-  public async getUserByTelegramId(telegramId: number) {}
+  async getUserByTelegramId(telegramId: number) {}
 
   /**
    * Находит пользователя в telegram_profiles
@@ -75,7 +75,7 @@ export class TelegramProfilesRepository {
    * @param telegramID - Telegram идентификатор
    * @returns - id telegram профиля, либо undefined, если не найден
    */
-  public async getTelegramProfileById(
+  async getTelegramProfileById(
     telegramID: number,
   ): Promise<number | undefined> {
     const query = {
