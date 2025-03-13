@@ -1,7 +1,6 @@
-import { Start, Hears, Update } from 'nestjs-telegraf';
+import { Start, Update, Action } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { TelegramService } from './telegram.service';
-import { BUTTONS } from './common/telegram.buttons';
 
 @Update()
 export class TelegramBotController {
@@ -10,18 +9,19 @@ export class TelegramBotController {
   /**
    * Метод, вызываемый при старте бота.
    * Отправляет приветственное сообщение и отображает главное меню.
-   * @param ctx - Контекст Telegraf
+   * @param context - Контекст Telegraf
    */
   @Start()
-  async start(ctx: Context): Promise<void> {
-    await this.telegramService.startBot(ctx);
+  async start(context: Context): Promise<void> {
+    await this.telegramService.startBot(context);
   }
 
-  /**
-   * Метод, вызываемый при нажатии кнопки "Главное меню".
-   * Отправляет информацию о сервере и отображает кнопки для покупки подписки, обновления статуса и перехода на канал.
-   * @param ctx - Контекст Telegraf
-   */
-  @Hears(BUTTONS.MAIN_MENU)
-  async getMenu(ctx: Context): Promise<void> {}
+  @Action(/^.*Page$/g)
+  async renderPage(context: Context): Promise<void> {
+    // TODO красивое ли решение?
+    if (!(context.callbackQuery && 'data' in context.callbackQuery)) return;
+    const page = context.callbackQuery?.data;
+
+    await this.telegramService.renderPage(context, page);
+  }
 }

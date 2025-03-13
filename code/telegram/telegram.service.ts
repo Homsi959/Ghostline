@@ -3,6 +3,8 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'telegraf';
+import { RenderPage } from 'code/common/utils';
+import { PAGE_KEYS } from './common/telegram.menu';
 
 @Injectable()
 export class TelegramService {
@@ -14,12 +16,24 @@ export class TelegramService {
 
   /**
    * Обрабатывает старт бота: создает пользователя и отправляет приветственное сообщение.
-   * @param ctx - Контекст Telegraf
+   * @param context - Контекст Telegraf
    */
-  public async startBot(ctx: Context): Promise<void> {
-    if (!('message' in ctx.update)) return;
+  public async startBot(context: Context): Promise<void> {
+    await this.processCheckUser(context);
 
-    const user = ctx.update.message.from;
+    await RenderPage(context, PAGE_KEYS.MAIN_PAGE);
+  }
+
+  public async renderPage(context: Context, page: string) {
+    const namePage = page.replace(/$/, '');
+
+    await RenderPage(context, namePage);
+  }
+
+  private async processCheckUser(context: Context) {
+    if (!('message' in context.update)) return;
+
+    const user = context.update.message.from;
     const { id } = user;
     // Сначала ищем, есть ли Telegram профиль
     const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
@@ -43,17 +57,17 @@ export class TelegramService {
 
   /**
    * Удаляет указанное сообщение по ID.
-   * @param ctx - Контекст Telegraf с сессией
+   * @param context - Контекст Telegraf с сессией
    * @param messageId - ID сообщения, которое необходимо удалить
    */
   private async deleteMessage(
-    ctx: Context,
+    context: Context,
     messageId: number,
   ): Promise<boolean> {
     if (!messageId) return false;
 
     try {
-      await ctx.deleteMessage(messageId);
+      await context.deleteMessage(messageId);
       this.logger.log(
         `[TelegramService.deleteMessage] - Удалено сообщение с ID: ${messageId}`,
       );
