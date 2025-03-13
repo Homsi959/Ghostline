@@ -3,7 +3,7 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'telegraf';
-import { buildInlineKeyboard } from 'code/common/utils';
+import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from './common/telegram.pages';
 
 @Injectable()
@@ -34,23 +34,26 @@ export class TelegramService {
    * @throws Ошибку, если контекст отсутствует.
    */
   public async renderPage(context: Context, page: string): Promise<void> {
-    const { message, keyboardConfig } = telegramPages[page];
+    const { message, keyboardConfig, goBackButton } = telegramPages[page];
+    let buttons = keyboardConfig
+      ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
+      : undefined;
 
     if (!context) {
       this.logger.error(`[TelegramService.renderPage] - Контекст отсутствует`);
       throw new Error('Контекст отсутствует');
     }
 
-    const options = keyboardConfig
-      ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
-      : undefined;
+    if (goBackButton) {
+      buttons = addGoBackButton(buttons);
+    }
 
     if (!context.callbackQuery) {
       // Отправляем новое сообщение, если метод вызван не через callback
-      await context.reply(message, options);
+      await context.reply(message, buttons);
     } else {
       // Изменяем существующее сообщение, если метод вызван через callback
-      await context.editMessageText(message, options);
+      await context.editMessageText(message, buttons);
     }
   }
 

@@ -12,6 +12,7 @@ type TTelegramPage = {
   message: string;
   // TODO добавить возомжность picture
   keyboardConfig?: TTelegramButtonConfig;
+  goBackButton?: boolean;
 };
 
 export type TTelegramPages = {

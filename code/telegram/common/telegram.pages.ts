@@ -72,6 +72,7 @@ const ACTIONS_KEYS = {
   ACTIVATE_FOR_7_DAYS: 'activateFor7Days',
   BUY_FOR_1_MONTH: 'buyFor1Month',
   BUY_FOR_6_MONTHS: 'buyFor6Months',
+  GO_BACK: 'goBack',
 } as const;
 
 /**
@@ -102,6 +103,10 @@ export const BUTTONS: Record<string, TTelegramButton> = {
     text: '6 месяцев - 800 рублей',
     action: ACTIONS_KEYS.BUY_FOR_6_MONTHS,
   },
+  GO_BACK: {
+    text: 'Назазд',
+    action: ACTIONS_KEYS.GO_BACK,
+  },
 };
 
 /**
@@ -124,9 +129,11 @@ export const telegramPages: TTelegramPages = {
   },
   [PAGE_KEYS.ABOUT_SERVICE_PAGE]: {
     message: MESSAGES.ABOUT_SERVICE_PAGE,
+    goBackButton: true,
   },
   [PAGE_KEYS.PURCHASE_OF_SUBSCRIPTION_PAGE]: {
     message: MESSAGES.PURCHASE_OF_SUBSCRIPTION_PAGE,
+    goBackButton: true,
     keyboardConfig: {
       buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
       columns: 1,

@@ -1,18 +1,51 @@
+import { BUTTONS } from 'code/telegram/common/telegram.pages';
+import { TTelegramButton } from 'code/telegram/common/telegram.types';
 import { Markup } from 'telegraf';
-import { TButtons } from './types';
+import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/types';
 
 /**
- * Конвертирует массив кнопок в Telegram клавиатуру
+ * Создаёт Telegram клавиатуру из массива кнопок с заданным количеством колонок.
  *
- * @param arr - Массив кнопок
- * @returns - Telegram клавиатура
+ * @param arr - Массив кнопок.
+ * @param columns - Количество колонок (по умолчанию 1).
+ * @returns - Telegram клавиатура.
  */
-export function buildInlineKeyboard(arr: TButtons[], columns: number = 1) {
-  const keyboard = arr.map(({ text, action }) =>
-    Markup.button.callback(text, action),
-  );
+export function buildInlineKeyboard(
+  arr: TTelegramButton[],
+  columns: number = 1,
+): Markup.Markup<InlineKeyboardMarkup> {
+  const keyboard = arr.reduce<InlineKeyboardButton[][]>((acc, item, index) => {
+    // Находим индекс текущей колонки, деля на количество колонок
+    const columnIndex = Math.floor(index / columns);
 
-  return Markup.inlineKeyboard(keyboard, {
-    columns,
-  });
+    // Если колонка еще не существует, создаем новый массив для нее
+    if (!acc[columnIndex]) {
+      acc[columnIndex] = [];
+    }
+
+    // Добавляем кнопку в соответствующую колонку
+    acc[columnIndex].push(Markup.button.callback(item.text, item.action));
+    return acc;
+  }, []);
+
+  return Markup.inlineKeyboard(keyboard);
+}
+
+/**
+ * Добавляет кнопку "Назад" в клавиатуру.
+ *
+ * @param keyboard - Существующая Telegram клавиатура (опционально).
+ * @returns - Новая клавиатура с добавленной кнопкой "Назад".
+ */
+export function addGoBackButton(
+  keyboard?: Markup.Markup<InlineKeyboardMarkup>,
+) {
+  // Если клавиатуры нет, создаем пустую
+  const keyboardArray = keyboard?.reply_markup.inline_keyboard || [];
+
+  keyboardArray.push([
+    Markup.button.callback(BUTTONS.GO_BACK.text, BUTTONS.GO_BACK.action),
+  ]);
+
+  return Markup.inlineKeyboard(keyboardArray);
 }
