@@ -8,6 +8,18 @@ import { TELEGRAM_TOKEN } from 'code/common/constants';
 import { session } from 'telegraf';
 import { TelegramModule } from 'code/telegram/telegram.module';
 
+/**
+ * Основной модуль приложения.
+ *
+ * Включает в себя все необходимые модули, такие как:
+ * - DatabaseModule: Для работы с базой данных.
+ * - WinstonModule: Для логирования с использованием Winston.
+ * - TelegramModule: Для работы с Telegram-ботом.
+ * - ConfigModule: Для работы с конфигурационными переменными.
+ * - TelegrafModule: Для работы с Telegram API с использованием Telegraf.
+ *
+ * @module AppModule
+ */
 @Module({
   imports: [
     DatabaseModule,
