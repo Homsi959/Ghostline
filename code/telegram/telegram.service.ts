@@ -24,7 +24,6 @@ export class TelegramService {
    */
   async startBot(context: Context): Promise<void> {
     await this.ensureUserExists(context);
-
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
@@ -93,7 +92,6 @@ export class TelegramService {
       }
     }
   }
-
   /**
    * Сохраняет историю страниц в сессии.
    *
@@ -101,10 +99,13 @@ export class TelegramService {
    * @param page - Страница для сохранения в истории.
    */
   private savePageHistory(context: Context, page: string) {
-    context.session ??= { pageHistory: [] }; // Если session = undefined, инициализируем его
-    context.session.pageHistory ??= []; // Если pageHistory = undefined, создаём массив
+    context.session ??= { pageHistory: [] }; // Инициализируем session, если его нет
+    const history = (context.session.pageHistory ??= []); // Инициализируем pageHistory, если его нет
+    const prevPage = history[history.length - 1];
 
-    context.session.pageHistory.push(page);
+    if (history.length === 0 || prevPage !== page) {
+      history.push(page);
+    }
   }
 
   /**
@@ -116,15 +117,17 @@ export class TelegramService {
   async goBackRender(context: Context) {
     const history = context.session.pageHistory;
 
-    if (history.length < 2) {
+    if (!Array.isArray(history) || history.length < 2) {
       this.logger.error(
         `[TelegramService.goBackRender] - История страниц пуста или содержит только одну страницу`,
       );
       return;
     }
 
-    const prevPage = history[history.length - 2];
+    const index = Math.max(0, history.length - 2);
+    const prevPage = history[index] ?? PAGE_KEYS.MAIN_PAGE;
 
+    history.pop();
     await this.renderPage(context, prevPage);
   }
 
