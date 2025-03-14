@@ -23,6 +23,9 @@ export class TelegramService {
    * @param context - Контекст Telegraf
    */
   async startBot(context: Context): Promise<void> {
+    this.logger.log(
+      `[TelegramService.startBot] - Бот запущен пользователем ${context.from?.id}`,
+    );
     await this.ensureUserExists(context);
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
@@ -54,9 +57,15 @@ export class TelegramService {
     if (!context.callbackQuery) {
       // Отправляем новое сообщение, если метод вызван не через callback
       await context.reply(message, buttons);
+      this.logger.log(
+        `[TelegramService.renderPage] - Отправлено новое сообщение со страницей: ${page}`,
+      );
     } else {
       // Изменяем существующее сообщение, если метод вызван через callback
       await context.editMessageText(message, buttons);
+      this.logger.log(
+        `[TelegramService.renderPage] - Отрисована страница: ${page}`,
+      );
     }
 
     this.savePageHistory(context, page);
@@ -105,6 +114,9 @@ export class TelegramService {
 
     if (history.length === 0 || prevPage !== page) {
       history.push(page);
+      this.logger.log(
+        `[TelegramService.savePageHistory] - Добавлена страница в историю: ${page}`,
+      );
     }
   }
 
