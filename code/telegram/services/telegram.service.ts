@@ -27,7 +27,7 @@ export class TelegramService {
    */
   async startBot(context: Context): Promise<void> {
     this.logger.log(
-      `[TelegramService.startBot] - Бот запущен пользователем ${context.from?.id}`,
+      `[TelegramService.startBot] - Бот запущен пользователем: ${context.from?.id}`,
     );
     await this.ensureUserExists(context);
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
