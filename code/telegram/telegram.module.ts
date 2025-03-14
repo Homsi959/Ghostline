@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TelegramBotController } from './telegram.controller';
-import { TelegramService } from './telegram.service';
+import { TelegramService } from './services/telegram.service';
+import { TelegramHistoryService } from './services/telegram.history.service';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -9,6 +10,6 @@ import { TelegramService } from './telegram.service';
  * Он включает контроллер и сервис для работы с запросами и взаимодействия с Telegram API.
  */
 @Module({
-  providers: [TelegramBotController, TelegramService],
+  providers: [TelegramBotController, TelegramService, TelegramHistoryService],
 })
 export class TelegramModule {}

@@ -3,8 +3,9 @@ import { UsersRepository } from 'code/database/repository/users.repository';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
 import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
-import { PAGE_KEYS, telegramPages } from './common/telegram.pages';
+import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { Context } from 'code/common/types';
+import { TelegramHistoryService } from './telegram.history.service';
 
 /**
  * Сервис для работы с Telegram-ботом.
@@ -16,6 +17,7 @@ export class TelegramService {
     private readonly usersRepo: UsersRepository,
     private readonly tgProfilesRepo: TelegramProfilesRepository,
     private readonly logger: WinstonService,
+    private readonly historyService: TelegramHistoryService,
   ) {}
 
   /**
@@ -68,7 +70,7 @@ export class TelegramService {
       );
     }
 
-    this.savePageHistory(context, page);
+    this.historyService.savePageHistory(context, page);
   }
 
   /**
@@ -101,21 +103,6 @@ export class TelegramService {
       }
     }
   }
-  /**
-   * Сохраняет историю страниц в сессии.
-   *
-   * @param context - Объект контекста, содержащий данные callback-запроса.
-   * @param page - Страница для сохранения в истории.
-   */
-  private savePageHistory(context: Context, page: string) {
-    context.session ??= { pageHistory: [] }; // Инициализируем session, если его нет
-    const history = (context.session.pageHistory ??= []); // Инициализируем pageHistory, если его нет
-    const prevPage = history[history.length - 1];
-
-    if (history.length === 0 || prevPage !== page) {
-      history.push(page);
-    }
-  }
 
   /**
    * Отображает предыдущую страницу из истории сессии.
@@ -124,19 +111,14 @@ export class TelegramService {
    * @param context - Объект контекста, содержащий данные callback-запроса.
    */
   async goBackRender(context: Context) {
-    const history = context.session.pageHistory;
-
-    if (!Array.isArray(history) || history.length < 2) {
+    const prevPage = this.historyService.getPreviousPage(context);
+    if (!prevPage) {
       this.logger.error(
-        `[TelegramService.goBackRender] - История страниц пуста или содержит только одну страницу`,
+        `[TelegramService.goBackRender] - История страниц пуста`,
       );
       return;
     }
 
-    const index = Math.max(0, history.length - 2);
-    const prevPage = history[index] ?? PAGE_KEYS.MAIN_PAGE;
-
-    history.pop();
     await this.renderPage(context, prevPage);
   }
 

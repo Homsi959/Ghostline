@@ -1,5 +1,5 @@
 import { Start, Update, Action } from 'nestjs-telegraf';
-import { TelegramService } from './telegram.service';
+import { TelegramService } from './services/telegram.service';
 import { WinstonService } from 'code/logger/winston.service';
 import { ACTIONS_KEYS } from './common/telegram.pages';
 import { Context } from 'code/common/types';
