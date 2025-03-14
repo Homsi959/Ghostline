@@ -114,9 +114,6 @@ export class TelegramService {
 
     if (history.length === 0 || prevPage !== page) {
       history.push(page);
-      this.logger.log(
-        `[TelegramService.savePageHistory] - Добавлена страница в историю: ${page}`,
-      );
     }
   }
 
