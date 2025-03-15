@@ -7,6 +7,8 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { TELEGRAM_TOKEN } from 'code/common/constants';
 import { session } from 'telegraf';
 import { TelegramModule } from 'code/telegram/telegram.module';
+import { ThreeXUIModule } from 'code/proxy-panel/threeXUI.module';
+import { HttpModule } from '@nestjs/axios';
 
 /**
  * Основной модуль приложения.
@@ -17,6 +19,8 @@ import { TelegramModule } from 'code/telegram/telegram.module';
  * - TelegramModule: Для работы с Telegram-ботом.
  * - ConfigModule: Для работы с конфигурационными переменными.
  * - TelegrafModule: Для работы с Telegram API с использованием Telegraf.
+ * - ThreeXUIModule: Для работы с прокси панелью 3X-UI.
+ * - HttpModule: Для работы с Axios.
  *
  * @module AppModule
  */
@@ -25,6 +29,8 @@ import { TelegramModule } from 'code/telegram/telegram.module';
     DatabaseModule,
     WinstonModule,
     TelegramModule,
+    ThreeXUIModule,
+    HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

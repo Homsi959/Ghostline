@@ -16,4 +16,4 @@ export const DATABASE_TOKEN = 'PG_CONNECTION';
 /**
  * Базовый URL для работы с прокси панелью
  */
-export const BASE_URL_3X_UI = 'https://jsonplaceholder.typicode.com';
+export const BASE_URL_3X_UI = 'BASE_URL_3X_UI';

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TelegramBotController } from './telegram.controller';
 import { TelegramService } from './services/telegram.service';
 import { TelegramHistoryService } from './services/telegram.history.service';
@@ -10,6 +11,7 @@ import { TelegramHistoryService } from './services/telegram.history.service';
  * Он включает контроллер и сервис для работы с запросами и взаимодействия с Telegram API.
  */
 @Module({
+  imports: [HttpModule],
   providers: [TelegramBotController, TelegramService, TelegramHistoryService],
 })
 export class TelegramModule {}
