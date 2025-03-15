@@ -17,3 +17,13 @@ export const DATABASE_TOKEN = 'PG_CONNECTION';
  * Базовый URL для работы с прокси панелью
  */
 export const BASE_URL_3X_UI = 'BASE_URL_3X_UI';
+
+/**
+ * Идентификатор для пользовательского интерфейса 3X.
+ */
+export const USER_3X_UI = 'USER_3X_UI';
+
+/**
+ * Идентификатор для пароля пользовательского интерфейса 3X.
+ */
+export const PASSWORD_3X_UI = 'PASSWORD_3X_UI';
