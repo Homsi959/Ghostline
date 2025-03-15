@@ -7,6 +7,17 @@ import { lastValueFrom } from 'rxjs';
 import { LoginResponse } from './threeXUI.types';
 import axios from 'axios';
 
+/**
+ * @description Сервис для взаимодействия с панелью 3x-ui, включая авторизацию и управление сессиями.
+ *
+ * @constructor
+ * @param {HttpService} httpService - Сервис для выполнения HTTP-запросов.
+ * @param {ConfigService} configService - Сервис для получения конфигурационных данных.
+ * @param {WinstonService} logger - Сервис для логирования.
+ *
+ * @method onModuleInit
+ * @description Метод, вызываемый при инициализации модуля. Выполняет авторизацию, если заданы учетные данные.
+ */
 @Injectable()
 export class ThreeXUIService implements OnModuleInit {
   /**
