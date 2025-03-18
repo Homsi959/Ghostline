@@ -83,24 +83,23 @@ export class TelegramService {
   private async ensureUserExists(context: Context): Promise<void> {
     if (!('message' in context.update)) return;
 
-    const user = context.update.message.from;
-    const { id } = user;
-
+    const telegramProfile = context.update.message.from;
+    const { id } = telegramProfile;
     // Проверяем, существует ли Telegram-профиль пользователя в БД
     const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
 
     // Если профиль отсутствует, создаём нового пользователя
     if (!telegramID) {
-      const userID = await this.usersRepo.createUser();
+      const user = await this.usersRepo.createUser();
 
       // Создаём Telegram-профиль только если удалось создать пользователя
-      if (userID) {
-        const telegramProfile = {
-          user_id: userID,
-          ...user,
+      if (user) {
+        const saveTelegramProfile = {
+          user_id: user.id,
+          ...telegramProfile,
         };
 
-        await this.tgProfilesRepo.createTelegramProfile(telegramProfile);
+        await this.tgProfilesRepo.createTelegramProfile(saveTelegramProfile);
       }
     }
   }

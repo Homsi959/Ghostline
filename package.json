@@ -9,7 +9,7 @@
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=production nest start",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "yarn typeorm migration:generate --dataSource src/data-source.ts",
+    "migration:generate": "yarn typeorm migration:generate src/migrations/InitialMigration --dataSource src/data-source.ts",
     "migration:run": "yarn typeorm migration:run --dataSource src/data-source.ts",
     "migration:revert": "yarn typeorm migration:revert --dataSource src/data-source.ts"
   },
@@ -29,6 +29,7 @@
     "rxjs": "^7.8.2",
     "telegraf": "^4.16.3",
     "typeorm": "^0.3.21",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {

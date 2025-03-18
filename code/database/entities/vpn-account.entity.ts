@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
@@ -25,6 +26,7 @@ export class VpnAccountEntity {
   @ManyToOne(() => UserEntity, (user) => user.vpnAccounts, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   /**

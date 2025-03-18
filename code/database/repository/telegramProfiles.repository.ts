@@ -20,18 +20,27 @@ export class TelegramProfilesRepository {
   ) {}
 
   /**
-   * Создает профиль Telegram.
-   * @param profileData - данные профиля.
-   * @returns сохранённый профиль.
+   * Создает профиль Telegram, используя QueryBuilder для возврата актуальных данных.
+   * @param profileData - данные профиля для вставки.
+   * @returns сохранённую сущность TelegramProfileEntity с заполненными значениями, установленными базой данных.
    */
   async createTelegramProfile(
     profileData: Partial<TelegramProfileEntity>,
   ): Promise<TelegramProfileEntity> {
-    const profile = this.telegramRepository.create(profileData);
-    const savedProfile = await this.telegramRepository.save(profile);
+    const insertResult = await this.telegramRepository
+      .createQueryBuilder()
+      .insert()
+      .into(TelegramProfileEntity)
+      .values(profileData)
+      .returning('*')
+      .execute();
+
+    const savedProfile = insertResult.generatedMaps[0] as TelegramProfileEntity;
+
     this.logger.log(
       `[TelegramProfilesRepository.createTelegramProfile] - Создан профиль с ID: ${savedProfile.telegramId}`,
     );
+
     return savedProfile;
   }
 

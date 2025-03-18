@@ -4,6 +4,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
@@ -19,19 +20,20 @@ export class TelegramProfileEntity {
   id: number;
 
   /**
+   * Идентификатор Telegram.
+   */
+  @Column({ type: 'bigint', unique: true, name: 'telegram_id' })
+  telegramId: number;
+
+  /**
    * Пользователь, к которому привязан профиль.
    * При удалении пользователя профиль удаляется (CASCADE).
    */
   @ManyToOne(() => UserEntity, (user) => user.telegramProfiles, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
-
-  /**
-   * Идентификатор Telegram.
-   */
-  @Column({ type: 'bigint', unique: true, name: 'telegram_id' })
-  telegramId: number;
 
   /**
    * Флаг, указывающий, является ли аккаунт ботом.

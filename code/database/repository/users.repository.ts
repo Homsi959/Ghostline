@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WinstonService } from 'code/logger/winston.service';
 import { UserEntity } from '../entities';
+import { v4 } from 'uuid';
 
 /**
  * Репозиторий пользователей.
@@ -24,11 +25,27 @@ export class UsersRepository {
    * @returns сохранённую сущность пользователя.
    */
   async createUser(): Promise<UserEntity> {
-    const newUser = this.userRepository.create();
-    const savedUser = await this.userRepository.save(newUser);
-    this.logger.log(
-      `[UsersRepository.createUser] - Создан новый пользователь c ID: ${savedUser.id}`,
-    );
-    return savedUser;
+    const values = { id: v4() };
+
+    try {
+      const insertResult = await this.userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(UserEntity)
+        .values(values)
+        .returning('*')
+        .execute();
+
+      this.logger.log(
+        `[UsersRepository.createUser] - создан пользователь с ID: ${values.id}`,
+      );
+
+      return insertResult.generatedMaps[0] as UserEntity;
+    } catch (error: any) {
+      throw new Error(
+        `[UsersRepository.createUser] - не удалось создать пользователя`,
+        error,
+      );
+    }
   }
 }

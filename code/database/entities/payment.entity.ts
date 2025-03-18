@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { PaymentStatus } from './entity.enum';
 import { UserEntity } from './user.entity';
@@ -24,6 +25,7 @@ export class PaymentEntity {
    * При удалении пользователя платеж удаляется (CASCADE).
    */
   @ManyToOne(() => UserEntity, (user) => user.payments, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   /**

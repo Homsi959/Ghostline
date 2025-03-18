@@ -18,7 +18,7 @@ export class UserEntity {
   /**
    * Дата создания пользователя.
    */
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   /**

@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { SubscriptionPlan, SubscriptionStatus } from './entity.enum';
@@ -26,6 +27,7 @@ export class SubscriptionEntity {
   @ManyToOne(() => UserEntity, (user) => user.subscriptions, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   /**
