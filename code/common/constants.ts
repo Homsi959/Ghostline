@@ -27,3 +27,13 @@ export const USER_3X_UI = 'USER_3X_UI';
  * Идентификатор для пароля пользовательского интерфейса 3X.
  */
 export const PASSWORD_3X_UI = 'PASSWORD_3X_UI';
+
+/**
+ * Режим разработки
+ */
+export const DEVELOPMENT = 'development';
+
+/**
+ * Режим производства
+ */
+export const PRODUCTION = 'production';
