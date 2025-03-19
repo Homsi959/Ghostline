@@ -8,6 +8,7 @@ import { TELEGRAM_TOKEN } from 'code/common/constants';
 import { session } from 'telegraf';
 import { TelegramModule } from 'code/telegram/telegram.module';
 import { HttpModule } from '@nestjs/axios';
+import { initializeTelegramSession } from 'code/telegram/common/telegram-session.middleware';
 
 /**
  * Основной модуль приложения.
@@ -44,7 +45,7 @@ import { HttpModule } from '@nestjs/axios';
 
         return {
           token,
-          middlewares: [session()],
+          middlewares: [session(), initializeTelegramSession],
         };
       },
     }),

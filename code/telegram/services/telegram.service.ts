@@ -71,7 +71,8 @@ export class TelegramService {
       );
     }
 
-    this.historyService.savePageHistory(context, page);
+    // Сохраняем отрисованную страницу
+    this.historyService.savePageHistory(context.session.pageHistory, page);
   }
 
   /**
