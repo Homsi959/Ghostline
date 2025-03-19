@@ -29,11 +29,12 @@ import { initializeTelegramSession } from 'code/telegram/common/telegram-session
     WinstonModule,
     TelegramModule,
     HttpModule,
+    // Загрузка конфигурации из переменных окружения
     ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true,
     }),
     TelegrafModule.forRootAsync({
-      imports: [ConfigModule, WinstonModule],
       inject: [ConfigService, WinstonService],
       useFactory: (configService: ConfigService, logger: WinstonService) => {
         const token = configService.get<string>(TELEGRAM_TOKEN);

@@ -18,11 +18,14 @@ import { WinstonService } from './logger/winston.service';
  * @throws {Error} Если сервер не удалось запустить.
  */
 async function bootstrap(): Promise<void> {
-  const nest = await NestFactory.create(AppModule);
+  const nest = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+  const logger = nest.get(WinstonService);
 
-  nest.useLogger(nest.get(WinstonService));
+  nest.useLogger(logger);
   const PORT = Number(process.env.PORT) || 4000;
-  console.log(
+  logger.log(
     `\x1b[36m\x1b[1m🚀🚀🚀 Сервер запущен на http://localhost:${PORT} 🚀🚀🚀\x1b[0m`,
   );
 

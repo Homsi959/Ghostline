@@ -1,5 +1,5 @@
 import { Module, Global } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelegramProfileEntity, UserEntity } from './entities';
 import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
@@ -16,14 +16,8 @@ import { DEVELOPMENT } from 'code/common/constants';
 @Global()
 @Module({
   imports: [
-    // Загрузка конфигурации из переменных окружения
-    ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true,
-    }),
     // Асинхронная настройка подключения к базе данных через TypeORM
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
