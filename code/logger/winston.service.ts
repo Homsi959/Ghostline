@@ -17,6 +17,10 @@ export class WinstonService implements LoggerService {
     this.logger = createLogger({
       level: this.config.get<string>(LOG_LEVEL_KEY),
       format: format.combine(
+        format((info) => {
+          if (info.level === 'info') info.level = 'log';
+          return info;
+        })(),
         format.colorize({ all: true }),
         format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
         format.printf(
