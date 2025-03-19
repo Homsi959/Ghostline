@@ -32,9 +32,7 @@ export class TelegramService {
   async startBot(context: Context): Promise<void> {
     const { from } = context;
 
-    this.logger.log(
-      `[TelegramService.startBot] - Бот запущен пользователем: ${context.from?.id}`,
-    );
+    this.logger.log(`Бот запущен пользователем: ${context.from?.id}`, this);
     if (from) {
       const telegramProfileDto = await toTelegramProfileDto(from);
       await this.ensureUserExists(telegramProfileDto);
@@ -58,7 +56,7 @@ export class TelegramService {
       : undefined;
 
     if (!context) {
-      this.logger.error(`[TelegramService.renderPage] - Контекст отсутствует`);
+      this.logger.error(`Контекст отсутствует`, this);
       throw new Error('Контекст отсутствует');
     }
 
@@ -69,15 +67,11 @@ export class TelegramService {
     if (!context.callbackQuery) {
       // Отправляем новое сообщение, если метод вызван не через callback
       await context.reply(message, buttons);
-      this.logger.log(
-        `[TelegramService.renderPage] - Отправлено новое сообщение со страницей: ${page}`,
-      );
+      this.logger.log(`Отправлено новое сообщение со страницей: ${page}`, this);
     } else {
       // Изменяем существующее сообщение, если метод вызван через callback
       await context.editMessageText(message, buttons);
-      this.logger.log(
-        `[TelegramService.renderPage] - Отрисована страница: ${page}`,
-      );
+      this.logger.log(`Отрисована страница: ${page}`, this);
     }
 
     // Сохраняем отрисованную страницу
@@ -123,9 +117,7 @@ export class TelegramService {
   async goBackRender(context: Context) {
     const prevPage = this.historyService.getPreviousPage(context);
     if (!prevPage) {
-      this.logger.error(
-        `[TelegramService.goBackRender] - История страниц пуста`,
-      );
+      this.logger.error(`История страниц пуста`, this);
       return;
     }
 
@@ -145,13 +137,12 @@ export class TelegramService {
 
     try {
       await context.deleteMessage(messageId);
-      this.logger.log(
-        `[TelegramService.deleteMessage] - Удалено сообщение с ID: ${messageId}`,
-      );
+      this.logger.log(`Удалено сообщение с ID: ${messageId}`, this);
       return true;
     } catch (error) {
       this.logger.error(
-        `[TelegramService.deleteMessage] - Не удалось удалить сообщение с ID: ${messageId}`,
+        `Не удалось удалить сообщение с ID: ${messageId}`,
+        this,
         error,
       );
       return false;

@@ -6,4 +6,5 @@ export type TMetaDataLogs = {
   timestamp: string; // Время, когда было записано сообщение
   level: string; // Уровень логирования (например, info, error, warn)
   message: string; // Содержание сообщения
+  context?: string; // Контекст где был вызван метод лога
 };

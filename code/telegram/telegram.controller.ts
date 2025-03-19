@@ -36,9 +36,7 @@ export class TelegramBotController {
   @Action(/^.*Page$/g)
   async renderPage(context: Context): Promise<void> {
     if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
-      this.logger.error(
-        `[TelegramBotController.renderPage] - Отсутствует data в callbackQuery`,
-      );
+      this.logger.error(`Отсутствует data в callbackQuery`, this);
       return;
     }
     const page = context.callbackQuery?.data;
@@ -55,9 +53,7 @@ export class TelegramBotController {
   @Action(ACTIONS_KEYS.GO_BACK)
   async goBackListener(context: Context) {
     if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
-      this.logger.error(
-        `[TelegramBotController.renderPage] - Отсутствует data в callbackQuery`,
-      );
+      this.logger.error(`Отсутствует data в callbackQuery`, this);
       return;
     }
 

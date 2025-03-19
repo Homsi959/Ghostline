@@ -36,16 +36,11 @@ export class UsersRepository {
         .returning('*')
         .execute();
 
-      this.logger.log(
-        `[UsersRepository.createUser] - Cоздан пользователь с ID: ${values.id}`,
-      );
+      this.logger.log(`Cоздан пользователь с ID: ${values.id}`, this);
 
       return insertResult.generatedMaps[0] as UserEntity;
     } catch (error: any) {
-      throw new Error(
-        `[UsersRepository.createUser] - не удалось создать пользователя`,
-        error,
-      );
+      throw new Error(`Не удалось создать пользователя`, error);
     }
   }
 }

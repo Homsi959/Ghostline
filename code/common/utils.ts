@@ -49,3 +49,19 @@ export function addGoBackButton(
 
   return Markup.inlineKeyboard(keyboardArray);
 }
+
+/**
+ * Возвращает название класса или переданную строку как контекст для логов.
+ *
+ * @param classInstanceOrString - экземпляр класса или строка контекста.
+ * @returns название класса или переданную строку.
+ */
+export function buildContext(
+  classInstanceOrString?: object | string,
+): string | undefined {
+  if (!classInstanceOrString) return undefined;
+
+  return typeof classInstanceOrString === 'string'
+    ? classInstanceOrString
+    : classInstanceOrString.constructor.name;
+}

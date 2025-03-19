@@ -3,6 +3,7 @@ import { createLogger, transports, format, Logger } from 'winston';
 import { TMetaDataLogs } from './winston.types';
 import { ConfigService } from '@nestjs/config';
 import { LOG_LEVEL_KEY } from 'code/common/constants';
+import { buildContext } from 'code/common/utils';
 
 /**
  * Сервис для работы с логированием с использованием библиотеки winston.
@@ -16,56 +17,40 @@ export class WinstonService implements LoggerService {
     this.logger = createLogger({
       level: this.config.get<string>(LOG_LEVEL_KEY),
       format: format.combine(
-        format.colorize({
-          all: true,
-        }),
+        format.colorize({ all: true }),
         format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
-        format.printf(({ timestamp, level, message }: TMetaDataLogs) => {
-          return `${timestamp} [${level}]: ${message}`;
-        }),
+        format.printf(
+          ({ timestamp, level, message, context }: TMetaDataLogs) => {
+            return `${timestamp} [${level}]${context ? ` [${context}]` : ''}: ${message}`;
+          },
+        ),
       ),
       transports: [new transports.Console()],
     });
   }
 
-  /**
-   * Логирует сообщение уровня "info".
-   * @param message - Сообщение для логирования.
-   */
-  log(message: string) {
-    this.logger.info(message);
+  log(message: string, classInstance?: object) {
+    const context = buildContext(classInstance);
+    this.logger.info(message, { context });
   }
 
-  /**
-   * Логирует сообщение уровня "error".
-   * @param message - Сообщение для логирования.
-   * @param trace - Стек вызовов для ошибки.
-   */
-  error(message: string, trace?: string) {
-    this.logger.error(message, trace && trace);
+  error(message: string, classInstance?: object, trace?: string) {
+    const context = buildContext(classInstance);
+    this.logger.error(message + (trace ? ` | ${trace}` : ''), { context });
   }
 
-  /**
-   * Логирует сообщение уровня "warn".
-   * @param message - Сообщение для логирования.
-   */
-  warn(message: string) {
-    this.logger.warn(message);
+  warn(message: string, classInstance?: object) {
+    const context = buildContext(classInstance);
+    this.logger.warn(message, { context });
   }
 
-  /**
-   * Логирует сообщение уровня "debug".
-   * @param message - Сообщение для логирования.
-   */
-  debug(message: string) {
-    this.logger.debug(message);
+  debug(message: string, classInstance?: object) {
+    const context = buildContext(classInstance);
+    this.logger.debug(message, { context });
   }
 
-  /**
-   * Логирует сообщение уровня "verbose".
-   * @param message - Сообщение для логирования.
-   */
-  verbose(message: string) {
-    this.logger.verbose(message);
+  verbose(message: string, classInstance?: object) {
+    const context = buildContext(classInstance);
+    this.logger.verbose(message, { context });
   }
 }

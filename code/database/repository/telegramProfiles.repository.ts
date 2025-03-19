@@ -38,9 +38,7 @@ export class TelegramProfilesRepository {
 
     const savedProfile = insertResult.generatedMaps[0] as TelegramProfileEntity;
 
-    this.logger.log(
-      `[TelegramProfilesRepository.createTelegramProfile] - Создан профиль с ID: ${savedProfile.telegramId}`,
-    );
+    this.logger.log(`Создан профиль с ID: ${savedProfile.telegramId}`, this);
 
     return savedProfile;
   }
@@ -58,9 +56,7 @@ export class TelegramProfilesRepository {
     });
 
     if (profile) {
-      this.logger.log(
-        `[TelegramProfilesRepository.getTelegramProfileById] - Найден профиль с ID: ${telegramId}`,
-      );
+      this.logger.log(`Найден профиль с ID: ${telegramId}`, this);
     }
 
     return profile || undefined;
