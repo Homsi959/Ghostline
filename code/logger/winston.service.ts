@@ -3,7 +3,7 @@ import { createLogger, transports, format, Logger } from 'winston';
 import { TMetaDataLogs } from './winston.types';
 import { ConfigService } from '@nestjs/config';
 import { LOG_LEVEL_KEY } from 'code/common/constants';
-import { buildContext } from 'code/common/utils';
+import { buildContext, levelFormatted } from 'code/common/utils';
 
 /**
  * Сервис для работы с логированием с использованием библиотеки winston.
@@ -17,18 +17,15 @@ export class WinstonService implements LoggerService {
     this.logger = createLogger({
       level: this.config.get<string>(LOG_LEVEL_KEY),
       format: format.combine(
-        format((info) => {
-          if (info.level === 'info') info.level = 'log';
-          return info;
-        })(),
         format.colorize({ all: true }),
         format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
         format.printf(
           ({ timestamp, level, message, context }: TMetaDataLogs) => {
-            return `${timestamp} [${level}]${context ? ` [${context}]` : ''}: ${message}`;
+            return `${timestamp} ${levelFormatted(level)}${context ? ` [${context}]` : ''}: ${message}`;
           },
         ),
       ),
+
       transports: [new transports.Console()],
     });
   }

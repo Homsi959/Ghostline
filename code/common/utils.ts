@@ -65,3 +65,15 @@ export function buildContext(
     ? classInstanceOrString
     : classInstanceOrString.constructor.name;
 }
+
+/**
+ * Форматирует уровень логирования для выравнивания и удаления цветовых escape-последовательностей.
+ *
+ * @param level - Уровень логирования (например, "info", "warn", "error").
+ * @returns Отформатированный уровень логирования в квадратных скобках, дополненный пробелами до 9 символов.
+ */
+export function levelFormatted(level: string): string {
+  const normalizedLevel = level.replace(/\u001b\[.*?m/g, '').toUpperCase(); // удаление escape-последовательностей
+  const formatedLevel = `[${normalizedLevel}]`;
+  return formatedLevel.padEnd(9);
+}

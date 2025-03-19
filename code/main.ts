@@ -21,11 +21,10 @@ async function bootstrap(): Promise<void> {
   const nest = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
-  const logger = nest.get(WinstonService);
 
-  nest.useLogger(logger);
+  nest.useLogger(nest.get(WinstonService));
   const PORT = Number(process.env.PORT) || 4000;
-  logger.log(
+  console.log(
     `\x1b[36m\x1b[1m🚀🚀🚀 Сервер запущен на http://localhost:${PORT} 🚀🚀🚀\x1b[0m`,
   );
 
