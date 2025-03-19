@@ -26,7 +26,7 @@ export class PaymentEntity {
    */
   @ManyToOne(() => UserEntity, (user) => user.payments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  userId: UserEntity['id'];
 
   /**
    * Сумма платежа.

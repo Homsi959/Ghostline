@@ -1,5 +1,5 @@
 import { BUTTONS } from 'code/telegram/common/telegram.pages';
-import { TTelegramButton } from 'code/telegram/common/telegram.types';
+import { TelegramButton } from 'code/telegram/common/telegram.types';
 import { Markup } from 'telegraf';
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/types';
 
@@ -11,7 +11,7 @@ import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/types';
  * @returns - Telegram клавиатура.
  */
 export function buildInlineKeyboard(
-  arr: TTelegramButton[],
+  arr: TelegramButton[],
   columns: number = 1,
 ): Markup.Markup<InlineKeyboardMarkup> {
   const keyboard = arr.reduce<InlineKeyboardButton[][]>((acc, item, index) => {

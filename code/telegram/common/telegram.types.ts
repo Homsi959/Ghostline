@@ -4,7 +4,7 @@ import { Context } from 'telegraf';
 /**
  * Тип для описания кнопок Telegram.
  */
-export type TTelegramButton = {
+export type TelegramButton = {
   text: string; // Текст на кнопке
   action: string; // Действие, которое будет выполнено при нажатии на кнопку
 };
@@ -12,31 +12,31 @@ export type TTelegramButton = {
 /**
  * Тип для конфигурации кнопок на странице Telegram.
  */
-type TTelegramButtonConfig = {
-  buttons: TTelegramButton[]; // Массив кнопок
+type TelegramButtonConfig = {
+  buttons: TelegramButton[]; // Массив кнопок
   columns?: number; // Количество колонок на клавиатуре
 };
 
 /**
  * Тип для описания страницы Telegram.
  */
-type TTelegramPage = {
+type TelegramPage = {
   message: string; // Сообщение, которое будет отображено на странице
-  keyboardConfig?: TTelegramButtonConfig; // Конфигурация клавиатуры с кнопками
+  keyboardConfig?: TelegramButtonConfig; // Конфигурация клавиатуры с кнопками
   goBackButton?: boolean; // Опциональная кнопка "Назад"
 };
 
 /**
  * Тип для всех страниц Telegram.
  */
-export type TTelegramPages = {
-  [key: string]: TTelegramPage; // Ключ — это уникальное название страницы, значение — описание страницы
+export type TelegramPages = {
+  [key: string]: TelegramPage; // Ключ — это уникальное название страницы, значение — описание страницы
 };
 
 /**
  * Методы для работы с сообщениями бота.
  */
-export type MinimalTelegramMethods = Pick<
+export type TelegramMessageContext = Pick<
   Context,
   'reply' | 'editMessageText' | 'callbackQuery'
 >;
@@ -51,7 +51,7 @@ export type TelegramSession = {
 /**
  * Контекст для работы с ботом, включающий методы, сессию и данные профиля.
  */
-export type MinimalTelegramContext = MinimalTelegramMethods & {
+export type TelegramUserContext = TelegramMessageContext & {
   session: TelegramSession;
   telegramProfile: CreateTelegramProfileDto;
 };

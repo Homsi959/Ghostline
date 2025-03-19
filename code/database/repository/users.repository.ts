@@ -37,7 +37,7 @@ export class UsersRepository {
         .execute();
 
       this.logger.log(
-        `[UsersRepository.createUser] - создан пользователь с ID: ${values.id}`,
+        `[UsersRepository.createUser] - Cоздан пользователь с ID: ${values.id}`,
       );
 
       return insertResult.generatedMaps[0] as UserEntity;

@@ -1,4 +1,4 @@
-import { TTelegramPages, TTelegramButton } from './telegram.types';
+import { TelegramPages, TelegramButton } from './telegram.types';
 
 /**
  * Константы для работы с телеграм-страницами, кнопками и действиями.
@@ -88,7 +88,7 @@ export const ACTIONS_KEYS = {
 /**
  * Кнопки для взаимодействия с пользователем
  */
-export const BUTTONS: Record<string, TTelegramButton> = {
+export const BUTTONS: Record<string, TelegramButton> = {
   SUBSCRIBING: {
     text: 'Попробовать бесплатно',
     action: PAGE_KEYS.SUBSCRIBING_PAGE,
@@ -122,7 +122,7 @@ export const BUTTONS: Record<string, TTelegramButton> = {
 /**
  * Структура страниц для рендера в Telegram, включая сообщения и кнопки
  */
-export const telegramPages: TTelegramPages = {
+export const telegramPages: TelegramPages = {
   [PAGE_KEYS.MAIN_PAGE]: {
     message: MESSAGES.MAIN_PAGE,
     keyboardConfig: {

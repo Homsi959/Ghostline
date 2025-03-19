@@ -5,8 +5,11 @@ import {
   IsDefined,
   MaxLength,
   IsOptional,
+  validate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { plainToClass, Type } from 'class-transformer';
+import { User } from 'telegraf/types';
+import { LoggerService } from '@nestjs/common';
 
 /**
  * DTO для создания Telegram-профиля.
@@ -29,42 +32,35 @@ export class CreateTelegramProfileDto {
   public readonly isBot: boolean;
 
   /**
-   * Первое имя пользователя.
-   */
-  @IsOptional()
-  @IsString({ message: 'firstName должен быть строкой' })
-  @MaxLength(100, { message: 'firstName не должен превышать 100 символов' })
-  public readonly firstName?: string;
-
-  /**
-   * Фамилия пользователя.
-   */
-  @IsOptional()
-  @IsString({ message: 'lastName должен быть строкой' })
-  @MaxLength(100, { message: 'lastName не должен превышать 100 символов' })
-  public readonly lastName?: string;
-
-  /**
    * Код языка пользователя.
    */
   @IsOptional()
   @IsString({ message: 'languageCode должен быть строкой' })
   @MaxLength(10, { message: 'languageCode не должен превышать 10 символов' })
   public readonly languageCode?: string;
+}
 
-  /**
-   * Флаг наличия подписки на премиум.
-   */
-  @IsDefined({ message: 'Флаг isPremium обязателен' })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'isPremium должен быть булевым значением' })
-  public readonly isPremium: boolean;
+/**
+ * Валидирует и трансформирует данные из Telegram в DTO.
+ */
+export async function toTelegramProfileDto(
+  from: User,
+  logger?: LoggerService,
+): Promise<CreateTelegramProfileDto> {
+  const dto = plainToClass(CreateTelegramProfileDto, {
+    telegramId: from.id,
+    isBot: from.is_bot,
+    languageCode: from.language_code,
+  });
 
-  /**
-   * Флаг, указывающий, добавлен ли профиль в меню вложений.
-   */
-  @IsDefined({ message: 'Флаг addedToAttachmentMenu обязателен' })
-  @Type(() => Boolean)
-  @IsBoolean({ message: 'addedToAttachmentMenu должен быть булевым значением' })
-  public readonly addedToAttachmentMenu: boolean;
+  const errors = await validate(dto);
+  if (errors.length > 0) {
+    logger?.error(
+      `[toTelegramProfileDto] - Ошибка валидации Telegram DTO`,
+      JSON.stringify(errors),
+    );
+    throw new Error(`Ошибка валидации данных Telegram-пользователя`);
+  }
+
+  return dto;
 }

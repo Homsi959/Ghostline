@@ -24,24 +24,24 @@ export class UserEntity {
   /**
    * Платежи пользователя.
    */
-  @OneToMany(() => PaymentEntity, (payment) => payment.user)
+  @OneToMany(() => PaymentEntity, (payment) => payment.userId)
   payments: PaymentEntity[];
 
   /**
    * Подписки пользователя.
    */
-  @OneToMany(() => SubscriptionEntity, (subscription) => subscription.user)
+  @OneToMany(() => SubscriptionEntity, (subscription) => subscription.userId)
   subscriptions: SubscriptionEntity[];
 
   /**
    * Профили Telegram, связанные с пользователем.
    */
-  @OneToMany(() => TelegramProfileEntity, (profile) => profile.user)
+  @OneToMany(() => TelegramProfileEntity, (profile) => profile.userId)
   telegramProfiles: TelegramProfileEntity[];
 
   /**
    * VPN-аккаунты пользователя.
    */
-  @OneToMany(() => VpnAccountEntity, (account) => account.user)
+  @OneToMany(() => VpnAccountEntity, (account) => account.userId)
   vpnAccounts: VpnAccountEntity[];
 }

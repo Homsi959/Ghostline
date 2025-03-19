@@ -6,6 +6,10 @@ import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { Context } from 'code/common/types';
 import { TelegramHistoryService } from './telegram.history.service';
+import {
+  CreateTelegramProfileDto,
+  toTelegramProfileDto,
+} from '../common/telegram.dto';
 
 /**
  * Сервис для работы с Telegram-ботом.
@@ -26,10 +30,15 @@ export class TelegramService {
    * @param context - Контекст Telegraf
    */
   async startBot(context: Context): Promise<void> {
+    const { from } = context;
+
     this.logger.log(
       `[TelegramService.startBot] - Бот запущен пользователем: ${context.from?.id}`,
     );
-    await this.ensureUserExists(context);
+    if (from) {
+      const telegramProfileDto = await toTelegramProfileDto(from);
+      await this.ensureUserExists(telegramProfileDto);
+    }
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
@@ -81,26 +90,26 @@ export class TelegramService {
    *
    * @param context - Контекст Telegraf, содержащий информацию о пользователе.
    */
-  private async ensureUserExists(context: Context): Promise<void> {
-    if (!('message' in context.update)) return;
-
-    const telegramProfile = context.update.message.from;
-    const { id } = telegramProfile;
+  private async ensureUserExists(
+    telegramProfile: CreateTelegramProfileDto,
+  ): Promise<void> {
+    const { telegramId } = telegramProfile;
     // Проверяем, существует ли Telegram-профиль пользователя в БД
-    const telegramID = await this.tgProfilesRepo.getTelegramProfileById(id);
+    const telegramIdFromDB =
+      await this.tgProfilesRepo.getTelegramProfileById(telegramId);
 
     // Если профиль отсутствует, создаём нового пользователя
-    if (!telegramID) {
+    if (!telegramIdFromDB) {
       const user = await this.usersRepo.createUser();
 
       // Создаём Telegram-профиль только если удалось создать пользователя
       if (user) {
-        const saveTelegramProfile = {
-          user_id: user.id,
+        const savedTelegramProfile = {
+          userId: user.id,
           ...telegramProfile,
         };
 
-        await this.tgProfilesRepo.createTelegramProfile(saveTelegramProfile);
+        await this.tgProfilesRepo.createTelegramProfile(savedTelegramProfile);
       }
     }
   }

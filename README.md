@@ -157,12 +157,7 @@ CREATE TABLE telegram_profiles (
     user_id             UUID REFERENCES users(id) ON DELETE CASCADE,
     telegram_id         BIGINT UNIQUE NOT NULL,
     is_bot              BOOLEAN,
-    first_name          VARCHAR(100),
-    last_name           VARCHAR(100),
-    username            VARCHAR(50),
     language_code       VARCHAR(10),
-    is_premium          BOOLEAN,
-    added_to_attachment_menu BOOLEAN,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```

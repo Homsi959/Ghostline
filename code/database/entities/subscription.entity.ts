@@ -28,7 +28,7 @@ export class SubscriptionEntity {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  userId: UserEntity['id'];
 
   /**
    * План подписки (например, trial, 1_month, 6_months).

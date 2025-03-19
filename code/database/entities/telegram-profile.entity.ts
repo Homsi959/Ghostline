@@ -21,7 +21,7 @@ export class TelegramProfileEntity {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  userId: UserEntity['id'];
 
   /**
    * Уникальный идентификатор профиля (автоинкремент).
@@ -42,40 +42,10 @@ export class TelegramProfileEntity {
   isBot: boolean;
 
   /**
-   * Первое имя пользователя.
-   */
-  @Column({ length: 100, nullable: true, name: 'first_name' })
-  firstName: string;
-
-  /**
-   * Фамилия пользователя.
-   */
-  @Column({ length: 100, nullable: true, name: 'last_name' })
-  lastName: string;
-
-  /**
-   * Имя пользователя в Telegram.
-   */
-  @Column({ length: 50, nullable: true })
-  username: string;
-
-  /**
    * Код языка пользователя.
    */
   @Column({ length: 10, nullable: true, name: 'language_code' })
   languageCode: string;
-
-  /**
-   * Флаг наличия подписки на премиум.
-   */
-  @Column({ type: 'boolean', nullable: true, name: 'is_premium' })
-  isPremium: boolean;
-
-  /**
-   * Флаг, указывающий, добавлен ли профиль в меню вложений.
-   */
-  @Column({ type: 'boolean', nullable: true, name: 'added_to_attachment_menu' })
-  addedToAttachmentMenu: boolean;
 
   /**
    * Дата создания профиля.

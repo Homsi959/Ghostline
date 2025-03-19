@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WinstonService } from 'code/logger/winston.service';
 import { TelegramProfileEntity } from '../entities';
+import { InsertTelegramProfileData } from './types';
 
 /**
  * Репозиторий профилей Telegram.
@@ -25,7 +26,7 @@ export class TelegramProfilesRepository {
    * @returns сохранённую сущность TelegramProfileEntity с заполненными значениями, установленными базой данных.
    */
   async createTelegramProfile(
-    profileData: Partial<TelegramProfileEntity>,
+    profileData: InsertTelegramProfileData,
   ): Promise<TelegramProfileEntity> {
     const insertResult = await this.telegramRepository
       .createQueryBuilder()
@@ -55,11 +56,13 @@ export class TelegramProfilesRepository {
     const profile = await this.telegramRepository.findOne({
       where: { telegramId },
     });
+
     if (profile) {
       this.logger.log(
         `[TelegramProfilesRepository.getTelegramProfileById] - Найден профиль с ID: ${telegramId}`,
       );
     }
+
     return profile || undefined;
   }
 }
