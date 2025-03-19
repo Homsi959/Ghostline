@@ -1,3 +1,6 @@
+import { CreateTelegramProfileDto } from './telegram.dto';
+import { Context } from 'telegraf';
+
 /**
  * Тип для описания кнопок Telegram.
  */
@@ -28,4 +31,27 @@ type TTelegramPage = {
  */
 export type TTelegramPages = {
   [key: string]: TTelegramPage; // Ключ — это уникальное название страницы, значение — описание страницы
+};
+
+/**
+ * Методы для работы с сообщениями бота.
+ */
+export type MinimalTelegramMethods = Pick<
+  Context,
+  'reply' | 'editMessageText' | 'callbackQuery'
+>;
+
+/**
+ * Сессия Telegram с историей отображаемых страниц.
+ */
+export type TelegramSession = {
+  pageHistory: string[];
+};
+
+/**
+ * Контекст для работы с ботом, включающий методы, сессию и данные профиля.
+ */
+export type MinimalTelegramContext = MinimalTelegramMethods & {
+  session: TelegramSession;
+  telegramProfile: CreateTelegramProfileDto;
 };

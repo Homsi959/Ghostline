@@ -46,18 +46,18 @@ export class TelegramProfilesRepository {
 
   /**
    * Ищет профиль по telegramId.
-   * @param telegramID - идентификатор Telegram.
+   * @param telegramId - идентификатор Telegram.
    * @returns найденный профиль или undefined.
    */
   async getTelegramProfileById(
-    telegramID: number,
+    telegramId: number,
   ): Promise<TelegramProfileEntity | undefined> {
     const profile = await this.telegramRepository.findOne({
-      where: { telegramId: telegramID },
+      where: { telegramId },
     });
     if (profile) {
       this.logger.log(
-        `[TelegramProfilesRepository.getTelegramProfileById] - Найден профиль с ID: ${telegramID}`,
+        `[TelegramProfilesRepository.getTelegramProfileById] - Найден профиль с ID: ${telegramId}`,
       );
     }
     return profile || undefined;

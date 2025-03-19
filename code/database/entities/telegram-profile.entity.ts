@@ -14,6 +14,16 @@ import { UserEntity } from './user.entity';
 @Entity({ name: 'telegram_profiles' })
 export class TelegramProfileEntity {
   /**
+   * Пользователь, к которому привязан профиль.
+   * При удалении пользователя профиль удаляется (CASCADE).
+   */
+  @ManyToOne(() => UserEntity, (user) => user.telegramProfiles, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
+
+  /**
    * Уникальный идентификатор профиля (автоинкремент).
    */
   @PrimaryGeneratedColumn()
@@ -24,16 +34,6 @@ export class TelegramProfileEntity {
    */
   @Column({ type: 'bigint', unique: true, name: 'telegram_id' })
   telegramId: number;
-
-  /**
-   * Пользователь, к которому привязан профиль.
-   * При удалении пользователя профиль удаляется (CASCADE).
-   */
-  @ManyToOne(() => UserEntity, (user) => user.telegramProfiles, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
 
   /**
    * Флаг, указывающий, является ли аккаунт ботом.
