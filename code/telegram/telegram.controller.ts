@@ -1,8 +1,8 @@
 import { Start, Update, Action } from 'nestjs-telegraf';
-import { TelegramService } from './services/telegram.service';
 import { WinstonService } from 'code/logger/winston.service';
-import { ACTIONS_KEYS } from './common/telegram.pages';
 import { Context } from 'code/common/types';
+import { ACTIONS_KEYS, PURCHASE_ACTIONS } from './common/telegram.actions';
+import { TelegramService, TelegramSubscribingService } from './services';
 
 /**
  * Контроллер для обработки событий в Telegram-боте.
@@ -13,6 +13,7 @@ import { Context } from 'code/common/types';
 export class TelegramBotController {
   constructor(
     private readonly telegramService: TelegramService,
+    private readonly subscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
   ) {}
 
@@ -51,12 +52,41 @@ export class TelegramBotController {
    * @param context - Контекст, содержащий callbackQuery.
    */
   @Action(ACTIONS_KEYS.GO_BACK)
-  async goBackListener(context: Context) {
+  async goBack(context: Context) {
     if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
       this.logger.error(`Отсутствует data в callbackQuery`, this);
       return;
     }
 
     await this.telegramService.goBackRender(context);
+  }
+
+  /**
+   * Обработчик действия "Назад".
+   * Проверяет наличие данных в callbackQuery и вызывает метод для отображения предыдущей страницы.
+   *
+   * @param context - Контекст, содержащий callbackQuery.
+   */
+  @Action(PURCHASE_ACTIONS)
+  async handlePurchase(context: Context) {
+    const callback = context.callbackQuery;
+
+    if (!(callback && 'data' in callback)) {
+      this.logger.error(`Отсутствует data в callbackQuery`, this);
+      return;
+    }
+
+    switch (callback.data) {
+      case ACTIONS_KEYS.ACTIVATE_TRIAL:
+        await this.subscribingService.activateTrial();
+        break;
+      // case ACTIONS_KEYS.BUY_FOR_1_MONTH:
+      //   break;
+      // case ACTIONS_KEYS.BUY_FOR_6_MONTHS:
+      //   break;
+
+      default:
+        break;
+    }
   }
 }

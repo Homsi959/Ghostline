@@ -123,29 +123,4 @@ export class TelegramService {
 
     await this.renderPage(context, prevPage);
   }
-
-  /**
-   * Удаляет указанное сообщение по ID.
-   * @param context - Контекст Telegraf с сессией
-   * @param messageId - ID сообщения, которое необходимо удалить
-   */
-  private async deleteMessage(
-    context: Context,
-    messageId: number,
-  ): Promise<boolean> {
-    if (!messageId) return false;
-
-    try {
-      await context.deleteMessage(messageId);
-      this.logger.log(`Удалено сообщение с ID: ${messageId}`, this);
-      return true;
-    } catch (error) {
-      this.logger.error(
-        `Не удалось удалить сообщение с ID: ${messageId}`,
-        this,
-        error,
-      );
-      return false;
-    }
-  }
 }

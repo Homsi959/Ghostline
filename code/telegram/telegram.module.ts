@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TelegramBotController } from './telegram.controller';
-import { TelegramService } from './services/telegram.service';
-import { TelegramHistoryService } from './services/telegram.history.service';
+import {
+  TelegramHistoryService,
+  TelegramService,
+  TelegramSubscribingService,
+} from './services';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -12,6 +15,11 @@ import { TelegramHistoryService } from './services/telegram.history.service';
  */
 @Module({
   imports: [HttpModule],
-  providers: [TelegramBotController, TelegramService, TelegramHistoryService],
+  providers: [
+    TelegramBotController,
+    TelegramService,
+    TelegramHistoryService,
+    TelegramSubscribingService,
+  ],
 })
 export class TelegramModule {}

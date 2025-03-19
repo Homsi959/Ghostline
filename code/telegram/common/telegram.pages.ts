@@ -1,5 +1,5 @@
 import { TelegramPages, TelegramButton } from './telegram.types';
-
+import { ACTIONS_KEYS } from './telegram.actions';
 /**
  * Константы для работы с телеграм-страницами, кнопками и действиями.
  */
@@ -76,16 +76,6 @@ const MESSAGES = {
 };
 
 /**
- * Названия событий
- */
-export const ACTIONS_KEYS = {
-  ACTIVATE_FOR_7_DAYS: 'activateFor7Days', // Активировать на 7 дней
-  BUY_FOR_1_MONTH: 'buyFor1Month', // Купить на 1 месяц
-  BUY_FOR_6_MONTHS: 'buyFor6Months', // Купить на 6 месяцев
-  GO_BACK: 'goBack', // Назад
-} as const;
-
-/**
  * Кнопки для взаимодействия с пользователем
  */
 export const BUTTONS: Record<string, TelegramButton> = {
@@ -97,9 +87,9 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: 'О сервисе',
     action: PAGE_KEYS.ABOUT_SERVICE_PAGE,
   },
-  ACTIVATE_FOR_7_DAYS: {
+  ACTIVATE_TRIAL: {
     text: 'Активировать бесплатно на 7 дней',
-    action: ACTIONS_KEYS.ACTIVATE_FOR_7_DAYS,
+    action: ACTIONS_KEYS.ACTIVATE_TRIAL,
   },
   BUY_SUBSCRIPTION: {
     text: 'Купить подписку',
@@ -134,7 +124,7 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.SUBSCRIBING_PAGE,
     goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.ACTIVATE_FOR_7_DAYS, BUTTONS.BUY_SUBSCRIPTION],
+      buttons: [BUTTONS.ACTIVATE_TRIAL, BUTTONS.BUY_SUBSCRIPTION],
       columns: 2,
     },
   },
