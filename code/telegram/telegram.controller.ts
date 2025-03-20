@@ -1,7 +1,11 @@
 import { Start, Update, Action } from 'nestjs-telegraf';
 import { WinstonService } from 'code/logger/winston.service';
 import { Context } from 'code/common/types';
-import { ACTIONS_KEYS, PURCHASE_ACTIONS } from './common/telegram.actions';
+import {
+  ACTIONS_KEYS,
+  ACTIONS_TO_SUBSCRIPTION,
+  PURCHASE_ACTIONS,
+} from './common/telegram.actions';
 import { TelegramService, TelegramSubscribingService } from './services';
 
 /**
@@ -62,10 +66,9 @@ export class TelegramBotController {
   }
 
   /**
-   * Обработчик действия "Назад".
-   * Проверяет наличие данных в callbackQuery и вызывает метод для отображения предыдущей страницы.
+   * Обрабатывает покупку подписки из Telegram-кнопок.
    *
-   * @param context - Контекст, содержащий callbackQuery.
+   * @param context - Контекст Telegram.
    */
   @Action(PURCHASE_ACTIONS)
   async handlePurchase(context: Context) {
@@ -76,17 +79,17 @@ export class TelegramBotController {
       return;
     }
 
-    switch (callback.data) {
-      case ACTIONS_KEYS.ACTIVATE_TRIAL:
-        await this.subscribingService.activateTrial();
-        break;
-      // case ACTIONS_KEYS.BUY_FOR_1_MONTH:
-      //   break;
-      // case ACTIONS_KEYS.BUY_FOR_6_MONTHS:
-      //   break;
+    const { id: userId, data } = callback;
+    const plan = ACTIONS_TO_SUBSCRIPTION[data];
 
-      default:
-        break;
+    if (!plan) {
+      this.logger.error(`Некорректный action: ${data}`);
+      return;
     }
+
+    await this.subscribingService.processPurchase({
+      userId,
+      plan,
+    });
   }
 }
