@@ -1,31 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { ActivateSubscribing } from './types';
 import { SubscriptionPlan } from 'code/database/entities/entity.enum';
+import { SubscriptionRepository } from 'code/database/repository/subscription.repository';
+import { ActivateSubscription } from './types';
 
 @Injectable()
 export class TelegramSubscribingService {
-  constructor(private readonly logger: WinstonService) {}
+  constructor(
+    private readonly logger: WinstonService,
+    private readonly subscribingRepo: SubscriptionRepository,
+  ) {}
 
-  async processPurchase({ userId, plan }: ActivateSubscribing) {
+  async processPurchase({ userId, plan }: ActivateSubscription) {
+    const userSubscription =
+      await this.subscribingRepo.findAcitveSubscriptionById(userId);
+
+    if (userSubscription) {
+      // подписка существует
+      // предложить вывести существующий ключ
+      return;
+    }
+
     switch (plan) {
       case SubscriptionPlan.TRIAL:
-        // Логика для пробной подписки
         break;
 
       case SubscriptionPlan.ONE_MONTH:
-        // Логика для подписки на 1 месяц
         break;
 
       case SubscriptionPlan.SIX_MONTHS:
-        // Логика для подписки на 6 месяцев
         break;
 
       default:
         this.logger.error(`Неизвестный план подписки: ${String(plan)}`, this);
         return;
     }
-
-    // Общая логика после определения плана
   }
 }

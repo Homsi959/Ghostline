@@ -83,7 +83,7 @@ export class TelegramBotController {
     const plan = ACTIONS_TO_SUBSCRIPTION[data];
 
     if (!plan) {
-      this.logger.error(`Некорректный action: ${data}`);
+      this.logger.error(`Некорректный action: ${data}`, this);
       return;
     }
 

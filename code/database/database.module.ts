@@ -1,10 +1,17 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TelegramProfileEntity, UserEntity } from './entities';
+import {
+  PaymentEntity,
+  SubscriptionEntity,
+  TelegramProfileEntity,
+  UserEntity,
+  VpnAccountEntity,
+} from './entities';
 import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
 import { UsersRepository } from './repository/users.repository';
 import { DEVELOPMENT } from 'code/common/constants';
+import { SubscriptionRepository } from './repository/subscription.repository';
 
 /**
  * Глобальный модуль базы данных.
@@ -37,10 +44,25 @@ import { DEVELOPMENT } from 'code/common/constants';
       }),
     }),
     // Регистрация сущностей для использования репозиториев TypeORM
-    TypeOrmModule.forFeature([UserEntity, TelegramProfileEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      TelegramProfileEntity,
+      PaymentEntity,
+      SubscriptionEntity,
+      VpnAccountEntity,
+    ]),
   ],
   // Провайдеры, которые будут доступны глобально для работы с базой данных
-  providers: [TelegramProfilesRepository, UsersRepository],
-  exports: [TypeOrmModule, TelegramProfilesRepository, UsersRepository],
+  providers: [
+    TelegramProfilesRepository,
+    UsersRepository,
+    SubscriptionRepository,
+  ],
+  exports: [
+    TypeOrmModule,
+    TelegramProfilesRepository,
+    UsersRepository,
+    SubscriptionRepository,
+  ],
 })
 export class DatabaseModule {}

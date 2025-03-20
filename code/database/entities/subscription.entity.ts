@@ -39,13 +39,13 @@ export class SubscriptionEntity {
   /**
    * Дата начала подписки.
    */
-  @Column({ type: 'timestamp', name: 'start_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'start_date', nullable: false })
   startDate: Date;
 
   /**
    * Дата окончания подписки.
    */
-  @Column({ type: 'timestamp', name: 'end_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'end_date', nullable: false })
   endDate: Date;
 
   /**

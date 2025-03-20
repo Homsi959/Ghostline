@@ -10,8 +10,8 @@ import { ACTIONS_KEYS } from './telegram.actions';
 export const PAGE_KEYS = {
   MAIN_PAGE: 'mainPage', // Главная страница
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
-  SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
-  PURCHASE_OF_SUBSCRIPTION_PAGE: 'purchaseOfSubscriptionPage', // Страница покупки подписки
+  SUBSCRIBING_PAGE: 'SubscribingPage', // Страница подписки
+  PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
 } as const;
 
 /**
@@ -93,7 +93,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
   },
   BUY_SUBSCRIPTION: {
     text: 'Купить подписку',
-    action: PAGE_KEYS.PURCHASE_OF_SUBSCRIPTION_PAGE,
+    action: PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE,
   },
   BUY_FOR_1_MONTH: {
     text: '1 месяц - 150 рублей',
@@ -132,7 +132,7 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.ABOUT_SERVICE_PAGE,
     goBackButton: true,
   },
-  [PAGE_KEYS.PURCHASE_OF_SUBSCRIPTION_PAGE]: {
+  [PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE]: {
     message: MESSAGES.PURCHASE_OF_SUBSCRIPTION_PAGE,
     goBackButton: true,
     keyboardConfig: {

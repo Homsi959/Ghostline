@@ -1,6 +1,6 @@
 import { SubscriptionPlan } from 'code/database/entities/entity.enum';
 
-export interface ActivateSubscribing {
+export interface ActivateSubscription {
   userId: string;
   plan: SubscriptionPlan;
 }
