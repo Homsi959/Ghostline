@@ -1,56 +1,23 @@
-import { SubscriptionPlan } from '../common/enum';
+import { SubscriptionPlan, SubscriptionStatus } from './enums';
 
 /**
- * Интерфейс для данных, используемых при вставке профиля Telegram в базу данных.
+ * Активная подписка из БД
  */
-export interface InsertTelegramProfileData {
-  /**
-   * Уникальный идентификатор пользователя в системе.
-   */
-  userId: string;
-
-  /**
-   * Уникальный идентификатор Telegram пользователя.
-   */
-  telegramId: number;
-
-  /**
-   * Флаг, указывающий, является ли пользователь ботом (необязательное поле).
-   */
-  isBot?: boolean;
-
-  /**
-   * Код языка пользователя в Telegram (необязательное поле).
-   */
-  languageCode?: string;
-}
-
-/**
- * Существующая пользователься подписка
- */
-export interface UserSubscription {
+export interface ActiveSubscription {
+  status: SubscriptionStatus.ACTIVE;
   userId: string;
   plan: SubscriptionPlan;
-  startDate: Date;
+  startDate;
   endDate: Date;
   createdAt: Date;
 }
 
 /**
- * Интерфейс данных для создания подписки.
+ * Созданый телеграм профиль
  */
-export interface SubscriptionData {
-  userId: string; // ID пользователя
-  plan: SubscriptionPlan; // Тип подписки
-  startDate: Date; // Начало подписки
-  endDate: Date; // Окончание подписки
-}
-
-export interface TelegramProfileDto {
-  id: number;
+export interface SavedTelegramProfile {
   telegramId: number;
   isBot: boolean;
   languageCode: string;
-  createdAt: Date;
   userId: string;
 }

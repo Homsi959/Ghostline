@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { SubscriptionPlan } from 'code/database/common/enum';
+import { SubscriptionPlan } from 'code/database/dao/enums';
 import { ActivateSubscription } from './types';
 import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 

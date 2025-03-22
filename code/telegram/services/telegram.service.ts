@@ -108,7 +108,7 @@ export class TelegramService {
           ...telegramProfile,
         };
 
-        await this.tgProfilesRepo.createTelegramProfile(savedTelegramProfile);
+        await this.tgProfilesRepo.saveTelegramProfile(savedTelegramProfile);
       }
     }
   }
