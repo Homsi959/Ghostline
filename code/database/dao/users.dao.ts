@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
  * Репозиторий пользователей.
  */
 @Injectable()
-export class UsersRepository {
+export class UsersDao {
   /**
    * @param userRepository - репозиторий UserEntity.
    * @param logger - сервис логирования.

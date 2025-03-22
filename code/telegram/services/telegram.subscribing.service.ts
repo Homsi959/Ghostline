@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { SubscriptionPlan } from 'code/database/common/enum';
-import { SubscriptionRepository } from 'code/database/repository/subscription.repository';
 import { ActivateSubscription } from './types';
-import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
+import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 
 @Injectable()
 export class TelegramSubscribingService {
   constructor(
     private readonly logger: WinstonService,
-    private readonly subscriptionRepository: SubscriptionRepository,
-    private readonly telegramProfilesRepository: TelegramProfilesRepository,
+    private readonly SubscriptionDao: SubscriptionDao,
+    private readonly TelegramProfilesDao: TelegramProfilesDao,
   ) {}
 
   async processPurchase({ telegramId, plan }: ActivateSubscription) {
     const telegramProfile =
-      await this.telegramProfilesRepository.getTelegramProfileById(telegramId);
+      await this.TelegramProfilesDao.getTelegramProfileById(telegramId);
 
     if (!telegramProfile) {
       this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`);
@@ -24,7 +23,7 @@ export class TelegramSubscribingService {
 
     const userId = telegramProfile.userId;
     const userSubscription =
-      await this.subscriptionRepository.findActiveSubscriptionById(userId);
+      await this.SubscriptionDao.findActiveSubscriptionById(userId);
 
     if (userSubscription) {
       this.logger.log(

@@ -5,7 +5,7 @@ import { WinstonService } from 'code/logger/winston.service';
  * Репозиторий подписок.
  */
 @Injectable()
-export class SubscriptionRepository {
+export class SubscriptionDao {
   /**
    * @param logger - сервис логирования.
    */

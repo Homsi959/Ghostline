@@ -1,7 +1,12 @@
 import { Module, Global } from '@nestjs/common';
-import { UsersRepository } from './repository/users.repository';
-import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
-import { SubscriptionRepository } from './repository/subscription.repository';
+import { DATABASE_TOKEN } from 'code/common/constants';
+import { ConfigService } from '@nestjs/config';
+import { Pool } from 'pg';
+import {
+  SubscriptionDao,
+  TelegramProfilesDao,
+  UsersDao,
+} from 'code/database/dao';
 
 /**
  * Глобальный модуль базы данных.
@@ -13,14 +18,23 @@ import { SubscriptionRepository } from './repository/subscription.repository';
 @Global()
 @Module({
   providers: [
-    UsersRepository,
-    TelegramProfilesRepository,
-    SubscriptionRepository,
+    {
+      provide: DATABASE_TOKEN,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return new Pool({
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          user: config.get<string>('DB_USER'),
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+        });
+      },
+    },
+    UsersDao,
+    TelegramProfilesDao,
+    SubscriptionDao,
   ],
-  exports: [
-    UsersRepository,
-    TelegramProfilesRepository,
-    SubscriptionRepository,
-  ],
+  exports: [UsersDao, TelegramProfilesDao, SubscriptionDao, DATABASE_TOKEN],
 })
 export class DatabaseModule {}

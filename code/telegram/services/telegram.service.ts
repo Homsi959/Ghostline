@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from 'code/database/repository/users.repository';
-import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
+import { UsersDao } from 'code/database/dao/users.dao';
+
 import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { TelegramHistoryService } from './telegram.history.service';
 import { Context } from '../common/telegram.types';
+import { TelegramProfilesDao } from 'code/database/dao';
 
 /**
  * Сервис для работы с Telegram-ботом.
@@ -15,8 +16,8 @@ import { Context } from '../common/telegram.types';
 @Injectable()
 export class TelegramService {
   constructor(
-    private readonly usersRepo: UsersRepository,
-    private readonly tgProfilesRepo: TelegramProfilesRepository,
+    private readonly usersRepo: UsersDao,
+    private readonly tgProfilesRepo: TelegramProfilesDao,
     private readonly logger: WinstonService,
     private readonly historyService: TelegramHistoryService,
   ) {}

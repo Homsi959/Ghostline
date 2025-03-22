@@ -6,7 +6,7 @@ import { InsertTelegramProfileData } from './types';
  * Репозиторий профилей Telegram.
  */
 @Injectable()
-export class TelegramProfilesRepository {
+export class TelegramProfilesDao {
   /**
    * @param telegramRepository - репозиторий TelegramProfileEntity.
    * @param logger - сервис логирования.
