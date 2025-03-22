@@ -6,6 +6,7 @@ import {
   TelegramService,
   TelegramSubscribingService,
 } from './services';
+import { DatabaseModule } from 'code/database/database.module';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -14,7 +15,7 @@ import {
  * Он включает контроллер и сервис для работы с запросами и взаимодействия с Telegram API.
  */
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, DatabaseModule],
   providers: [
     TelegramBotController,
     TelegramService,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { InsertTelegramProfileData, TelegramProfileDto } from './types';
+import { InsertTelegramProfileData } from './types';
 
 /**
  * Репозиторий профилей Telegram.

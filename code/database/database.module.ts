@@ -1,4 +1,7 @@
 import { Module, Global } from '@nestjs/common';
+import { UsersRepository } from './repository/users.repository';
+import { TelegramProfilesRepository } from './repository/telegramProfiles.repository';
+import { SubscriptionRepository } from './repository/subscription.repository';
 
 /**
  * Глобальный модуль базы данных.
@@ -8,5 +11,16 @@ import { Module, Global } from '@nestjs/common';
  * Он также предоставляет репозитории для работы с сущностями.
  */
 @Global()
-@Module({})
+@Module({
+  providers: [
+    UsersRepository,
+    TelegramProfilesRepository,
+    SubscriptionRepository,
+  ],
+  exports: [
+    UsersRepository,
+    TelegramProfilesRepository,
+    SubscriptionRepository,
+  ],
+})
 export class DatabaseModule {}

@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { SubscriptionData, UserSubscription } from './types';
-import { SubscriptionStatus } from '../common/enum';
 
 /**
  * Репозиторий подписок.
