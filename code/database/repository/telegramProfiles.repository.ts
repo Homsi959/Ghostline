@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WinstonService } from 'code/logger/winston.service';
 import { TelegramProfileEntity } from '../entities';
-import { InsertTelegramProfileData } from './types';
+import { InsertTelegramProfileData, TelegramProfileDto } from './types';
 
 /**
  * Репозиторий профилей Telegram.
@@ -32,7 +32,10 @@ export class TelegramProfilesRepository {
       .createQueryBuilder()
       .insert()
       .into(TelegramProfileEntity)
-      .values(profileData)
+      .values({
+        ...profileData,
+        userId: { id: profileData.userId },
+      })
       .returning('*')
       .execute();
 
@@ -50,15 +53,31 @@ export class TelegramProfilesRepository {
    */
   async getTelegramProfileById(
     telegramId: number,
-  ): Promise<TelegramProfileEntity | undefined> {
-    const profile = await this.telegramRepository.findOne({
-      where: { telegramId },
-    });
+  ): Promise<TelegramProfileDto | null> {
+    const profileWithUserEntity = await this.telegramRepository
+      .createQueryBuilder('profile')
+      .leftJoin('profile.userId', 'user')
+      .select([
+        'profile.id',
+        'profile.telegramId',
+        'profile.isBot',
+        'profile.languageCode',
+        'profile.createdAt',
+        'user.id',
+      ])
+      .where('profile.telegramId = :telegramId', { telegramId })
+      .getOne();
 
-    if (profile) {
+    if (profileWithUserEntity) {
       this.logger.log(`Найден профиль с ID: ${telegramId}`, this);
+      const profileWithoutUserEntity = {
+        ...profileWithUserEntity,
+        userId: profileWithUserEntity?.userId.id,
+      };
+      return profileWithoutUserEntity;
+    } else {
+      this.logger.warn(`Не найден профиль с ID: ${telegramId}`, this);
+      return null;
     }
-
-    return profile || undefined;
   }
 }

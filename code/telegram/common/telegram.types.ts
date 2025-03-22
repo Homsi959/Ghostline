@@ -1,5 +1,5 @@
+import { Context as TelegrafContext } from 'telegraf';
 import { CreateTelegramProfileDto } from './telegram.dto';
-import { Context } from 'telegraf';
 
 /**
  * Тип для описания кнопок Telegram.
@@ -46,12 +46,12 @@ export type TelegramMessageContext = Pick<
  */
 export type TelegramSession = {
   pageHistory: string[];
+  from: CreateTelegramProfileDto;
 };
 
 /**
- * Контекст для работы с ботом, включающий методы, сессию и данные профиля.
+ * Расширенный интерфейс контекста Telegraf, добавляющий типизацию для сессии пользователя.
  */
-export type TelegramUserContext = TelegramMessageContext & {
+export interface Context extends TelegrafContext {
   session: TelegramSession;
-  telegramProfile: CreateTelegramProfileDto;
-};
+}

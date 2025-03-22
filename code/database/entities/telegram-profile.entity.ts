@@ -21,7 +21,7 @@ export class TelegramProfileEntity {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  userId: UserEntity['id'];
+  userId: UserEntity;
 
   /**
    * Уникальный идентификатор профиля (автоинкремент).

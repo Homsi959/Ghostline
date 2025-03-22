@@ -4,12 +4,12 @@ import { TelegramProfilesRepository } from 'code/database/repository/telegramPro
 import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
-import { Context } from 'code/common/types';
 import { TelegramHistoryService } from './telegram.history.service';
 import {
   CreateTelegramProfileDto,
   toTelegramProfileDto,
 } from '../common/telegram.dto';
+import { Context } from '../common/telegram.types';
 
 /**
  * Сервис для работы с Telegram-ботом.
@@ -32,9 +32,19 @@ export class TelegramService {
   async startBot(context: Context): Promise<void> {
     const { from } = context;
 
-    this.logger.log(`Бот запущен пользователем: ${context.from?.id}`, this);
+    this.logger.log(
+      `Бот запущен пользователем Telegram-профиля с ID: ${context.from?.id}`,
+      this,
+    );
     if (from) {
       const telegramProfileDto = await toTelegramProfileDto(from);
+
+      context.session.from = {
+        isBot: from.is_bot,
+        telegramId: from.id,
+        languageCode: from.language_code,
+      };
+
       await this.ensureUserExists(telegramProfileDto);
     }
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);

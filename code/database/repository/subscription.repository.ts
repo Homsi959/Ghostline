@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { SubscriptionEntity } from '../entities';
-import { UserSubscription } from './types';
+import { SubscriptionData, UserSubscription } from './types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionStatus } from '../entities/entity.enum';
@@ -17,27 +17,58 @@ export class SubscriptionRepository {
   constructor(
     private readonly logger: WinstonService,
     @InjectRepository(SubscriptionEntity)
-    private readonly SubscriptionRepo: Repository<SubscriptionEntity>,
+    private readonly subscriptionRepository: Repository<SubscriptionEntity>,
   ) {}
 
-  async findAcitveSubscriptionById(
+  async findActiveSubscriptionById(
     userId: string,
   ): Promise<UserSubscription | null> {
     try {
-      const Subscription = await this.SubscriptionRepo.findOne({
-        where: { userId, status: SubscriptionStatus.ACTIVE },
+      const subscription = await this.subscriptionRepository.findOne({
+        where: {
+          userId: { id: userId }, // 👈 передаём объект
+          status: SubscriptionStatus.ACTIVE,
+        },
       });
 
-      if (Subscription) {
+      if (subscription) {
         this.logger.log(`Найдена активная подписка пользователя ID: ${userId}`);
-        return Subscription;
+        return {
+          ...subscription,
+          userId: subscription.userId.id,
+        } as UserSubscription;
       } else {
         return null;
       }
     } catch (error: any) {
-      throw new Error(`Не удалось создать пользователя`, error);
+      this.logger.error(`Не удалось создать пользователя`, this, error);
+      return null;
     }
   }
 
-  async addSubscription() {}
+  /**
+   * Создаёт подписку в базе данных.
+   * @param data - Данные подписки.
+   * @returns Созданная подписка либо null.
+   */
+  async createSubscription({
+    userId,
+    plan,
+    startDate,
+    endDate,
+  }: SubscriptionData): Promise<SubscriptionEntity | null> {
+    try {
+      const subscription = this.subscriptionRepository.create({
+        userId: { id: userId },
+        plan,
+        startDate,
+        endDate,
+      });
+
+      return await this.subscriptionRepository.save(subscription);
+    } catch (error) {
+      this.logger.error(`Ошибка при создании подписки: ${error.message}`, this);
+      return null;
+    }
+  }
 }

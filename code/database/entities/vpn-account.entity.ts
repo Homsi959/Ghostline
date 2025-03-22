@@ -27,7 +27,7 @@ export class VpnAccountEntity {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  userId: UserEntity['id'];
+  userId: UserEntity;
 
   /**
    * Уникальный UUID соединения.

@@ -35,3 +35,22 @@ export interface UserSubscription {
   endDate: Date;
   createdAt: Date;
 }
+
+/**
+ * Интерфейс данных для создания подписки.
+ */
+export interface SubscriptionData {
+  userId: string; // ID пользователя
+  plan: SubscriptionPlan; // Тип подписки
+  startDate: Date; // Начало подписки
+  endDate: Date; // Окончание подписки
+}
+
+export interface TelegramProfileDto {
+  id: number;
+  telegramId: number;
+  isBot: boolean;
+  languageCode: string;
+  createdAt: Date;
+  userId: string;
+}
