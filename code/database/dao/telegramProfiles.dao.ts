@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { SavedTelegramProfile } from './types';
 import { Pool } from 'pg';
 import { DATABASE_TOKEN } from 'code/common/constants';
+import { SavedTelegramProfile } from '../common/types';
 
 /**
- * Репозиторий профилей Telegram.
+ * DAO профилей Telegram.
  */
 @Injectable()
 export class TelegramProfilesDao {
   /**
-   * @param telegramRepository - репозиторий TelegramProfileEntity.
    * @param logger - сервис логирования.
+   * @param db - соеденение с БД.
    */
   constructor(
     private readonly logger: WinstonService,

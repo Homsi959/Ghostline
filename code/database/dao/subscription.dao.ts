@@ -1,18 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { SubscriptionEntity } from './entity';
 import { Pool } from 'pg';
 import { DATABASE_TOKEN } from 'code/common/constants';
-import { ActiveSubscription } from './types';
-import { SubscriptionStatus } from './enums';
+import { ActiveSubscription } from '../common/types';
+import { SubscriptionEntity } from '../common/entities';
+import { SubscriptionStatus } from '../common/enums';
 
 /**
- * Репозиторий подписок.
+ * DAO подписок.
  */
 @Injectable()
 export class SubscriptionDao {
   /**
    * @param logger - сервис логирования.
+   * @param db - соеденение с БД.
    */
   constructor(
     private readonly logger: WinstonService,

@@ -1,4 +1,4 @@
-import { SubscriptionPlan } from 'code/database/dao/enums';
+import { SubscriptionPlan } from 'code/database/common/enums';
 
 export interface ActivateSubscription {
   telegramId: number;
