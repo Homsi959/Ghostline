@@ -1,12 +1,13 @@
 import { Start, Update, Action } from 'nestjs-telegraf';
 import { WinstonService } from 'code/logger/winston.service';
-import { Context } from 'code/common/types';
+
 import {
   ACTIONS_KEYS,
   ACTIONS_TO_SUBSCRIPTION,
   PURCHASE_ACTIONS,
 } from './common/telegram.actions';
 import { TelegramService, TelegramSubscribingService } from './services';
+import { Context } from './common/telegram.types';
 
 /**
  * Контроллер для обработки событий в Telegram-боте.
@@ -75,20 +76,29 @@ export class TelegramBotController {
     const callback = context.callbackQuery;
 
     if (!(callback && 'data' in callback)) {
-      this.logger.error(`Отсутствует data в callbackQuery`, this);
+      this.logger.error(
+        `Отсутствует data (то есть action) в callbackQuery`,
+        this,
+      );
       return;
     }
 
-    const { id: userId, data } = callback;
-    const plan = ACTIONS_TO_SUBSCRIPTION[data];
+    if (!(callback && 'from' in callback)) {
+      this.logger.error(`Отсутствует from в callbackQuery`, this);
+      return;
+    }
+
+    const { data: action } = callback;
+    const { id: telegramId } = context.callbackQuery.from;
+    const plan = ACTIONS_TO_SUBSCRIPTION[action];
 
     if (!plan) {
-      this.logger.error(`Некорректный action: ${data}`, this);
+      this.logger.error(`Некорректный action: ${action}`, this);
       return;
     }
 
     await this.subscribingService.processPurchase({
-      userId,
+      telegramId,
       plan,
     });
   }

@@ -1,11 +1,15 @@
-import { Context } from 'code/common/types';
+import { Context } from './telegram.types';
 
 /**
  * Значения по умолчанию для сессии Telegram.
  */
 const defaultTelegramSession = {
   pageHistory: [],
-  // Добавь сюда другие поля сессии по необходимости
+  from: {
+    telegramId: 0,
+    isBot: false,
+    languageCode: 'en',
+  },
 };
 
 /**
