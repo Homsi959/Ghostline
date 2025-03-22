@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { SubscriptionPlan } from 'code/database/entities/entity.enum';
+import { SubscriptionPlan } from 'code/database/common/enum';
 import { SubscriptionRepository } from 'code/database/repository/subscription.repository';
 import { ActivateSubscription } from './types';
 import { TelegramProfilesRepository } from 'code/database/repository/telegramProfiles.repository';
@@ -51,12 +51,5 @@ export class TelegramSubscribingService {
         this.logger.error(`Неизвестный тип подписки: ${String(plan)}`);
         return;
     }
-
-    return this.subscriptionRepository.createSubscription({
-      userId,
-      plan,
-      startDate,
-      endDate,
-    });
   }
 }

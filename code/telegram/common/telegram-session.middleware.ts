@@ -1,4 +1,3 @@
-import { CreateTelegramProfileDto } from './telegram.dto';
 import { Context } from './telegram.types';
 
 /**
@@ -10,7 +9,7 @@ const defaultTelegramSession = {
     telegramId: 0,
     isBot: false,
     languageCode: 'en',
-  } as CreateTelegramProfileDto,
+  },
 };
 
 /**

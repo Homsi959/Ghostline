@@ -1,4 +1,4 @@
-import { SubscriptionPlan } from '../entities/entity.enum';
+import { SubscriptionPlan } from '../common/enum';
 
 /**
  * Интерфейс для данных, используемых при вставке профиля Telegram в базу данных.

@@ -5,10 +5,6 @@ import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { TelegramHistoryService } from './telegram.history.service';
-import {
-  CreateTelegramProfileDto,
-  toTelegramProfileDto,
-} from '../common/telegram.dto';
 import { Context } from '../common/telegram.types';
 
 /**
@@ -37,7 +33,7 @@ export class TelegramService {
       this,
     );
     if (from) {
-      const telegramProfileDto = await toTelegramProfileDto(from);
+      // const telegramProfileDto = await toTelegramProfileDto(from);
 
       context.session.from = {
         isBot: from.is_bot,
@@ -45,7 +41,7 @@ export class TelegramService {
         languageCode: from.language_code,
       };
 
-      await this.ensureUserExists(telegramProfileDto);
+      // await this.ensureUserExists(telegramProfileDto);
     }
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
@@ -94,9 +90,7 @@ export class TelegramService {
    *
    * @param context - Контекст Telegraf, содержащий информацию о пользователе.
    */
-  private async ensureUserExists(
-    telegramProfile: CreateTelegramProfileDto,
-  ): Promise<void> {
+  private async ensureUserExists(telegramProfile: any): Promise<void> {
     const { telegramId } = telegramProfile;
     // Проверяем, существует ли Telegram-профиль пользователя в БД
     const telegramIdFromDB =

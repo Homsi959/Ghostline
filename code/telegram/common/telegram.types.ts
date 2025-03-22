@@ -1,5 +1,4 @@
 import { Context as TelegrafContext } from 'telegraf';
-import { CreateTelegramProfileDto } from './telegram.dto';
 
 /**
  * Тип для описания кнопок Telegram.
@@ -46,7 +45,7 @@ export type TelegramMessageContext = Pick<
  */
 export type TelegramSession = {
   pageHistory: string[];
-  from: CreateTelegramProfileDto;
+  from: any;
 };
 
 /**
