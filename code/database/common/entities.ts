@@ -28,7 +28,7 @@ export interface TelegramProfileEntity {
   id: number;
   telegram_id: number;
   is_bot: boolean;
-  language_code: string;
+  language_code: string | undefined;
   created_at: Date;
   user_id: string;
 }

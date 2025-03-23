@@ -26,13 +26,14 @@ export class TelegramService {
     );
 
     if (from) {
-      context.session.from = {
+      const sessionFrom: Omit<SaveTelegramProfile, 'userId'> = {
         isBot: from.is_bot,
         telegramId: from.id,
         languageCode: from.language_code,
       };
 
-      await this.ensureUserExists(context.session.from);
+      context.session.from = sessionFrom;
+      await this.ensureUserExists(sessionFrom);
     }
 
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);

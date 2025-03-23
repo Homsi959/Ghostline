@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { ActivateSubscription } from './types';
+import { ActivatedSubscription } from './types';
 import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 import { SubscriptionPlan } from 'code/database/common/enums';
 
@@ -8,28 +8,29 @@ import { SubscriptionPlan } from 'code/database/common/enums';
 export class TelegramSubscribingService {
   constructor(
     private readonly logger: WinstonService,
-    private readonly SubscriptionDao: SubscriptionDao,
-    private readonly TelegramProfilesDao: TelegramProfilesDao,
+    private readonly subscriptionDao: SubscriptionDao,
+    private readonly telegramProfilesDao: TelegramProfilesDao,
   ) {}
 
-  async processPurchase({ telegramId, plan }: ActivateSubscription) {
+  async processPurchase({ telegramId, plan }: any): Promise<any> {
     const telegramProfile =
-      await this.TelegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
+      await this.telegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
 
     if (!telegramProfile) {
-      this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`);
+      this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`, this);
       return;
     }
 
     const userId = telegramProfile.userId;
     const userSubscription =
-      await this.SubscriptionDao.findActiveSubscriptionById(userId);
+      await this.subscriptionDao.findActiveSubscriptionById(userId);
 
     if (userSubscription) {
       this.logger.log(
         `Пользователь ${userId} уже имеет активную подписку: ${userSubscription.plan}`,
+        this,
       );
-      // TODO: предложить вывести существующий ключ
+
       return;
     }
 
@@ -49,6 +50,24 @@ export class TelegramSubscribingService {
       default:
         this.logger.error(`Неизвестный тип подписки: ${String(plan)}`);
         return;
+    }
+
+    const activatedSubscription = await this.subscriptionDao.createSubscription(
+      {
+        userId,
+        plan,
+        startDate,
+        endDate,
+      },
+    );
+
+    if (activatedSubscription) {
+      this.logger.log(
+        `Подписка активирована для пользователя ${userId} c Telegram профилем: ${telegramId} на план ${plan}`,
+        this,
+      );
+
+      return activatedSubscription;
     }
   }
 }

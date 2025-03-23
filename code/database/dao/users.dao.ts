@@ -35,7 +35,7 @@ export class UsersDao {
 
     try {
       await this.db.query(query);
-      this.logger.log(`✅ Создан пользователь с ID: ${uuid}`, this);
+      this.logger.log(`Создан пользователь с ID: ${uuid}`, this);
 
       return uuid;
     } catch (error: any) {

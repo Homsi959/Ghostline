@@ -28,7 +28,7 @@ export interface ActiveSubscription {
 export interface SaveTelegramProfile {
   telegramId: number;
   isBot: boolean;
-  languageCode: string;
+  languageCode: string | undefined;
   userId: string;
 }
 
@@ -38,7 +38,7 @@ export interface SaveTelegramProfile {
 export interface TelegramProfile {
   telegramId: number;
   isBot: boolean;
-  languageCode: string;
+  languageCode: string | undefined;
   createdAt: Date;
   userId: string;
 }
