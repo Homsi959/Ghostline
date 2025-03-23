@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { Pool } from 'pg';
 import { DATABASE_TOKEN } from 'code/common/constants';
-import { ActiveSubscription } from '../common/types';
+import { ActivateSubscription, ActiveSubscription } from '../common/types';
 import { SubscriptionEntity } from '../common/entities';
 import { SubscriptionStatus } from '../common/enums';
 
@@ -71,7 +71,50 @@ export class SubscriptionDao {
   /**
    * Создаёт подписку в базе данных.
    * @param data - Данные подписки.
-   * @returns Созданная подписка либо null.
+   * @returns ID созданной подписки или null.
    */
-  async createSubscription(): Promise<any> {}
+  async createSubscription({
+    userId,
+    plan,
+    startDate,
+    endDate,
+  }: ActivateSubscription): Promise<string | null> {
+    const query = {
+      name: 'create-subscription',
+      text: `
+      INSERT INTO subscriptions (
+        plan,
+        start_date,
+        end_date,
+        status,
+        user_id
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+    `,
+      values: [plan, startDate, endDate, SubscriptionStatus.ACTIVE, userId],
+    };
+
+    try {
+      const { rows } = await this.db.query<{ id: string }>(query);
+      const idActivatedSubscription = rows[0]?.id ?? null;
+
+      if (idActivatedSubscription) {
+        this.logger.log(
+          `Создана подписка: план ${plan}, пользователь ${userId}`,
+          this,
+        );
+        return idActivatedSubscription;
+      } else {
+        this.logger.warn(
+          `Не удалось создать подписку: план ${plan}, пользователь ${userId}`,
+          this,
+        );
+        return null;
+      }
+    } catch (error: any) {
+      this.logger.error(`Ошибка создания подписки: ${error.message}`, this);
+      return null;
+    }
+  }
 }

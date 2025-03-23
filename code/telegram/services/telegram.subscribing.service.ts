@@ -14,7 +14,7 @@ export class TelegramSubscribingService {
 
   async processPurchase({ telegramId, plan }: ActivateSubscription) {
     const telegramProfile =
-      await this.TelegramProfilesDao.getTelegramProfileById(telegramId);
+      await this.TelegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
 
     if (!telegramProfile) {
       this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`);

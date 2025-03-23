@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import { v4 } from 'uuid';
 
 /**
- * Репозиторий пользователей.
+ * DAO пользователей.
  */
 @Injectable()
 export class UsersDao {
@@ -20,15 +20,31 @@ export class UsersDao {
 
   /**
    * Создает нового пользователя.
-   * @returns сохранённую сущность пользователя.
+   * @returns uuid пользователя.
    */
-  async createUser(): Promise<any> {
-    const values = { id: v4() };
+  async createUser(): Promise<string> {
+    const uuid = v4();
+    const query = {
+      name: 'create-user',
+      text: `
+      INSERT INTO users (id)
+      VALUES ($1)
+    `,
+      values: [uuid],
+    };
 
     try {
-      this.logger.log(`Cоздан пользователь с ID: ${values.id}`, this);
+      await this.db.query(query);
+      this.logger.log(`✅ Создан пользователь с ID: ${uuid}`, this);
+
+      return uuid;
     } catch (error: any) {
-      throw new Error(`Не удалось создать пользователя`, error);
+      this.logger.error(
+        `Ошибка при создании пользователя: ${error.message}`,
+        this,
+        error,
+      );
+      throw new Error(`Не удалось создать пользователя`);
     }
   }
 }

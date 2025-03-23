@@ -2,7 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { Pool } from 'pg';
 import { DATABASE_TOKEN } from 'code/common/constants';
-import { SavedTelegramProfile } from '../common/types';
+import { SaveTelegramProfile, TelegramProfile } from '../common/types';
+import { TelegramProfileEntity } from '../common/entities';
 
 /**
  * DAO профилей Telegram.
@@ -28,7 +29,7 @@ export class TelegramProfilesDao {
     telegramId,
     languageCode,
     userId,
-  }: SavedTelegramProfile): Promise<number | null> {
+  }: SaveTelegramProfile): Promise<number | null> {
     const query = {
       name: 'save-telegram_profile',
       text: `
@@ -49,13 +50,15 @@ export class TelegramProfilesDao {
       const insertedId = result.rows[0]?.telegram_id ?? null;
 
       this.logger.log(
-        `[saveTelegramProfile] Профиль Telegram создан (telegram_id=${insertedId})`,
+        `Профиль Telegram создан (telegram_id=${insertedId})`,
+        this,
       );
 
       return insertedId;
     } catch (error: any) {
       this.logger.error(
-        `[saveTelegramProfile] Ошибка при создании профиля: ${error.message}`,
+        `Ошибка при создании профиля: ${error.message}`,
+        this,
         error,
       );
       return null;
@@ -63,9 +66,54 @@ export class TelegramProfilesDao {
   }
 
   /**
-   * Ищет профиль по telegramId.
-   * @param telegramId - идентификатор Telegram.
-   * @returns найденный профиль или undefined.
+   * Ищет Telegram профиль по userId.
+   * @param userId - идентификатор клиента.
+   * @returns найденный профиль или null.
    */
-  async getTelegramProfileById(telegramId: number): Promise<any> {}
+  async getTelegramProfileByTelegramId(
+    telegramId: number,
+  ): Promise<TelegramProfile | null> {
+    const query = {
+      name: 'get-telegram_profile-by-telegram_id',
+      text: `
+      SELECT *
+      FROM telegram_profiles
+      WHERE telegram_id = $1
+      LIMIT 1
+    `,
+      values: [telegramId],
+    };
+
+    try {
+      const { rows } = await this.db.query<TelegramProfileEntity>(query);
+      const row = rows[0];
+
+      if (!row) {
+        this.logger.warn(
+          `Профиль Telegram не найден для user_id=${telegramId}`,
+          this,
+        );
+        return null;
+      }
+
+      const mappedProfile: TelegramProfile = {
+        telegramId: row.telegram_id,
+        isBot: row.is_bot,
+        languageCode: row.language_code,
+        createdAt: row.created_at,
+        userId: row.user_id,
+      };
+
+      this.logger.log(`Найден профиль Telegram для c ID=${telegramId}`, this);
+
+      return mappedProfile;
+    } catch (error: any) {
+      this.logger.error(
+        `Ошибка при получении профиля: ${error.message}`,
+        this,
+        error,
+      );
+      return null;
+    }
+  }
 }

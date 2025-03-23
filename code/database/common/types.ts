@@ -1,6 +1,16 @@
 import { SubscriptionPlan, SubscriptionStatus } from './enums';
 
 /**
+ * Данные на создание подписки
+ */
+export interface ActivateSubscription {
+  userId: string;
+  plan: SubscriptionPlan;
+  startDate: Date;
+  endDate: Date;
+}
+
+/**
  * Активная подписка из БД
  */
 export interface ActiveSubscription {
@@ -13,11 +23,22 @@ export interface ActiveSubscription {
 }
 
 /**
- * Созданый телеграм профиль
+ * Данные для добавления телеграм профиля
  */
-export interface SavedTelegramProfile {
+export interface SaveTelegramProfile {
   telegramId: number;
   isBot: boolean;
   languageCode: string;
+  userId: string;
+}
+
+/**
+ * Сохраненный телеграм профиль
+ */
+export interface TelegramProfile {
+  telegramId: number;
+  isBot: boolean;
+  languageCode: string;
+  createdAt: Date;
   userId: string;
 }

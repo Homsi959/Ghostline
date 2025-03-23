@@ -1,6 +1,14 @@
 import { SubscriptionPlan, SubscriptionStatus } from './enums';
 
 /**
+ * Схема таблицы пользователя (таблица users)
+ */
+export interface UserEntity {
+  id: string; // UUID
+  created_at: Date;
+}
+
+/**
  * Схема таблицы подписок (таблица subscriptions)
  */
 export interface SubscriptionEntity {
@@ -19,10 +27,10 @@ export interface SubscriptionEntity {
 export interface TelegramProfileEntity {
   id: number;
   telegram_id: number;
-  is_bot: boolean | null;
-  language_code: string | null;
+  is_bot: boolean;
+  language_code: string;
   created_at: Date;
-  user_id: string | null;
+  user_id: string;
 }
 
 /**
@@ -36,15 +44,7 @@ export interface PaymentEntity {
   transaction_id: string;
   status: string;
   created_at: Date;
-  user_id: string | null;
-}
-
-/**
- * Схема таблицы пользователя (таблица users)
- */
-export interface UserEntity {
-  id: string; // UUID
-  created_at: Date;
+  user_id: string;
 }
 
 /**
@@ -58,5 +58,5 @@ export interface VpnAccountEntity {
   public_key: string;
   sni: string;
   created_at: Date;
-  user_id: string | null;
+  user_id: string;
 }

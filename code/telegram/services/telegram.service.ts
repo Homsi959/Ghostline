@@ -1,128 +1,94 @@
 import { Injectable } from '@nestjs/common';
 import { UsersDao } from 'code/database/dao/users.dao';
-
+import { TelegramProfilesDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { TelegramHistoryService } from './telegram.history.service';
 import { Context } from '../common/telegram.types';
-import { TelegramProfilesDao } from 'code/database/dao';
+import { SaveTelegramProfile } from 'code/database/common/types';
 
-/**
- * Сервис для работы с Telegram-ботом.
- * Обрабатывает запросы от пользователей, управляет рендерингом страниц,
- * сохраняет историю страниц в сессии, а также управляет данными пользователей.
- */
 @Injectable()
 export class TelegramService {
   constructor(
-    private readonly usersRepo: UsersDao,
-    private readonly tgProfilesRepo: TelegramProfilesDao,
-    private readonly logger: WinstonService,
+    private readonly usersDao: UsersDao,
+    private readonly telegramProfilesDao: TelegramProfilesDao,
     private readonly historyService: TelegramHistoryService,
+    private readonly logger: WinstonService,
   ) {}
 
-  /**
-   * Обрабатывает старт бота: создает пользователя и отправляет приветственное сообщение.
-   * @param context - Контекст Telegraf
-   */
   async startBot(context: Context): Promise<void> {
     const { from } = context;
 
     this.logger.log(
-      `Бот запущен пользователем Telegram-профиля с ID: ${context.from?.id}`,
+      `Бот запущен пользователем Telegram-профиля с ID: ${from?.id}`,
       this,
     );
-    if (from) {
-      // const telegramProfileDto = await toTelegramProfileDto(from);
 
+    if (from) {
       context.session.from = {
         isBot: from.is_bot,
         telegramId: from.id,
         languageCode: from.language_code,
       };
 
-      // await this.ensureUserExists(telegramProfileDto);
+      await this.ensureUserExists(context.session.from);
     }
+
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
-  /**
-   * Отображает указанную страницу в чате.
-   * Если метод вызывается не через callback, отправляет новое сообщение.
-   * В противном случае изменяет текст существующего сообщения.
-   *
-   * @param context - Контекст Telegraf, содержащий информацию о чате и пользователе.
-   * @param page - Ключ страницы, которую нужно отобразить.
-   * @throws Ошибку, если контекст отсутствует.
-   */
-  async renderPage(context: Context, page: string): Promise<void> {
-    const { message, keyboardConfig, goBackButton } = telegramPages[page];
+  async renderPage(context: Context, pageKey: string): Promise<void> {
+    if (!context) {
+      this.logger.error('Контекст отсутствует', this);
+      throw new Error('Контекст отсутствует');
+    }
+
+    const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
     let buttons = keyboardConfig
       ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
       : undefined;
-
-    if (!context) {
-      this.logger.error(`Контекст отсутствует`, this);
-      throw new Error('Контекст отсутствует');
-    }
 
     if (goBackButton) {
       buttons = addGoBackButton(buttons);
     }
 
-    if (!context.callbackQuery) {
-      // Отправляем новое сообщение, если метод вызван не через callback
-      await context.reply(message, buttons);
-      this.logger.log(`Отправлено новое сообщение со страницей: ${page}`, this);
-    } else {
-      // Изменяем существующее сообщение, если метод вызван через callback
+    if (context.callbackQuery) {
       await context.editMessageText(message, buttons);
-      this.logger.log(`Отрисована страница: ${page}`, this);
+      this.logger.log(`Изменено сообщение: ${pageKey}`, this);
+    } else {
+      await context.reply(message, buttons);
+      this.logger.log(`Отправлено сообщение: ${pageKey}`, this);
     }
 
-    // Сохраняем отрисованную страницу
-    this.historyService.savePageHistory(context.session.pageHistory, page);
+    this.historyService.savePageHistory(context.session.pageHistory, pageKey);
   }
 
-  /**
-   * Проверяет, существует ли Telegram-профиль пользователя в БД.
-   * Если профиль отсутствует, создаёт нового пользователя и Telegram-профиль.
-   *
-   * @param context - Контекст Telegraf, содержащий информацию о пользователе.
-   */
-  private async ensureUserExists(telegramProfile: any): Promise<void> {
-    const { telegramId } = telegramProfile;
-    // Проверяем, существует ли Telegram-профиль пользователя в БД
-    const telegramIdFromDB =
-      await this.tgProfilesRepo.getTelegramProfileById(telegramId);
+  private async ensureUserExists(
+    telegramProfile: Omit<SaveTelegramProfile, 'userId'>,
+  ): Promise<void> {
+    const exists =
+      await this.telegramProfilesDao.getTelegramProfileByTelegramId(
+        telegramProfile.telegramId,
+      );
 
-    // Если профиль отсутствует, создаём нового пользователя
-    if (!telegramIdFromDB) {
-      const user = await this.usersRepo.createUser();
+    if (!exists) {
+      const userId = await this.usersDao.createUser();
 
-      // Создаём Telegram-профиль только если удалось создать пользователя
-      if (user) {
-        const savedTelegramProfile = {
-          userId: user.id,
+      if (userId) {
+        await this.telegramProfilesDao.saveTelegramProfile({
           ...telegramProfile,
-        };
-
-        await this.tgProfilesRepo.saveTelegramProfile(savedTelegramProfile);
+          userId,
+        });
       }
     }
   }
 
-  /**
-   * Отображает предыдущую страницу из истории сессии.
-   * Если история пуста или в ней только одна страница, то ничего не происходит.
-   *
-   * @param context - Объект контекста, содержащий данные callback-запроса.
-   */
-  async goBackRender(context: Context) {
+  async goBackRender(context: Context): Promise<void> {
     const prevPage = this.historyService.getPreviousPage(context);
+
     if (!prevPage) {
-      this.logger.error(`История страниц пуста`, this);
+      this.logger.error('История страниц пуста', this);
       return;
     }
 
