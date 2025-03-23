@@ -52,7 +52,6 @@ export interface PaymentEntity {
  */
 export interface VpnAccountEntity {
   id: number;
-  uuid_connection: string;
   server: string;
   port: number;
   public_key: string;
