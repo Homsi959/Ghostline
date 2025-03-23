@@ -16,7 +16,9 @@ export class TelegramSubscribingService {
     const telegramProfile =
       await this.telegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
 
-    if (!telegramProfile) {
+    if (telegramProfile) {
+      this.logger.log(`Найден профиль Telegram для c ID=${telegramId}`, this);
+    } else {
       this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`, this);
       return;
     }
@@ -30,6 +32,10 @@ export class TelegramSubscribingService {
         `Пользователь ${userId} уже имеет активную подписку: ${userSubscription.plan}`,
         this,
       );
+
+      return;
+    } else if (!userSubscription) {
+      this.logger.warn(`Нет активных подписок у пользователя: ${userId}`, this);
 
       return;
     }
@@ -68,6 +74,13 @@ export class TelegramSubscribingService {
       );
 
       return activatedSubscription;
+    } else if (!activatedSubscription) {
+      this.logger.warn(
+        `Не удалось создать подписку: план ${plan}, пользователь ${userId}`,
+        this,
+      );
+
+      return;
     }
   }
 }

@@ -88,13 +88,7 @@ export class TelegramProfilesDao {
       const { rows } = await this.db.query<TelegramProfileEntity>(query);
       const row = rows[0];
 
-      if (!row) {
-        this.logger.warn(
-          `Профиль Telegram не найден для user_id=${telegramId}`,
-          this,
-        );
-        return null;
-      }
+      if (!row) return null;
 
       const mappedProfile: TelegramProfile = {
         telegramId: row.telegram_id,
@@ -103,8 +97,6 @@ export class TelegramProfilesDao {
         createdAt: row.created_at,
         userId: row.user_id,
       };
-
-      this.logger.log(`Найден профиль Telegram для c ID=${telegramId}`, this);
 
       return mappedProfile;
     } catch (error: any) {

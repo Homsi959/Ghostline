@@ -43,13 +43,7 @@ export class SubscriptionDao {
     try {
       const { rows } = await this.db.query<SubscriptionEntity>(query);
 
-      if (rows.length == 0) {
-        this.logger.warn(
-          `Нет активных подписок у пользователя: ${userId}`,
-          this,
-        );
-        return null;
-      }
+      if (rows.length == 0) return null;
 
       const row = rows[0];
       const activeSubscription: ActiveSubscription = {
@@ -99,19 +93,7 @@ export class SubscriptionDao {
       const { rows } = await this.db.query<{ id: string }>(query);
       const idActivatedSubscription = rows[0]?.id ?? null;
 
-      if (idActivatedSubscription) {
-        this.logger.log(
-          `Создана подписка: план ${plan}, пользователь ${userId}`,
-          this,
-        );
-        return idActivatedSubscription;
-      } else {
-        this.logger.warn(
-          `Не удалось создать подписку: план ${plan}, пользователь ${userId}`,
-          this,
-        );
-        return null;
-      }
+      return idActivatedSubscription ?? null;
     } catch (error: any) {
       this.logger.error(`Ошибка создания подписки: ${error.message}`, this);
       return null;

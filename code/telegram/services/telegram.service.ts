@@ -73,10 +73,17 @@ export class TelegramService {
         telegramProfile.telegramId,
       );
 
-    if (!exists) {
+    if (exists) {
+      this.logger.log(
+        `Найден профиль Telegram для c ID=${telegramProfile.telegramId}`,
+        this,
+      );
+    } else {
       const userId = await this.usersDao.createUser();
 
       if (userId) {
+        this.logger.log(`Создан пользователь с ID: ${userId}`, this);
+
         await this.telegramProfilesDao.saveTelegramProfile({
           ...telegramProfile,
           userId,
