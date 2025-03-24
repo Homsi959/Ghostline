@@ -6,6 +6,7 @@ import {
   SubscriptionDao,
   TelegramProfilesDao,
   UsersDao,
+  VpnAccountsDao,
 } from 'code/database/dao';
 
 /**
@@ -34,7 +35,14 @@ import {
     UsersDao,
     TelegramProfilesDao,
     SubscriptionDao,
+    VpnAccountsDao,
   ],
-  exports: [UsersDao, TelegramProfilesDao, SubscriptionDao, DATABASE_TOKEN],
+  exports: [
+    UsersDao,
+    TelegramProfilesDao,
+    SubscriptionDao,
+    VpnAccountsDao,
+    DATABASE_TOKEN,
+  ],
 })
 export class DatabaseModule {}
