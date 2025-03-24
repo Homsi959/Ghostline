@@ -31,7 +31,7 @@ import { initializeTelegramSession } from 'code/telegram/common/telegram-session
     HttpModule,
     // Загрузка конфигурации из переменных окружения
     ConfigModule.forRoot({
-      envFilePath: `configs/envs/.env.${process.env.NODE_ENV || 'development'}`,
+      envFilePath: `settings/envs/.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true,
     }),
     TelegrafModule.forRootAsync({
