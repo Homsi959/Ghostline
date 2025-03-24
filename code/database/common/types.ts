@@ -42,3 +42,16 @@ export interface TelegramProfile {
   createdAt: Date;
   userId: string;
 }
+
+/**
+ * VPN-аккаунт
+ */
+export interface VpnAccount {
+  server: string;
+  port: number;
+  publicKey: string;
+  sni: string;
+  createdAt: Date;
+  userId: string;
+  flow: string | null;
+}

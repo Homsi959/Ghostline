@@ -61,7 +61,7 @@ export function buildContext(
 ): string | undefined {
   if (!classInstanceOrString) return undefined;
 
-  return typeof classInstanceOrString === 'string'
+  return typeof classInstanceOrString == 'string'
     ? classInstanceOrString
     : classInstanceOrString.constructor.name;
 }

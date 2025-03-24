@@ -18,7 +18,7 @@ export class WinstonService implements LoggerService {
       level: this.config.get<string>(LOG_LEVEL_KEY),
       format: format.combine(
         format((info) => {
-          if (info.level === 'info') info.level = 'log';
+          if (info.level == 'info') info.level = 'log';
           return info;
         })(),
         format.colorize({ all: true }),

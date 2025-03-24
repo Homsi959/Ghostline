@@ -16,7 +16,7 @@ export class TelegramHistoryService {
   savePageHistory(history: TelegramSession['pageHistory'], page: string) {
     const prevPage = history[history.length - 1];
 
-    if (history.length === 0 || prevPage !== page) {
+    if (history.length == 0 || prevPage !== page) {
       history.push(page);
     }
   }
