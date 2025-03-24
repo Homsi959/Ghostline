@@ -1,0 +1,36 @@
+{
+    "inbounds": [
+      {
+        "port": 443,
+        "protocol": "vless",
+        "settings": {
+          "clients": [
+            {
+              "id": "REPLACE_WITH_YOUR_UUID",
+              "flow": "xtls-rprx-vision"
+            }
+          ],
+          "decryption": "none"
+        },
+        "streamSettings": {
+          "network": "tcp",
+          "security": "reality",
+          "realitySettings": {
+            "show": false,
+            "dest": "www.microsoft.com:443",
+            "serverNames": [ "www.microsoft.com" ],
+            "privateKey": "REPLACE_WITH_YOUR_PRIVATE_KEY",
+            "shortIds": [ "REPLACE_WITH_YOUR_SHORTID" ],
+            "xver": 0
+          }
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "protocol": "freedom",
+        "tag": "direct"
+      }
+    ]
+  }
+  
