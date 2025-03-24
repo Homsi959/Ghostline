@@ -58,4 +58,5 @@ export interface VpnAccountEntity {
   sni: string;
   created_at: Date;
   user_id: string;
+  flow: string | null;
 }

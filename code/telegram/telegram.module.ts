@@ -7,6 +7,7 @@ import {
   TelegramSubscribingService,
 } from './services';
 import { DatabaseModule } from 'code/database/database.module';
+import { XrayModule } from 'code/xray/xray.module';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -15,7 +16,7 @@ import { DatabaseModule } from 'code/database/database.module';
  * Он включает контроллер и сервис для работы с запросами и взаимодействия с Telegram API.
  */
 @Module({
-  imports: [HttpModule, DatabaseModule],
+  imports: [HttpModule, DatabaseModule, XrayModule],
   providers: [
     TelegramBotController,
     TelegramService,
