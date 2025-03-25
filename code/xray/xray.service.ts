@@ -111,7 +111,11 @@ export class XrayService implements OnModuleInit {
       const errMsg =
         error instanceof Error ? error.message : 'Неизвестная ошибка';
 
-      this.logger.error(`Не удалось перезапустить Xray: ${errMsg}`);
+      this.logger.error(
+        `Не удалось перезапустить Xray: ${errMsg}`,
+        this,
+        error instanceof Error ? error.stack : undefined,
+      );
       return false;
     }
   }
