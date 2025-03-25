@@ -69,3 +69,13 @@ export interface Policy {
     statsInboundDownlink: boolean;
   };
 }
+
+export interface VlessLinkParams {
+  userId: string;
+  protocol: string;
+  security: string;
+  flow: string;
+  pbk: string;
+  shortId: string;
+  tag: string;
+}

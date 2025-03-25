@@ -7,6 +7,8 @@ import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { TelegramHistoryService } from './telegram.history.service';
 import { Context } from '../common/telegram.types';
 import { SaveTelegramProfile } from 'code/database/common/types';
+import { TelegramSubscribingService } from './telegram.subscribing.service';
+import { SubscriptionPlan } from 'code/database/common/enums';
 
 @Injectable()
 export class TelegramService {
@@ -14,6 +16,7 @@ export class TelegramService {
     private readonly usersDao: UsersDao,
     private readonly telegramProfilesDao: TelegramProfilesDao,
     private readonly historyService: TelegramHistoryService,
+    private readonly telegramSubscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
   ) {}
 
@@ -89,6 +92,28 @@ export class TelegramService {
           userId,
         });
       }
+    }
+  }
+
+  /**
+   * Вызывает метод для оформления подписки
+   */
+  async subscribe({
+    telegramId,
+    plan,
+    context,
+  }: {
+    telegramId: number;
+    plan: SubscriptionPlan;
+    context: Context;
+  }) {
+    const link = await this.telegramSubscribingService.processPurchase({
+      telegramId,
+      plan,
+    });
+
+    if (link) {
+      // отрисуй страницу где чел может скоприровать ключ плюс перйти на страницу подключения
     }
   }
 

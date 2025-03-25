@@ -97,7 +97,8 @@ export class TelegramBotController {
       return;
     }
 
-    await this.subscribingService.processPurchase({
+    await this.telegramService.subscribe({
+      context,
       telegramId,
       plan,
     });

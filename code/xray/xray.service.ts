@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
 import { readFileSync, writeFileSync } from 'fs';
-import { Client, XrayConfig } from './types';
+import { Client, VlessLinkParams, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { VpnAccountsDao } from 'code/database/dao';
 
@@ -34,21 +34,21 @@ export class XrayService implements OnModuleInit {
    * @param {vpnAccounts} - список VPN-аккаунтов (uuid пользователей)
    * @return {boolean} - добавление прошло успешно или нет
    */
-  addClients(vpnAccounts: Client[]): boolean {
+  addVpnAccounts(vpnAccounts: Client[]): boolean {
     try {
       const config = this.readConfig();
       const clients = config.inbounds[0]?.settings?.clients || [];
       let updated = false;
 
-      for (const account of vpnAccounts) {
-        const exists = clients.some((client) => client.id == account.id);
+      for (const { id, flow } of vpnAccounts) {
+        const exists = clients.some((client) => client.id == id);
 
         if (exists) {
-          this.logger.warn(`Клиент ${account.id} уже существует`, this);
+          this.logger.warn(`Клиент ${id} уже существует`, this);
           continue;
         }
 
-        clients.push({ id: account.id, flow: 'xtls-rprx-vision' });
+        clients.push({ id, flow });
         updated = true;
       }
 
@@ -117,6 +117,47 @@ export class XrayService implements OnModuleInit {
   }
 
   /**
+   * Формирует VLESS-ссылку для подключения к Xray серверу.
+   * @param params - параметры для подключения
+   * @returns VLESS-ссылка для клиента
+   */
+  generateVlessLink({
+    userId,
+    flow,
+    pbk,
+    protocol,
+    security,
+    shortId,
+    tag,
+  }: VlessLinkParams): string {
+    const host = this.configService.get<string>('XRAY_LISTEN_IP');
+
+    if (!host) {
+      this.logger.error(
+        `Переменная окружения XRAY_LISTEN_IP отсутствует`,
+        this,
+      );
+      throw new Error('XRAY_LISTEN_IP не задан');
+    }
+
+    const query = [
+      'encryption=none',
+      `security=${security}`,
+      `flow=${flow}`,
+      `pbk=${pbk}`,
+      `sid=${shortId}`,
+      'sni=www.microsoft.com',
+      'method=none',
+    ].join('&');
+
+    const link = `${protocol}://${userId}@${host}?${query}#${tag}`;
+
+    this.logger.log(`Создана VLESS ссылка: ${link}`, this);
+
+    return link;
+  }
+
+  /**
    * Загружает переменные окружения:
    * - XRAY_CONFIG_PATH: путь до конфигурационного файла.
    * - XRAY_RESTART_COMMAND: команда перезапуска Xray.
@@ -170,7 +211,7 @@ export class XrayService implements OnModuleInit {
             flow,
           })) as Client[];
 
-        this.addClients(vpnAccountsFiltered);
+        this.addVpnAccounts(vpnAccountsFiltered);
         this.logger.log(
           `Загружено VPN-аккаунтов из БД в конфиг Xray: ${vpnAccounts.length}`,
           this,
@@ -190,7 +231,7 @@ export class XrayService implements OnModuleInit {
    * Возвращает конфиг Xray
    * @return {XrayConfig} - возвращает конфиг
    */
-  private readConfig(): XrayConfig {
+  readConfig(): XrayConfig {
     return JSON.parse(readFileSync(this.configPath, 'utf-8')) as XrayConfig;
   }
 

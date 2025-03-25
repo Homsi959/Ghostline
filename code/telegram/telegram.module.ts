@@ -8,6 +8,7 @@ import {
 } from './services';
 import { DatabaseModule } from 'code/database/database.module';
 import { XrayModule } from 'code/xray/xray.module';
+import { XrayService } from 'code/xray/xray.service';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -22,6 +23,7 @@ import { XrayModule } from 'code/xray/xray.module';
     TelegramService,
     TelegramHistoryService,
     TelegramSubscribingService,
+    XrayService,
   ],
 })
 export class TelegramModule {}

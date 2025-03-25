@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
-import { ActivatedSubscription } from './types';
 import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 import { SubscriptionPlan } from 'code/database/common/enums';
+import { XrayService } from 'code/xray/xray.service';
 
 @Injectable()
 export class TelegramSubscribingService {
@@ -10,37 +10,69 @@ export class TelegramSubscribingService {
     private readonly logger: WinstonService,
     private readonly subscriptionDao: SubscriptionDao,
     private readonly telegramProfilesDao: TelegramProfilesDao,
+    private readonly xrayService: XrayService,
   ) {}
 
-  async processPurchase({ telegramId, plan }: any): Promise<any> {
+  /**
+   * Обрабатывает покупку и активирует подписку.
+   */
+  async processPurchase({
+    telegramId,
+    plan,
+  }: {
+    telegramId: number;
+    plan: SubscriptionPlan;
+  }): Promise<string | void> {
     const telegramProfile =
       await this.telegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
 
-    if (telegramProfile) {
-      this.logger.log(`Найден профиль Telegram для c ID=${telegramId}`, this);
-    } else {
+    if (!telegramProfile) {
       this.logger.error(`Не найден Telegram-профиль с ID: ${telegramId}`, this);
       return;
     }
 
+    this.logger.log(`Найден профиль Telegram с ID=${telegramId}`, this);
+
     const userId = telegramProfile.userId;
-    const userSubscription =
+    const hasSubscription =
       await this.subscriptionDao.findActiveSubscriptionById(userId);
 
-    if (userSubscription) {
+    if (hasSubscription) {
       this.logger.log(
-        `Пользователь ${userId} уже имеет активную подписку: ${userSubscription.plan}`,
+        `Пользователь ${userId} уже имеет активную подписку`,
         this,
       );
-
-      return;
-    } else if (!userSubscription) {
-      this.logger.warn(`Нет активных подписок у пользователя: ${userId}`, this);
-
       return;
     }
 
     const startDate = new Date();
+    const endDate = this.calculateEndDate(startDate, plan);
+
+    if (!endDate) return;
+
+    const subscription = await this.createSubscription(
+      userId,
+      plan,
+      startDate,
+      endDate,
+    );
+
+    if (!subscription) return;
+
+    const vpnCreated = this.createVpnAccount(userId);
+
+    if (!vpnCreated) return;
+
+    return this.generateVpnLink(userId);
+  }
+
+  /**
+   * Вычисляет дату окончания подписки в зависимости от типа плана.
+   */
+  private calculateEndDate(
+    startDate: Date,
+    plan: SubscriptionPlan,
+  ): Date | null {
     const endDate = new Date(startDate);
 
     switch (plan) {
@@ -55,32 +87,80 @@ export class TelegramSubscribingService {
         break;
       default:
         this.logger.error(`Неизвестный тип подписки: ${String(plan)}`);
-        return;
+        return null;
     }
 
-    const activatedSubscription = await this.subscriptionDao.createSubscription(
-      {
-        userId,
-        plan,
-        startDate,
-        endDate,
-      },
-    );
+    return endDate;
+  }
 
-    if (activatedSubscription) {
-      this.logger.log(
-        `Подписка активирована для пользователя ${userId} c Telegram профилем: ${telegramId} на план ${plan}`,
-        this,
-      );
+  /**
+   * Создает подписку в БД.
+   */
+  private async createSubscription(
+    userId: string,
+    plan: SubscriptionPlan,
+    start: Date,
+    end: Date,
+  ) {
+    const subscription = await this.subscriptionDao.createSubscription({
+      userId,
+      plan,
+      startDate: start,
+      endDate: end,
+    });
 
-      return activatedSubscription;
-    } else if (!activatedSubscription) {
+    if (!subscription) {
       this.logger.warn(
         `Не удалось создать подписку: план ${plan}, пользователь ${userId}`,
         this,
       );
-
-      return;
+      return null;
     }
+
+    this.logger.log(
+      `Подписка активирована для пользователя ${userId} на план ${plan}`,
+      this,
+    );
+    return subscription;
+  }
+
+  /**
+   * Создает VPN-аккаунт через Xray.
+   */
+  private createVpnAccount(userId: string): boolean {
+    const added = this.xrayService.addVpnAccounts([
+      {
+        id: userId,
+        flow: 'xtls-rprx-vision',
+      },
+    ]);
+
+    if (!added) {
+      this.logger.warn(`Не удалось добавить VPN клиента ${userId}`, this);
+    }
+
+    return added;
+  }
+
+  /**
+   * Генерирует ссылку подключения VLESS.
+   */
+  private generateVpnLink(userId: string): string {
+    const { inbounds } = this.xrayService.readConfig();
+    const { protocol, streamSettings } = inbounds[0];
+
+    if (!streamSettings?.security) {
+      throw new Error('Отсутствует настройка безопасности в конфиге Xray');
+    }
+
+    return this.xrayService.generateVlessLink({
+      userId,
+      protocol,
+      security: streamSettings.security,
+      flow: 'xtls-rprx-vision',
+      pbk: '',
+      shortId: '',
+      tag: 'HomsiVPN | VLESS | Reality | 🇳🇱 NL',
+    });
   }
 }
