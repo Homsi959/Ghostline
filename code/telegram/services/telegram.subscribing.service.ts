@@ -63,7 +63,7 @@ export class TelegramSubscribingService {
 
     if (!vpnCreated) return;
 
-    return this.generateVpnLink(userId);
+    return this.xrayService.generateVlessLink(userId);
   }
 
   /**
@@ -140,27 +140,5 @@ export class TelegramSubscribingService {
     }
 
     return added;
-  }
-
-  /**
-   * Генерирует ссылку подключения VLESS.
-   */
-  private generateVpnLink(userId: string): string {
-    const { inbounds } = this.xrayService.readConfig();
-    const { protocol, streamSettings } = inbounds[0];
-
-    if (!streamSettings?.security) {
-      throw new Error('Отсутствует настройка безопасности в конфиге Xray');
-    }
-
-    return this.xrayService.generateVlessLink({
-      userId,
-      protocol,
-      security: streamSettings.security,
-      flow: 'xtls-rprx-vision',
-      pbk: '',
-      shortId: '',
-      tag: 'HomsiVPN | VLESS | Reality | 🇳🇱 NL',
-    });
   }
 }

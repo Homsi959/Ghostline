@@ -6,17 +6,17 @@ export interface XrayConfig {
 }
 
 export interface Inbound {
-  listen?: string;
+  listen: string;
   port: number;
   protocol: string;
   settings: InboundSettings;
-  streamSettings?: StreamSettings;
+  streamSettings: StreamSettings;
 }
 
 export interface InboundSettings {
-  clients?: Client[];
-  decryption?: string;
-  services?: string[];
+  clients: Client[];
+  decryption: string;
+  services: string[];
 }
 
 export interface Client {
@@ -42,8 +42,8 @@ export interface RealitySettings {
 export interface Outbound {
   protocol: string;
   tag: string;
-  settings?: {
-    address?: string;
+  settings: {
+    address: string;
   };
 }
 
@@ -68,14 +68,4 @@ export interface Policy {
     statsInboundUplink: boolean;
     statsInboundDownlink: boolean;
   };
-}
-
-export interface VlessLinkParams {
-  userId: string;
-  protocol: string;
-  security: string;
-  flow: string;
-  pbk: string;
-  shortId: string;
-  tag: string;
 }

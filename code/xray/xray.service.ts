@@ -2,14 +2,14 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
 import { readFileSync, writeFileSync } from 'fs';
-import { Client, VlessLinkParams, XrayConfig } from './types';
+import { Client, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { VpnAccountsDao } from 'code/database/dao';
 
 @Injectable()
 export class XrayService implements OnModuleInit {
-  private configPath: string;
-  private restartCmd: string;
+  private xrayConfigPath: string;
+  public xrayConfig: XrayConfig;
 
   constructor(
     private readonly configService: ConfigService,
@@ -24,8 +24,11 @@ export class XrayService implements OnModuleInit {
    * - Загружает VPN-аккаунты из базы данных.
    */
   async onModuleInit() {
-    this.loadEnvironmentConfig();
-    this.injectKeysIntoConfig();
+    const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+
+    if (xrayConfigPath) this.xrayConfigPath = xrayConfigPath;
+
+    this.xrayConfig = this.readConfig();
     await this.loadVpnAccountsFromDb();
   }
 
@@ -103,8 +106,12 @@ export class XrayService implements OnModuleInit {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   restartXray(): boolean {
+    const restartCmd = this.configService.get<string>('XRAY_RESTART_COMMAND');
+
+    if (!restartCmd) return false;
+
     try {
-      execSync(this.restartCmd);
+      execSync(restartCmd);
       this.logger.log(`Xray успешно перезапущен`, this);
       return true;
     } catch (error: unknown) {
@@ -122,26 +129,30 @@ export class XrayService implements OnModuleInit {
 
   /**
    * Формирует VLESS-ссылку для подключения к Xray серверу.
-   * @param params - параметры для подключения
-   * @returns VLESS-ссылка для клиента
+   * Использует данные из текущей конфигурации Xray и переменные окружения.
+   *
+   * @param userId - UUID пользователя, который будет использовать VPN
+   * @returns Сформированная строка VLESS-ссылки
    */
-  generateVlessLink({
-    userId,
-    flow,
-    pbk,
-    protocol,
-    security,
-    shortId,
-    tag,
-  }: VlessLinkParams): string {
-    const host = this.configService.get<string>('XRAY_LISTEN_IP');
+  generateVlessLink(userId: string): string {
+    const { inbounds } = this.xrayConfig;
 
-    if (!host) {
+    const inbound = inbounds[0];
+    const protocol = inbound.protocol;
+    const security = inbound.streamSettings.security;
+    const shortId = inbound.streamSettings.realitySettings.shortIds[0];
+
+    const flow = this.configService.get<string>('XRAY_FLOW');
+    const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
+    const host = this.configService.get<string>('XRAY_LISTEN_IP');
+    const tag = this.configService.get<string>('XRAY_LINK_TAG');
+
+    if (!flow || !pbk || !host || !tag) {
       this.logger.error(
-        `Переменная окружения XRAY_LISTEN_IP отсутствует`,
+        'Не удалось сформировать ссылку — отсутствуют необходимые параметры',
         this,
       );
-      throw new Error('XRAY_LISTEN_IP не задан');
+      throw new Error('Недостаточно данных для генерации ссылки');
     }
 
     const query = [
@@ -154,46 +165,10 @@ export class XrayService implements OnModuleInit {
       'method=none',
     ].join('&');
 
-    const link = `${protocol}://${userId}@${host}?${query}#${tag}`;
+    const link = `${protocol}://${userId}@${host}:443?${query}#${encodeURIComponent(tag)}`;
 
     this.logger.log(`Создана VLESS ссылка: ${link}`, this);
-
     return link;
-  }
-
-  /**
-   * Загружает переменные окружения:
-   * - XRAY_CONFIG_PATH: путь до конфигурационного файла.
-   * - XRAY_RESTART_COMMAND: команда перезапуска Xray.
-   */
-  private loadEnvironmentConfig() {
-    const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    const restartCmd = this.configService.get<string>('XRAY_RESTART_COMMAND');
-
-    if (configPath) this.configPath = configPath;
-    if (restartCmd) this.restartCmd = restartCmd;
-  }
-
-  /**
-   * Подставляет в конфигурационный файл Xray ключи из переменных окружения:
-   * - XRAY_PRIVATE_KEY
-   * - XRAY_SHORT_ID
-   * Если поля присутствуют, перезаписывает конфигурационный файл.
-   */
-  private injectKeysIntoConfig() {
-    const privateKey = this.configService.get<string>('XRAY_PRIVATE_KEY');
-    const shortId = this.configService.get<string>('XRAY_SHORT_ID');
-
-    const config = this.readConfig();
-    const inbound = config.inbounds?.[0];
-    const streamSettings = inbound?.streamSettings;
-    const realitySettings = streamSettings?.realitySettings;
-
-    if (realitySettings && privateKey && shortId) {
-      realitySettings.privateKey = privateKey;
-      realitySettings.shortIds = [shortId];
-      this.writeConfig(config);
-    }
   }
 
   /**
@@ -235,8 +210,8 @@ export class XrayService implements OnModuleInit {
    * Возвращает конфиг Xray
    * @return {XrayConfig} - возвращает конфиг
    */
-  readConfig(): XrayConfig {
-    return JSON.parse(readFileSync(this.configPath, 'utf-8')) as XrayConfig;
+  private readConfig(): XrayConfig {
+    return JSON.parse(readFileSync(this.xrayConfigPath, 'utf-8')) as XrayConfig;
   }
 
   /**
@@ -245,6 +220,6 @@ export class XrayService implements OnModuleInit {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   private writeConfig(config: XrayConfig) {
-    writeFileSync(this.configPath, JSON.stringify(config, null, 2));
+    writeFileSync(this.xrayConfigPath, JSON.stringify(config, null, 2));
   }
 }
