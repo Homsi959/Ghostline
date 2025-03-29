@@ -59,4 +59,5 @@ export interface VpnAccountEntity {
   created_at: Date;
   user_id: string;
   flow: string;
+  devices_limit: number;
 }

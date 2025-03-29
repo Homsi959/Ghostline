@@ -1,4 +1,9 @@
 {
+  "log": {
+    "loglevel": "info",
+    "access": "/Users/homsi/Desktop/Projects/vpn_service/code/xray/logs/access.log",
+    "error": "/Users/homsi/Desktop/Projects/vpn_service/code/xray/logs/error.log"
+  },
   "inbounds": [
     {
       "port": 443,
@@ -13,13 +18,9 @@
         "realitySettings": {
           "show": false,
           "dest": "www.microsoft.com:443",
-          "serverNames": [
-            "www.microsoft.com"
-          ],
+          "serverNames": ["www.microsoft.com"],
           "privateKey": "sEdWVwJzEw7YNPx_RHhT1u1pLu1vQ-B0aH_GymZ90HU",
-          "shortIds": [
-            "d6ffc901031065a5"
-          ],
+          "shortIds": ["d6ffc901031065a5"],
           "xver": 0
         }
       }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 import { SubscriptionPlan } from 'code/database/common/enums';
-import { XrayService } from 'code/xray/xray.service';
+import { XrayClientService } from 'code/xray/xrayClient.service';
 
 @Injectable()
 export class TelegramSubscribingService {
@@ -10,7 +10,7 @@ export class TelegramSubscribingService {
     private readonly logger: WinstonService,
     private readonly subscriptionDao: SubscriptionDao,
     private readonly telegramProfilesDao: TelegramProfilesDao,
-    private readonly xrayService: XrayService,
+    private readonly xrayClientService: XrayClientService,
   ) {}
 
   /**
@@ -63,7 +63,7 @@ export class TelegramSubscribingService {
 
     if (!vpnCreated) return;
 
-    return this.xrayService.generateVlessLink(userId);
+    return this.xrayClientService.generateVlessLink(userId);
   }
 
   /**
@@ -128,7 +128,7 @@ export class TelegramSubscribingService {
    * Создает VPN-аккаунт через Xray.
    */
   private createVpnAccount(userId: string): boolean {
-    const added = this.xrayService.addVpnAccounts([
+    const added = this.xrayClientService.addVpnAccounts([
       {
         id: userId,
         flow: 'xtls-rprx-vision',

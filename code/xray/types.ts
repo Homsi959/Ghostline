@@ -69,3 +69,16 @@ export interface Policy {
     statsInboundDownlink: boolean;
   };
 }
+
+export interface ConnectionLogs {
+  uuid: string;
+  connections: ConnectionInfo[];
+}
+
+export interface ConnectionInfo {
+  ip: string;
+  port: string;
+  inbound: string;
+  appointment: string;
+  dateConnection: string;
+}
