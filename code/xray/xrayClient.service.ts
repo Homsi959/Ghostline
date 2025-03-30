@@ -145,7 +145,7 @@ export class XrayClientService implements OnModuleInit {
    * @param userId - UUID пользователя, который будет использовать VPN
    * @returns Сформированная строка VLESS-ссылки
    */
-  generateVlessLink(userId: string): string {
-    return this.xrayHelperService.generateVlessLink(userId);
+  async generateVlessLink(userId: string): Promise<string> {
+    return await this.xrayHelperService.generateVlessLink(userId);
   }
 }

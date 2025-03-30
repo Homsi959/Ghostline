@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
 import { writeFile } from 'fs';
@@ -7,24 +7,11 @@ import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 
 @Injectable()
-export class XrayHelperService implements OnModuleInit {
-  public xrayConfig: XrayConfig;
-
+export class XrayHelperService {
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: WinstonService,
   ) {}
-
-  /**
-   * Инициализация модуля:
-   * Загрузка конфига в переменную xrayConfig
-   */
-  onModuleInit() {
-    // const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    // if (xrayConfigPath) {
-    //   this.xrayConfig = this.readConfig(xrayConfigPath);
-    // }
-  }
 
   /**
    * Перезапускает Xray
@@ -59,14 +46,21 @@ export class XrayHelperService implements OnModuleInit {
    * @param userId - UUID пользователя, который будет использовать VPN
    * @returns Сформированная строка VLESS-ссылки
    */
-  generateVlessLink(userId: string): string {
-    const { inbounds } = this.xrayConfig;
+  async generateVlessLink(userId: string): Promise<string> {
+    const xrayPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+    if (!xrayPath) {
+      throw new Error('Не найден путь к конфиг файлу Xray в env');
+    }
 
+    const config = await this.readFile<XrayConfig>(xrayPath, {
+      asJson: true,
+    });
+    const { inbounds } = config;
     const inbound = inbounds[0];
     const protocol = inbound.protocol;
     const security = inbound.streamSettings.security;
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
-
+    const sni = inbound.streamSettings.realitySettings.serverNames[0];
     const flow = this.configService.get<string>('XRAY_FLOW');
     const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const host = this.configService.get<string>('XRAY_LISTEN_IP');
@@ -86,7 +80,7 @@ export class XrayHelperService implements OnModuleInit {
       `flow=${flow}`,
       `pbk=${pbk}`,
       `sid=${shortId}`,
-      'sni=www.microsoft.com',
+      `sni=${sni}`,
       'method=none',
     ].join('&');
 
