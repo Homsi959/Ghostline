@@ -4,3 +4,8 @@ export interface ActivatedSubscription {
   telegramId: number;
   plan: SubscriptionPlan;
 }
+
+export interface VpnAccessDecision {
+  toBan: string[];
+  toUnban: string[];
+}

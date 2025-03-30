@@ -1,8 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { readFileSync, writeFileSync } from 'fs';
-import { XrayConfig } from './types';
+import { writeFile } from 'fs';
+import { readFile } from 'fs/promises';
+import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 
 @Injectable()
@@ -96,12 +97,34 @@ export class XrayHelperService implements OnModuleInit {
   }
 
   /**
-   * Возвращает конфиг Xray
-   * @param {xrayPath} - Путь
-   * @return {XrayConfig} - возвращает конфиг
+   * Универсальное чтение файла: текст, JSON или бинарный
+   * @param filePath Путь до файла
+   * @param options Опции чтения: парсинг JSON и/или указание кодировки
+   * @returns Содержимое файла в нужном формате
    */
-  readFile(xrayPath: string): XrayConfig {
-    return JSON.parse(readFileSync(xrayPath, 'utf-8')) as XrayConfig;
+  async readFile<T = any>(
+    filePath: string,
+    options: ReadFileOptions = {},
+  ): Promise<T> {
+    const { asJson = false, encoding } = options;
+
+    const content = await readFile(
+      filePath,
+      encoding ? { encoding } : undefined,
+    );
+
+    if (asJson) {
+      const jsonString =
+        typeof content === 'string' ? content : content.toString('utf-8');
+
+      try {
+        return JSON.parse(jsonString) as T;
+      } catch (error) {
+        throw new Error(`Ошибка парсинга JSON из файла ${filePath}: ${error}`);
+      }
+    }
+
+    return content as T;
   }
 
   /**
@@ -110,6 +133,12 @@ export class XrayHelperService implements OnModuleInit {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   writeFile(xrayPath: string, config: XrayConfig) {
-    writeFileSync(xrayPath, JSON.stringify(config, null, 2));
+    writeFile(xrayPath, JSON.stringify(config, null, 2), (err) => {
+      if (err) {
+        this.logger.error(`Ошибка записи файла: ${err.message}`, this);
+        throw err;
+      }
+      this.logger.log(`Файл успешно записан: ${xrayPath}`, this);
+    });
   }
 }

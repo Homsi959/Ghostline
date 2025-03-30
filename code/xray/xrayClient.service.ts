@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { Client } from './types';
 import { VpnAccountsDao } from 'code/database/dao';
 import { XrayHelperService } from './xrayHelper.service';
 
@@ -37,21 +36,27 @@ export class XrayClientService implements OnModuleInit {
    * @param {vpnAccounts} - список VPN-аккаунтов (uuid пользователей)
    * @return {boolean} - добавление прошло успешно или нет
    */
-  addVpnAccounts(vpnAccounts: Client[]): boolean {
+  async addVpnAccounts(userIDs: string[]): Promise<boolean> {
+    const flow = this.configService.get<string>('XRAY_FLOW');
+
+    if (!flow) {
+      throw new Error('Не был получен flow для Xray');
+    }
+
     try {
-      const config = this.xrayHelperService.readFile(this.xrayPath);
+      const config = await this.xrayHelperService.readFile(this.xrayPath);
       const clients = config.inbounds[0]?.settings?.clients || [];
       let updated = false;
 
-      for (const { id, flow } of vpnAccounts) {
-        const exists = clients.some((client) => client.id == id);
+      for (const userId of userIDs) {
+        const exists = clients.some((client) => client.id == userId);
 
         if (exists) {
-          this.logger.warn(`Клиент ${id} уже существует`, this);
+          this.logger.warn(`Клиент ${userId} уже существует`, this);
           continue;
         }
 
-        clients.push({ id, flow });
+        clients.push({ userId, flow });
         updated = true;
       }
 
@@ -78,9 +83,9 @@ export class XrayClientService implements OnModuleInit {
    * @param {userId} - uuid пользователя
    * @return {boolean} - удаление прошло удачно или нет
    */
-  removeClient(userId: string): boolean {
+  async removeClient(userId: string): Promise<boolean> {
     try {
-      const config = this.xrayHelperService.readFile(this.xrayPath);
+      const config = await this.xrayHelperService.readFile(this.xrayPath);
       const clients = config.inbounds[0]?.settings?.clients || [];
       const filtered = clients.filter((c) => c.id != userId);
 
@@ -114,12 +119,9 @@ export class XrayClientService implements OnModuleInit {
         this.logger.warn(`VPN-аккаунты не найдены в базе данных.`, this);
         return;
       } else {
-        const vpnAccountsFiltered = vpnAccounts.map(({ userId, flow }) => ({
-          id: userId,
-          flow,
-        })) as Client[];
+        const vpnAccountsFiltered = vpnAccounts.map(({ userId }) => userId);
 
-        this.addVpnAccounts(vpnAccountsFiltered);
+        await this.addVpnAccounts(vpnAccountsFiltered);
         this.logger.log(
           `Загружено VPN-аккаунтов из БД в конфиг Xray: ${vpnAccounts.length}`,
           this,

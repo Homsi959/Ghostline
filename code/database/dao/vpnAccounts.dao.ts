@@ -43,7 +43,9 @@ export class VpnAccountsDao {
         sni: acc.sni,
         createdAt: acc.created_at,
         userId: acc.user_id,
-        flow: acc.flow ?? null,
+        flow: acc.flow,
+        isBlocked: acc.isBlocked,
+        devicesLimit: acc.devices_limit,
       }));
 
       return accounts;

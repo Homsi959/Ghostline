@@ -53,5 +53,7 @@ export interface VpnAccount {
   sni: string;
   createdAt: Date;
   userId: string;
-  flow: string | null;
+  flow: string;
+  devicesLimit: number;
+  isBlocked: boolean;
 }

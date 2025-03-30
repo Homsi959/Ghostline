@@ -127,13 +127,8 @@ export class TelegramSubscribingService {
   /**
    * Создает VPN-аккаунт через Xray.
    */
-  private createVpnAccount(userId: string): boolean {
-    const added = this.xrayClientService.addVpnAccounts([
-      {
-        id: userId,
-        flow: 'xtls-rprx-vision',
-      },
-    ]);
+  private async createVpnAccount(userId: string): Promise<boolean> {
+    const added = await this.xrayClientService.addVpnAccounts([userId]);
 
     if (!added) {
       this.logger.warn(`Не удалось добавить VPN клиента ${userId}`, this);

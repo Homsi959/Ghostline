@@ -60,4 +60,5 @@ export interface VpnAccountEntity {
   user_id: string;
   flow: string;
   devices_limit: number;
+  isBlocked: boolean;
 }

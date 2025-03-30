@@ -14,14 +14,9 @@ export interface Inbound {
 }
 
 export interface InboundSettings {
-  clients: Client[];
+  clients: string[];
   decryption: string;
   services: string[];
-}
-
-export interface Client {
-  id: string;
-  flow: string;
 }
 
 export interface StreamSettings {
@@ -69,12 +64,6 @@ export interface Policy {
     statsInboundDownlink: boolean;
   };
 }
-
-export interface ConnectionLogs {
-  uuid: string;
-  connections: ConnectionInfo[];
-}
-
 export interface ConnectionInfo {
   ip: string;
   port: string;
@@ -82,3 +71,22 @@ export interface ConnectionInfo {
   appointment: string;
   dateConnection: string;
 }
+
+export interface ConnectionLog {
+  userId: string;
+  connections: ConnectionInfo[];
+}
+
+export type ConnectionLogs = ConnectionLog[];
+
+export interface LimitedConnection {
+  userId: string;
+  limit: number;
+  IPs: string[];
+  isBlocked: boolean;
+}
+
+export type ReadFileOptions = {
+  asJson?: boolean;
+  encoding?: BufferEncoding;
+};
