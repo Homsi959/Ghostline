@@ -1,12 +1,16 @@
 export interface XrayConfig {
+  log: LogConfig;
   inbounds: Inbound[];
   outbounds: Outbound[];
-  routing: Routing;
-  policy: Policy;
+}
+
+export interface LogConfig {
+  loglevel: string;
+  access: string;
+  error: string;
 }
 
 export interface Inbound {
-  listen: string;
   port: number;
   protocol: string;
   settings: InboundSettings;
@@ -14,9 +18,14 @@ export interface Inbound {
 }
 
 export interface InboundSettings {
-  clients: string[];
+  clients: XrayClient[];
   decryption: string;
-  services: string[];
+}
+
+export interface XrayClient {
+  id: string;
+  flow: string;
+  email: string;
 }
 
 export interface StreamSettings {
@@ -37,33 +46,9 @@ export interface RealitySettings {
 export interface Outbound {
   protocol: string;
   tag: string;
-  settings: {
-    address: string;
-  };
+  settings?: Record<string, unknown>;
 }
 
-export interface Routing {
-  rules: RoutingRule[];
-}
-
-export interface RoutingRule {
-  type: string;
-  inboundTag: string[];
-  outboundTag: string;
-}
-
-export interface Policy {
-  levels: {
-    [key: string]: {
-      statsUserUplink: boolean;
-      statsUserDownlink: boolean;
-    };
-  };
-  system: {
-    statsInboundUplink: boolean;
-    statsInboundDownlink: boolean;
-  };
-}
 export interface ConnectionInfo {
   ip: string;
   port: string;

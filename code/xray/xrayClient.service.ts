@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
 import { VpnAccountsDao } from 'code/database/dao';
 import { XrayHelperService } from './xrayHelper.service';
+import { XrayConfig } from './types';
 
 @Injectable()
 export class XrayClientService implements OnModuleInit {
@@ -44,7 +45,12 @@ export class XrayClientService implements OnModuleInit {
     }
 
     try {
-      const config = await this.xrayHelperService.readFile(this.xrayPath);
+      const config = await this.xrayHelperService.readFile<XrayConfig>(
+        this.xrayPath,
+        {
+          asJson: true,
+        },
+      );
       const clients = config.inbounds[0]?.settings?.clients || [];
       let updated = false;
 
@@ -56,7 +62,7 @@ export class XrayClientService implements OnModuleInit {
           continue;
         }
 
-        clients.push({ userId, flow });
+        clients.push({ id: userId, email: userId, flow });
         updated = true;
       }
 
