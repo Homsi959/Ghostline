@@ -51,7 +51,7 @@ export class XrayClientService implements OnModuleInit {
           asJson: true,
         },
       );
-      const clients = config.inbounds[0]?.settings?.clients || [];
+      const clients = config.inbounds[0].settings.clients;
       let updated = false;
 
       for (const userId of userIDs) {
@@ -91,8 +91,13 @@ export class XrayClientService implements OnModuleInit {
    */
   async removeClient(userId: string): Promise<boolean> {
     try {
-      const config = await this.xrayHelperService.readFile(this.xrayPath);
-      const clients = config.inbounds[0]?.settings?.clients || [];
+      const config = await this.xrayHelperService.readFile<XrayConfig>(
+        this.xrayPath,
+        {
+          asJson: true,
+        },
+      );
+      const clients = config.inbounds[0].settings.clients || [];
       const filtered = clients.filter((c) => c.id != userId);
 
       if (filtered.length == clients.length) {

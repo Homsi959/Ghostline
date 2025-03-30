@@ -59,7 +59,7 @@ export class TelegramSubscribingService {
 
     if (!subscription) return;
 
-    const vpnCreated = this.createVpnAccount(userId);
+    const vpnCreated = await this.createVpnAccount(userId);
 
     if (!vpnCreated) return;
 

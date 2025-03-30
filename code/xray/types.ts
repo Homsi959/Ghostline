@@ -46,7 +46,7 @@ export interface RealitySettings {
 export interface Outbound {
   protocol: string;
   tag: string;
-  settings?: Record<string, unknown>;
+  settings: Record<string, unknown>;
 }
 
 export interface ConnectionInfo {
