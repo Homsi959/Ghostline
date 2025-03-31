@@ -34,8 +34,8 @@ export class XrayClientService implements OnModuleInit {
 
   /**
    * Добавляет в конфигурационный файл Xray новых клиентов
-   * @param {vpnAccounts} - список VPN-аккаунтов (uuid пользователей)
-   * @return {boolean} - добавление прошло успешно или нет
+   * @param userIDs - список VPN-аккаунтов (uuid пользователей)
+   * @returns true, если добавлены новые клиенты; false — если нет
    */
   async addVpnAccounts(userIDs: string[]): Promise<boolean> {
     const flow = this.configService.get<string>('XRAY_FLOW');
@@ -47,30 +47,30 @@ export class XrayClientService implements OnModuleInit {
     try {
       const config = await this.xrayHelperService.readFile<XrayConfig>(
         this.xrayPath,
-        {
-          asJson: true,
-        },
+        { asJson: true },
       );
-      const clients = config.inbounds[0].settings.clients;
-      let updated = false;
+      const clients = config.inbounds[0]?.settings?.clients ?? [];
+      const newClients = userIDs
+        .filter((userId) => {
+          const exists = clients.some((client) => client.id == userId);
+          if (exists) {
+            this.logger.warn(`Клиент ${userId} уже существует`, this);
+            return false;
+          }
+          return true;
+        })
+        .map((userId) => ({
+          id: userId,
+          email: userId,
+          flow,
+        }));
 
-      for (const userId of userIDs) {
-        const exists = clients.some((client) => client.id == userId);
-
-        if (exists) {
-          this.logger.warn(`Клиент ${userId} уже существует`, this);
-          continue;
-        }
-
-        clients.push({ id: userId, email: userId, flow });
-        updated = true;
-      }
-
-      if (!updated) {
+      if (newClients.length == 0) {
         this.logger.log(`Ни одного нового клиента не добавлено`, this);
         return false;
       }
 
+      clients.push(...newClients);
       config.inbounds[0].settings.clients = clients;
       this.xrayHelperService.writeFile(this.xrayPath, config);
 

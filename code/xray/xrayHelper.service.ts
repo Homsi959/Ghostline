@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { writeFile } from 'fs';
+import { writeFile, writeFileSync } from 'fs';
 import { readFile } from 'fs/promises';
+import * as path from 'path';
 import { ReadFileOptions, XrayConfig } from './types';
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 
 @Injectable()
 export class XrayHelperService {
@@ -18,23 +19,45 @@ export class XrayHelperService {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   restartXray(): boolean {
-    const restartCmd = this.configService.get<string>('XRAY_RESTART_COMMAND');
+    const rawPath = this.configService.get<string>('XRAY_CONFIG_PATH');
 
-    if (!restartCmd) return false;
+    if (!rawPath) {
+      throw new Error('XRAY_CONFIG_PATH не задан');
+    }
+
+    const configPath = path.isAbsolute(rawPath)
+      ? rawPath
+      : path.resolve(process.cwd(), rawPath);
 
     try {
-      execSync(restartCmd);
-      this.logger.log(`Xray успешно перезапущен`, this);
+      try {
+        execSync('pkill xray');
+        this.logger.log('Предыдущий процесс Xray завершен', this);
+      } catch {
+        this.logger.warn(
+          'Процесс Xray не был запущен ранее или уже завершен',
+          this,
+        );
+      }
+
+      // Запускаем Xray в фоне
+      const child = spawn('xray', ['run', '-c', configPath], {
+        detached: true,
+        stdio: 'ignore',
+      });
+
+      child.unref();
+
+      // (опционально) сохраняем PID для управления в будущем
+      const pidPath = path.resolve(__dirname, '../../../xray.pid');
+      if (child.pid) writeFileSync(pidPath, child.pid.toString());
+
+      this.logger.log(`Xray перезапущен. PID: ${child.pid}`, this);
       return true;
     } catch (error: unknown) {
-      const errMsg =
-        error instanceof Error ? error.message : 'Неизвестная ошибка';
-
-      this.logger.error(
-        `Не удалось перезапустить Xray: ${errMsg}`,
-        this,
-        error instanceof Error ? error.stack : undefined,
-      );
+      const message =
+        error instanceof Error ? error.message : 'Ошибка запуска Xray';
+      this.logger.error(`Не удалось запустить Xray: ${message}`, this);
       return false;
     }
   }
