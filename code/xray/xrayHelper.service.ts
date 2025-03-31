@@ -6,32 +6,39 @@ import { readFile } from 'fs/promises';
 import * as path from 'path';
 import { ReadFileOptions, XrayConfig } from './types';
 import { execSync, spawn } from 'child_process';
+import { SshService } from 'code/ssh/ssh.service';
+import { DEVELOPMENT } from 'code/common/constants';
 
 @Injectable()
 export class XrayHelperService {
   constructor(
-    private readonly configService: ConfigService,
     private readonly logger: WinstonService,
+    private readonly configService: ConfigService,
+    private readonly sshService: SshService,
   ) {}
 
   /**
    * Перезапускает Xray
    * @return {boolean} - перезапуск прошел удачно или нет
    */
-  restartXray(): boolean {
-    const rawPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+  async restartXray(): Promise<boolean> {
+    const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
 
-    if (!rawPath) {
+    if (!xrayConfigPath) {
       throw new Error('XRAY_CONFIG_PATH не задан');
     }
 
-    const configPath = path.isAbsolute(rawPath)
-      ? rawPath
-      : path.resolve(process.cwd(), rawPath);
+    const configPath = path.isAbsolute(xrayConfigPath)
+      ? xrayConfigPath
+      : path.resolve(process.cwd(), xrayConfigPath);
 
     try {
       try {
-        execSync('pkill xray');
+        if (this.configService.get('NODE_ENV') == DEVELOPMENT) {
+          await this.sshService.runCommand('pkill xray');
+        } else {
+          execSync('pkill xray');
+        }
         this.logger.log('Предыдущий процесс Xray завершен', this);
       } catch {
         this.logger.warn(

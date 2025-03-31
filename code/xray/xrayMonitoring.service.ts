@@ -40,7 +40,7 @@ export class XrayMonitoringService implements OnModuleInit {
    * 4. Вычисляет, какие UUID нужно заблокировать или разблокировать.
    * 5. Выполняет блокировку/разблокировку соответствующих клиентов.
    */
-  @Cron('*/1 * * * *')
+  @Cron('*/5 * * * *')
   async processCheckConnectionLimits() {
     this.logger.log(
       `Началась проверка на количество подключенных устройств`,
