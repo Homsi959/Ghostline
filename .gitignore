@@ -54,3 +54,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 *.generated.yml
 /vpn_clients_generated
+/settings/ssh-keys

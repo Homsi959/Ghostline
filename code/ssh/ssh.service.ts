@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
+import { readFile } from 'fs/promises';
 import { NodeSSH } from 'node-ssh';
+import * as path from 'path';
 
 @Injectable()
 export class SshService {
@@ -13,15 +15,39 @@ export class SshService {
   ) {}
 
   async connect() {
-    const sshKey = this.configService.get<string>('SSH_KEY');
+    const vpsPrivateKeyPath = this.configService.get<string>(
+      'VPS_DEV_PRIVATE_KEY_PATH',
+    );
+    const vpsDevHost = this.configService.get<string>('VPS_DEV_HOST');
+    const vpsDevUsername = this.configService.get<string>('VPS_DEV_USERNAME');
 
-    if (!sshKey) return;
+    if (!vpsPrivateKeyPath || !vpsDevHost || !vpsDevUsername) return;
 
-    await this.ssh.connect({
-      host: '147.45.229.219',
-      username: 'root',
-      privateKey: sshKey,
-    });
+    const sshPrivateKeyAbsolutePath = path.resolve(
+      process.cwd(),
+      vpsPrivateKeyPath,
+    );
+
+    try {
+      const sshKey = await readFile(sshPrivateKeyAbsolutePath, 'utf-8');
+
+      await this.ssh.connect({
+        host: vpsDevHost,
+        username: vpsDevUsername,
+        privateKey: sshKey,
+      });
+
+      this.logger.log(
+        `Подключение с сервером DEV: ${vpsDevHost} по SSH установлено`,
+        this,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при подключении через SSH: ${vpsDevHost}`,
+        this,
+      );
+      throw error;
+    }
   }
 
   async runCommand(command: string): Promise<string> {

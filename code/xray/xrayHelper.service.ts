@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { writeFile, writeFileSync } from 'fs';
+import { writeFile } from 'fs';
 import { readFile } from 'fs/promises';
-import * as path from 'path';
 import { ReadFileOptions, XrayConfig } from './types';
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
 import { DEVELOPMENT } from 'code/common/constants';
 
@@ -23,43 +22,27 @@ export class XrayHelperService {
    */
   async restartXray(): Promise<boolean> {
     const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+    const isDev = this.configService.get('NODE_ENV') == DEVELOPMENT;
 
     if (!xrayConfigPath) {
       throw new Error('XRAY_CONFIG_PATH не задан');
     }
 
-    const configPath = path.isAbsolute(xrayConfigPath)
-      ? xrayConfigPath
-      : path.resolve(process.cwd(), xrayConfigPath);
+    // const configPath = path.isAbsolute(xrayConfigPath)
+    //   ? xrayConfigPath
+    //   : path.resolve(process.cwd(), xrayConfigPath);
 
     try {
       try {
-        if (this.configService.get('NODE_ENV') == DEVELOPMENT) {
-          await this.sshService.runCommand('pkill xray');
+        if (isDev) {
+          await this.sshService.runCommand('sudo systemctl restart xray');
         } else {
-          execSync('pkill xray');
+          execSync('sudo systemctl restart xray');
         }
-        this.logger.log('Предыдущий процесс Xray завершен', this);
+        this.logger.log(`Xray перезапущен`, this);
       } catch {
-        this.logger.warn(
-          'Процесс Xray не был запущен ранее или уже завершен',
-          this,
-        );
+        this.logger.warn(`Процесс Xray не удалось перезапустить`, this);
       }
-
-      // Запускаем Xray в фоне
-      const child = spawn('xray', ['run', '-c', configPath], {
-        detached: true,
-        stdio: 'ignore',
-      });
-
-      child.unref();
-
-      // (опционально) сохраняем PID для управления в будущем
-      const pidPath = path.resolve(__dirname, '../../../xray.pid');
-      if (child.pid) writeFileSync(pidPath, child.pid.toString());
-
-      this.logger.log(`Xray перезапущен. PID: ${child.pid}`, this);
       return true;
     } catch (error: unknown) {
       const message =
