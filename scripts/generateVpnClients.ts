@@ -4,9 +4,15 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 
 const NUM_CLIENTS = 10;
-const CONFIG_TEMPLATE_PATH = path.resolve(__dirname, 'config.json');
-const DOCKERFILE_PATH = path.resolve(__dirname, 'Dockerfile');
-const CLIENTS_ROOT = path.resolve(__dirname, '../vpn_clients');
+const CONFIG_TEMPLATE_PATH = path.resolve(
+  __dirname,
+  '../settings/configs/xray-client.config.dev.json',
+);
+const DOCKERFILE_PATH = path.resolve(
+  __dirname,
+  '../settings/configs/Dockerfile',
+);
+const CLIENTS_ROOT = path.resolve(__dirname, '../vpn_clients_generated');
 const COMPOSE_PATH = path.resolve(__dirname, '../docker-compose.generated.yml');
 const CLIENTS_LIST_PATH = path.join(CLIENTS_ROOT, 'clients.json');
 
@@ -15,7 +21,9 @@ const clientsArray: { id: string; flow: string; email: string }[] = [];
 
 const main = () => {
   if (!fs.existsSync(CONFIG_TEMPLATE_PATH)) {
-    throw new Error(`❌ Не найден config.json по пути ${CONFIG_TEMPLATE_PATH}`);
+    throw new Error(
+      `❌ Не найден xray-client.config.dev.json по пути ${CONFIG_TEMPLATE_PATH}`,
+    );
   }
   if (!fs.existsSync(DOCKERFILE_PATH)) {
     throw new Error(`❌ Не найден Dockerfile по пути ${DOCKERFILE_PATH}`);
@@ -26,7 +34,7 @@ const main = () => {
   for (let i = 1; i <= NUM_CLIENTS; i++) {
     const clientName = `client${i}`;
     const clientDir = path.join(CLIENTS_ROOT, clientName);
-    const configPath = path.join(clientDir, 'config.json');
+    const configPath = path.join(clientDir, 'xray-client.config.dev.json');
     const uuid = randomUUID();
 
     fs.mkdirSync(clientDir, { recursive: true });
@@ -40,10 +48,10 @@ const main = () => {
     composeLines.push(
       `  ${clientName}:`,
       `    build:`,
-      `      context: ./vpn_clients/${clientName}`,
+      `      context: ./vpn_clients_generated/${clientName}`,
       `    container_name: ${clientName}`,
       `    volumes:`,
-      `      - ./vpn_clients/${clientName}/config.json:/app/config.json`,
+      `      - ./vpn_clients_generated/${clientName}/xray-client.config.dev.json:/app/xray-client.config.dev.json`,
       `      - /etc/localtime:/etc/localtime:ro`,
       `    restart: unless-stopped`,
       '',
