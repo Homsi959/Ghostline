@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersDao } from 'code/database/dao/users.dao';
 import { TelegramProfilesDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
@@ -9,16 +9,46 @@ import { Context } from '../common/telegram.types';
 import { SaveTelegramProfile } from 'code/database/common/types';
 import { TelegramSubscribingService } from './telegram.subscribing.service';
 import { SubscriptionPlan } from 'code/database/common/enums';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class TelegramService {
+export class TelegramService implements OnModuleInit {
   constructor(
     private readonly usersDao: UsersDao,
     private readonly telegramProfilesDao: TelegramProfilesDao,
     private readonly historyService: TelegramHistoryService,
     private readonly telegramSubscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
+    private readonly configService: ConfigService,
   ) {}
+
+  onModuleInit() {
+    const limitLengthButton = this.configService.get<string>(
+      'LIMIT_LENGTH_BUTTON',
+    );
+
+    if (!limitLengthButton) {
+      throw new Error('Не получен лимит из конфига');
+    }
+
+    const maxLength = Number(limitLengthButton);
+
+    for (const { keyboardConfig } of Object.values(telegramPages)) {
+      if (!keyboardConfig) continue;
+
+      const tooLongButton = keyboardConfig.buttons.find(
+        ({ text }) => text.length > maxLength,
+      );
+
+      if (tooLongButton) {
+        this.logger.error(
+          `Кнопка "${tooLongButton.text}" превышает лимит в ${maxLength} символов`,
+          this,
+        );
+        throw new Error('Лимит длины строки кнопки превышен');
+      }
+    }
+  }
 
   async startBot(context: Context): Promise<void> {
     const { from } = context;

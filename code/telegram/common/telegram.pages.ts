@@ -12,6 +12,7 @@ export const PAGE_KEYS = {
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
   SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
+  GET_VPN_KEY_PAGE: 'getVpnKeyPage', // Страница получения VPN ключа
 } as const;
 
 /**
@@ -73,6 +74,9 @@ const MESSAGES = {
 
 💳 Выберите удобный для вас тариф и подключайтесь прямо сейчас!
   `,
+  GET_VPN_KEY_PAGE: `
+  Ваш ключ для подключения VPN:
+  `,
 };
 
 /**
@@ -80,7 +84,7 @@ const MESSAGES = {
  */
 export const BUTTONS: Record<string, TelegramButton> = {
   SUBSCRIBING: {
-    text: 'Попробовать бесплатно',
+    text: 'Пробный доступ', // Попробовать бесплатно
     action: PAGE_KEYS.SUBSCRIBING_PAGE,
   },
   ABOUT_SERVICE: {
@@ -88,20 +92,24 @@ export const BUTTONS: Record<string, TelegramButton> = {
     action: PAGE_KEYS.ABOUT_SERVICE_PAGE,
   },
   ACTIVATE_TRIAL: {
-    text: 'Активировать бесплатно на 7 дней',
+    text: 'Актив. на 7 дней', // Активировать бесплатно на 7 дней
     action: ACTIONS_KEYS.ACTIVATE_TRIAL,
   },
   BUY_SUBSCRIPTION: {
-    text: 'Купить подписку',
+    text: 'Купить доступ', // Купить подписку
     action: PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE,
   },
   BUY_FOR_1_MONTH: {
-    text: '1 месяц - 150 рублей',
+    text: '1 мес — 150 ₽',
     action: ACTIONS_KEYS.BUY_FOR_1_MONTH,
   },
   BUY_FOR_6_MONTHS: {
-    text: '6 месяцев - 800 рублей',
+    text: '6 мес — 800 ₽',
     action: ACTIONS_KEYS.BUY_FOR_6_MONTHS,
+  },
+  HOW_TO_CONNECT: {
+    text: 'Как подключить?',
+    action: ACTIONS_KEYS.HOW_TO_CONNECT,
   },
   GO_BACK: {
     text: 'Назад',
@@ -137,6 +145,14 @@ export const telegramPages: TelegramPages = {
     goBackButton: true,
     keyboardConfig: {
       buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
+      columns: 1,
+    },
+  },
+  [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
+    message: MESSAGES.GET_VPN_KEY_PAGE,
+    goBackButton: true,
+    keyboardConfig: {
+      buttons: [BUTTONS.HOW_TO_CONNECT],
       columns: 1,
     },
   },
