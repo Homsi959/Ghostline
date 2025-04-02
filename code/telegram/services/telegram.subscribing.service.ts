@@ -38,7 +38,7 @@ export class TelegramSubscribingService {
       await this.subscriptionDao.findActiveSubscriptionById(userId);
 
     if (hasSubscription) {
-      this.logger.log(
+      this.logger.warn(
         `Пользователь ${userId} уже имеет активную подписку`,
         this,
       );

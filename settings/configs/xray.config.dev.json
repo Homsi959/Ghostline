@@ -10,11 +10,7 @@
       "protocol": "vless",
       "settings": {
         "clients": [
-          {
-            "id": "7b396aea-080c-48e4-b98f-dc4ab0a1e481",
-            "email": "7b396aea-080c-48e4-b98f-dc4ab0a1e481",
-            "flow": "xtls-rprx-vision"
-          }
+
         ],
         "decryption": "none"
       },

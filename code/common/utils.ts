@@ -24,7 +24,11 @@ export function buildInlineKeyboard(
     }
 
     // Добавляем кнопку в соответствующую колонку
-    acc[columnIndex].push(Markup.button.callback(item.text, item.action));
+    acc[columnIndex].push(
+      'action' in item
+        ? Markup.button.callback(item.text, item.action || '')
+        : Markup.button.url(item.text, item.url),
+    );
     return acc;
   }, []);
 
@@ -44,7 +48,7 @@ export function addGoBackButton(
   const keyboardArray = keyboard?.reply_markup.inline_keyboard || [];
 
   keyboardArray.push([
-    Markup.button.callback(BUTTONS.GO_BACK.text, BUTTONS.GO_BACK.action),
+    Markup.button.callback(BUTTONS.GO_BACK.text, BUTTONS.GO_BACK.action || ''),
   ]);
 
   return Markup.inlineKeyboard(keyboardArray);

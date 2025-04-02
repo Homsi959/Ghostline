@@ -1,8 +1,5 @@
 import { TelegramPages, TelegramButton } from './telegram.types';
 import { ACTIONS_KEYS } from './telegram.actions';
-/**
- * Константы для работы с телеграм-страницами, кнопками и действиями.
- */
 
 /**
  * Названия страниц
@@ -13,6 +10,7 @@ export const PAGE_KEYS = {
   SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
   GET_VPN_KEY_PAGE: 'getVpnKeyPage', // Страница получения VPN ключа
+  HOW_TO_CONNECT_PAGE: 'howToConnectPage', // Страница со ссылками на инструкции по подключению
 } as const;
 
 /**
@@ -75,9 +73,28 @@ const MESSAGES = {
 💳 Выберите удобный для вас тариф и подключайтесь прямо сейчас!
   `,
   GET_VPN_KEY_PAGE: `
-  Ваш ключ для подключения VPN:
+🔐 Ваш VPN ключ:
+
+<pre>{{vlessLink}}</pre>
+
+Теперь вы можете подключиться к VPN, используя разные приложения в зависимости от вашего устройства:
+  `,
+  HOW_TO_CONNECT_PAGE: `
+  Выбирете свое устройство и у вас откроется статья с инструкцией
   `,
 };
+
+/**
+ * // TODO перекинуть в env
+ * Ссылки на инструкции для подключения
+ */
+export const CONNECTION_INSTRUCTIONS_LINKS = {
+  HOW_TO_CONNECT_IOS: 'https://teletype.in/@shield_vpn/android',
+  HOW_TO_CONNECT_ANDROID: 'https://teletype.in/@shield_vpn/android',
+  HOW_TO_CONNECT_ANDROID_TV: 'https://teletype.in/@shield_vpn/android',
+  HOW_TO_CONNECT_WINDOWS: 'https://teletype.in/@shield_vpn/android',
+  HOW_TO_CONNECT_MACOS: 'https://teletype.in/@shield_vpn/android',
+} as const;
 
 /**
  * Кнопки для взаимодействия с пользователем
@@ -109,8 +126,30 @@ export const BUTTONS: Record<string, TelegramButton> = {
   },
   HOW_TO_CONNECT: {
     text: 'Как подключить?',
-    action: ACTIONS_KEYS.HOW_TO_CONNECT,
+    action: PAGE_KEYS.HOW_TO_CONNECT_PAGE,
   },
+  // Кнопки с инструкциями подключения
+  CONNECT_IOS: {
+    text: 'IOS',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_IOS,
+  },
+  CONNECT_ANDROID: {
+    text: 'ANDROID',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID,
+  },
+  CONNECT_ANDROID_TV: {
+    text: 'ANDROID_TV',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID_TV,
+  },
+  CONNECT_WINDOWS: {
+    text: 'WINDOWS',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_WINDOWS,
+  },
+  CONNECT_MACOS: {
+    text: 'MACOS',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS,
+  },
+  // Кнопки с инструкциями подключения
   GO_BACK: {
     text: 'Назад',
     action: ACTIONS_KEYS.GO_BACK,
@@ -145,7 +184,7 @@ export const telegramPages: TelegramPages = {
     goBackButton: true,
     keyboardConfig: {
       buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
-      columns: 1,
+      columns: 2,
     },
   },
   [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
@@ -154,6 +193,20 @@ export const telegramPages: TelegramPages = {
     keyboardConfig: {
       buttons: [BUTTONS.HOW_TO_CONNECT],
       columns: 1,
+    },
+  },
+  [PAGE_KEYS.HOW_TO_CONNECT_PAGE]: {
+    message: MESSAGES.HOW_TO_CONNECT_PAGE,
+    goBackButton: true,
+    keyboardConfig: {
+      buttons: [
+        BUTTONS.CONNECT_IOS,
+        BUTTONS.CONNECT_ANDROID,
+        BUTTONS.CONNECT_WINDOWS,
+        BUTTONS.CONNECT_MACOS,
+        BUTTONS.CONNECT_ANDROID_TV,
+      ],
+      columns: 2,
     },
   },
 };

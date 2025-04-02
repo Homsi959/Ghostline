@@ -14,10 +14,15 @@ export const PURCHASE_ACTIONS_KEYS = {
  */
 export const ACTIONS_KEYS = {
   GO_BACK: 'goBack', // Назад
-  HOW_TO_CONNECT: 'howToConnect', // Как подключить VPN
   ...PURCHASE_ACTIONS_KEYS,
 } as const;
 
+/**
+ * Ключи событий, которые соответствуют действиям по покупке подписки.
+ *
+ * Используется для маппинга экшенов Telegram-кнопок к типам подписки (SubscriptionPlan).
+ * Только эти ключи допустимы в объекте ACTIONS_TO_SUBSCRIPTION.
+ */
 type PurchaseActionKey =
   | typeof ACTIONS_KEYS.ACTIVATE_TRIAL
   | typeof ACTIONS_KEYS.BUY_FOR_1_MONTH

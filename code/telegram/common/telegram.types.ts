@@ -1,12 +1,11 @@
 import { Context as TelegrafContext } from 'telegraf';
 
 /**
- * Тип для описания кнопок Telegram.
+ * Тип для описания кнопок Telegram, где можно выбрать либо action, либо url, но не оба одновременно.
  */
-export type TelegramButton = {
-  text: string; // Текст на кнопке
-  action: string; // Действие, которое будет выполнено при нажатии на кнопку
-};
+export type TelegramButton =
+  | { text: string; action: string; url?: never }
+  | { text: string; url: string; action?: never };
 
 /**
  * Тип для конфигурации кнопок на странице Telegram.

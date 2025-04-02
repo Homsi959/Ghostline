@@ -72,13 +72,25 @@ export class TelegramService implements OnModuleInit {
     await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
   }
 
-  async renderPage(context: Context, pageKey: string): Promise<void> {
+  async renderPage(
+    context: Context,
+    pageKey: string,
+    payload?: Record<string, string>,
+  ): Promise<void> {
     if (!context) {
       this.logger.error('Контекст отсутствует', this);
       throw new Error('Контекст отсутствует');
     }
 
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
+    const renderedMessage = payload
+      ? Object.entries(payload).reduce(
+          (msg, [key, value]) =>
+            msg.replace(new RegExp(`{{${key}}}`, 'g'), value),
+          message,
+        )
+      : message;
+
     let buttons = keyboardConfig
       ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
       : undefined;
@@ -87,11 +99,15 @@ export class TelegramService implements OnModuleInit {
       buttons = addGoBackButton(buttons);
     }
 
-    if (context.callbackQuery) {
-      await context.editMessageText(message, buttons);
+    if (context.callbackQuery && buttons) {
+      await context.editMessageText(renderedMessage, {
+        parse_mode: 'HTML',
+        reply_markup: buttons.reply_markup,
+      });
+
       this.logger.log(`Отрисована страница: ${pageKey}`, this);
     } else {
-      await context.reply(message, buttons);
+      await context.reply(renderedMessage, buttons);
       this.logger.log(`Отправлено сообщение со страницей: ${pageKey}`, this);
     }
 
@@ -142,9 +158,10 @@ export class TelegramService implements OnModuleInit {
       plan,
     });
 
-    if (link) {
-      // отрисуй страницу где чел может скоприровать ключ плюс перйти на страницу подключения
-    }
+    if (!link) return;
+    await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE, {
+      vlessLink: link,
+    });
   }
 
   async goBackRender(context: Context): Promise<void> {
