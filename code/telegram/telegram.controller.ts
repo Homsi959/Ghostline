@@ -18,7 +18,6 @@ import { Context } from './common/telegram.types';
 export class TelegramBotController {
   constructor(
     private readonly telegramService: TelegramService,
-    private readonly subscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
   ) {}
 
