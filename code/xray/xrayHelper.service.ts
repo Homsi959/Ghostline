@@ -7,6 +7,7 @@ import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
 import { DEVELOPMENT } from 'code/common/constants';
+import * as path from 'path';
 
 @Injectable()
 export class XrayHelperService {
@@ -28,14 +29,15 @@ export class XrayHelperService {
       throw new Error('XRAY_CONFIG_PATH не задан');
     }
 
-    // const configPath = path.isAbsolute(xrayConfigPath)
-    //   ? xrayConfigPath
-    //   : path.resolve(process.cwd(), xrayConfigPath);
+    const configPath = path.isAbsolute(xrayConfigPath)
+      ? xrayConfigPath
+      : path.resolve(process.cwd(), xrayConfigPath);
 
     try {
       try {
         if (isDev) {
           await this.sshService.runCommand('sudo systemctl restart xray');
+          await this.sshService.uploadFile(configPath, '/etc/xray/config.json');
         } else {
           execSync('sudo systemctl restart xray');
         }

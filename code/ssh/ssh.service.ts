@@ -1,67 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { readFile } from 'fs/promises';
-import { NodeSSH } from 'node-ssh';
+import { exec } from 'child_process';
 import * as path from 'path';
+import { promisify } from 'util';
 
 @Injectable()
-export class SshService {
-  private ssh = new NodeSSH();
+export class SshService implements OnModuleInit {
+  private sshKeyPath: string;
+  private host: string;
+  private username: string;
+  private execAsync = promisify(exec);
 
   constructor(
     private readonly logger: WinstonService,
     private readonly configService: ConfigService,
   ) {}
 
-  async connect() {
-    const vpsPrivateKeyPath = this.configService.get<string>(
+  onModuleInit() {
+    const sshKeyPath = this.configService.get<string>(
       'VPS_DEV_PRIVATE_KEY_PATH',
     );
-    const vpsDevHost = this.configService.get<string>('VPS_DEV_HOST');
-    const vpsDevUsername = this.configService.get<string>('VPS_DEV_USERNAME');
+    const host = this.configService.get<string>('VPS_DEV_HOST');
+    const username = this.configService.get<string>('VPS_DEV_USERNAME');
 
-    if (!vpsPrivateKeyPath || !vpsDevHost || !vpsDevUsername) return;
-
-    const sshPrivateKeyAbsolutePath = path.resolve(
-      process.cwd(),
-      vpsPrivateKeyPath,
-    );
-
-    try {
-      const sshKey = await readFile(sshPrivateKeyAbsolutePath, 'utf-8');
-
-      await this.ssh.connect({
-        host: vpsDevHost,
-        username: vpsDevUsername,
-        privateKey: sshKey,
-      });
-
-      this.logger.log(
-        `Подключение с сервером DEV: ${vpsDevHost} по SSH установлено`,
-        this,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Ошибка при подключении через SSH: ${vpsDevHost}`,
-        this,
-      );
-      throw error;
+    if (!sshKeyPath || !host || !username) {
+      this.logger.error('SSH параметры не заданы', this);
+      throw new Error('SSH параметры не заданы');
     }
+
+    this.sshKeyPath = path.resolve(process.cwd(), sshKeyPath);
+    this.host = host;
+    this.username = username;
+    this.logger.log(
+      `SSH-сервис инициализирован: ${this.username}@${this.host}`,
+      this,
+    );
   }
 
   async runCommand(command: string): Promise<string> {
-    await this.connect();
-    const result = await this.ssh.execCommand(command);
+    const fullCommand = `ssh -i "${this.sshKeyPath}" ${this.username}@${this.host} "${command}"`;
 
-    if (result.stderr) {
+    try {
+      const { stdout, stderr } = await this.execAsync(fullCommand);
+
+      if (stderr) {
+        this.logger.warn(`stderr при выполнении команды: ${stderr}`, this);
+      }
+
+      this.logger.log(`Команда успешно выполнена: ${command}`, this);
+      return stdout.trim();
+    } catch (error: any) {
       this.logger.error(
-        `Не удалось выполнить команду на dev контуре по SSH: ${result.stderr}`,
+        `Ошибка при выполнении SSH команды: ${error.message}`,
         this,
       );
-
-      throw new Error(`Ошибка: ${result.stderr}`);
+      throw new Error(`SSH команда завершилась с ошибкой: ${error.message}`);
     }
-    return result.stdout;
+  }
+
+  async uploadFile(localPath: string, remotePath: string): Promise<void> {
+    const scpCommand = `scp -i "${this.sshKeyPath}" "${localPath}" ${this.username}@${this.host}:"${remotePath}"`;
+
+    try {
+      await this.execAsync(scpCommand);
+      this.logger.log(
+        `Файл ${localPath} успешно отправлен на ${remotePath}`,
+        this,
+      );
+    } catch (error: any) {
+      this.logger.error(`Ошибка при отправке файла: ${error.message}`, this);
+      throw new Error(`Ошибка SCP: ${error.message}`);
+    }
   }
 }

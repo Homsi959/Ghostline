@@ -18,9 +18,13 @@
         "realitySettings": {
           "show": false,
           "dest": "www.yahoo.com:443",
-          "serverNames": ["www.yahoo.com"],
+          "serverNames": [
+            "www.yahoo.com"
+          ],
           "privateKey": "sEdWVwJzEw7YNPx_RHhT1u1pLu1vQ-B0aH_GymZ90HU",
-          "shortIds": ["d6ffc901031065a5"],
+          "shortIds": [
+            "d6ffc901031065a5"
+          ],
           "xver": 0
         }
       }

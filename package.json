@@ -22,7 +22,6 @@
     "dotenv": "^16.4.7",
     "nest-winston": "^1.10.2",
     "nestjs-telegraf": "^2.8.1",
-    "node-ssh": "^13.2.1",
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
