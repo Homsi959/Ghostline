@@ -1,8 +1,8 @@
 {
   "log": {
     "loglevel": "info",
-    "access": "/Users/homsi/Desktop/Projects/vpn_service/code/xray/logs/access.log",
-    "error": "/Users/homsi/Desktop/Projects/vpn_service/code/xray/logs/error.log"
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
   },
   "inbounds": [
     {
@@ -17,9 +17,9 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "dest": "www.yahoo.com:443",
+          "dest": "www.microsoft.com:443",
           "serverNames": [
-            "www.yahoo.com"
+            "www.microsoft.com"
           ],
           "privateKey": "sEdWVwJzEw7YNPx_RHhT1u1pLu1vQ-B0aH_GymZ90HU",
           "shortIds": [

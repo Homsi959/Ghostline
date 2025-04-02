@@ -36,8 +36,11 @@ export class XrayHelperService {
     try {
       try {
         if (isDev) {
+          await this.sshService.uploadFile(
+            configPath,
+            '/usr/local/etc/xray/config.json',
+          );
           await this.sshService.runCommand('sudo systemctl restart xray');
-          await this.sshService.uploadFile(configPath, '/etc/xray/config.json');
         } else {
           execSync('sudo systemctl restart xray');
         }
@@ -76,9 +79,13 @@ export class XrayHelperService {
     const security = inbound.streamSettings.security;
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
+
+    const isDev = this.configService.get<string>('NODE_ENV');
     const flow = this.configService.get<string>('XRAY_FLOW');
     const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
-    const host = this.configService.get<string>('XRAY_LISTEN_IP');
+    const host = this.configService.get<string>(
+      isDev ? 'VPS_DEV_HOST' : 'XRAY_LISTEN_IP',
+    );
     const tag = this.configService.get<string>('XRAY_LINK_TAG');
 
     if (!flow || !pbk || !host || !tag) {
