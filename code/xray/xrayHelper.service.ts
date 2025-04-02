@@ -44,7 +44,10 @@ export class XrayHelperService {
         } else {
           execSync('sudo systemctl restart xray');
         }
-        this.logger.log(`Xray перезапущен`, this);
+        this.logger.log(
+          `Xray на контуре ${isDev ? 'DEV' : 'PROD'} перезапущен`,
+          this,
+        );
       } catch {
         this.logger.warn(`Процесс Xray не удалось перезапустить`, this);
       }

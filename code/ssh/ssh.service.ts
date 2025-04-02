@@ -48,7 +48,10 @@ export class SshService implements OnModuleInit {
         this.logger.warn(`stderr при выполнении команды: ${stderr}`, this);
       }
 
-      this.logger.log(`Команда успешно выполнена: ${command}`, this);
+      this.logger.log(
+        `Команда на DEV сервере успешно выполнена: ${command}`,
+        this,
+      );
       return stdout.trim();
     } catch (error: any) {
       this.logger.error(
@@ -65,7 +68,7 @@ export class SshService implements OnModuleInit {
     try {
       await this.execAsync(scpCommand);
       this.logger.log(
-        `Файл ${localPath} успешно отправлен на ${remotePath}`,
+        `Файл ${localPath} успешно отправлен на удаленный DEV сервер и записан в путь ${remotePath}`,
         this,
       );
     } catch (error: any) {

@@ -10,7 +10,7 @@ import { ACTIONS_KEYS } from './telegram.actions';
 export const PAGE_KEYS = {
   MAIN_PAGE: 'mainPage', // Главная страница
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
-  SUBSCRIBING_PAGE: 'SubscribingPage', // Страница подписки
+  SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
 } as const;
 

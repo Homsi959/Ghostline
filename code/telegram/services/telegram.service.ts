@@ -59,10 +59,10 @@ export class TelegramService {
 
     if (context.callbackQuery) {
       await context.editMessageText(message, buttons);
-      this.logger.log(`Изменено сообщение: ${pageKey}`, this);
+      this.logger.log(`Отрисована страница: ${pageKey}`, this);
     } else {
       await context.reply(message, buttons);
-      this.logger.log(`Отправлено сообщение: ${pageKey}`, this);
+      this.logger.log(`Отправлено сообщение со страницей: ${pageKey}`, this);
     }
 
     this.historyService.savePageHistory(context.session.pageHistory, pageKey);
