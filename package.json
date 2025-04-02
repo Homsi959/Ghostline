@@ -9,7 +9,9 @@
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=production nest start",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
-    "gen:activity": "ts-node scripts/generateActivity.ts"
+    "gen:activity": "ts-node scripts/generateActivity.ts",
+    "clean:clients": "ts-node scripts/cleanupVpnClients.ts"
+    
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
