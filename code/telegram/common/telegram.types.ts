@@ -44,6 +44,9 @@ export type TelegramMessageContext = Pick<
  */
 export type TelegramSession = {
   pageHistory: string[];
+  payload: {
+    vlessLink: string;
+  };
 };
 
 /**

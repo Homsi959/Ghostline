@@ -10,6 +10,7 @@ import { SaveTelegramProfile } from 'code/database/common/types';
 import { TelegramSubscribingService } from './telegram.subscribing.service';
 import { SubscriptionPlan } from 'code/database/common/enums';
 import { ConfigService } from '@nestjs/config';
+import { XrayClientService } from 'code/xray/xrayClient.service';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -21,6 +22,7 @@ export class TelegramService implements OnModuleInit {
     private readonly logger: WinstonService,
     private readonly configService: ConfigService,
     private readonly subscriptionDao: SubscriptionDao,
+    private readonly xrayClientService: XrayClientService,
   ) {}
 
   onModuleInit() {
@@ -77,6 +79,11 @@ export class TelegramService implements OnModuleInit {
           );
 
         if (activeSubscribe) {
+          const vlessLink = await this.xrayClientService.generateVlessLink(
+            telegramProfile.userId,
+          );
+
+          context.session.payload.vlessLink = vlessLink;
           await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
         } else {
           await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
@@ -180,14 +187,16 @@ export class TelegramService implements OnModuleInit {
     plan: SubscriptionPlan;
     context: Context;
   }) {
-    const link = await this.telegramSubscribingService.processPurchase({
+    const vlessLink = await this.telegramSubscribingService.processPurchase({
       telegramId,
       plan,
     });
 
-    if (!link) return;
+    if (!vlessLink) return;
+
+    context.session.payload.vlessLink = vlessLink;
     await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE, {
-      vlessLink: link,
+      vlessLink,
     });
   }
 

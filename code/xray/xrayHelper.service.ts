@@ -109,10 +109,10 @@ export class XrayHelperService {
       'method=none',
     ].join('&');
 
-    const link = `${protocol}://${userId}@${host}:443?${query}#${encodeURIComponent(tag)}`;
+    const vlessLink = `${protocol}://${userId}@${host}:443?${query}#${encodeURIComponent(tag)}`;
 
-    this.logger.log(`Создана VLESS ссылка: ${link}`, this);
-    return link;
+    this.logger.log(`Создана VLESS ссылка: ${vlessLink}`, this);
+    return vlessLink;
   }
 
   /**
