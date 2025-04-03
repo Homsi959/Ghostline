@@ -19,7 +19,7 @@ type TelegramButtonConfig = {
  * Тип для описания страницы Telegram.
  */
 type TelegramPage = {
-  message: string; // Сообщение, которое будет отображено на странице
+  message: PageMessage; // Сообщение, которое будет отображено на странице
   keyboardConfig?: TelegramButtonConfig; // Конфигурация клавиатуры с кнопками
   goBackButton?: boolean; // Опциональная кнопка "Назад"
 };
@@ -39,19 +39,24 @@ export type TelegramMessageContext = Pick<
   'reply' | 'editMessageText' | 'callbackQuery'
 >;
 
-/**
- * Сессия Telegram с историей отображаемых страниц.
- */
+/** Сессия Telegram с историей отображаемых страниц. */
 export type TelegramSession = {
   pageHistory: string[];
   payload: {
-    vlessLink: string;
+    vlessLink?: string;
   };
 };
 
-/**
- * Расширенный интерфейс контекста Telegraf, добавляющий типизацию для сессии пользователя.
- */
+/** Расширенный интерфейс контекста Telegraf, добавляющий типизацию для сессии пользователя. */
 export interface Context extends TelegrafContext {
   session: TelegramSession;
 }
+
+/** Сообщение страницы с текстом и необязательными переменными для подстановки */
+type PageMessage = {
+  text: string;
+  dependencies?: string[];
+};
+
+/** Мапа сообщений для всех Telegram-страниц */
+export type TelegramPageMessages = Record<string, PageMessage>;

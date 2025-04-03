@@ -95,25 +95,27 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  async renderPage(
-    context: Context,
-    pageKey: string,
-    payload?: Record<string, string>,
-  ): Promise<void> {
+  async renderPage(context: Context, pageKey: string): Promise<void> {
     if (!context) {
       this.logger.error('Контекст отсутствует', this);
       throw new Error('Контекст отсутствует');
     }
 
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
+    const { text, dependencies } = message;
     const telegramId = context.from?.id;
-    const renderedMessage = payload
-      ? Object.entries(payload).reduce(
-          (msg, [key, value]) =>
-            msg.replace(new RegExp(`{{${key}}}`, 'g'), value),
-          message,
-        )
-      : message;
+    const payload = context.session.payload;
+    let renderedMessage = text;
+
+    // Если у сообщения указаны зависимости — заменяем плейсхолдеры на значения из payload
+    if (dependencies?.length) {
+      renderedMessage = dependencies.reduce((result, key) => {
+        const replacement = payload?.[key as keyof typeof payload] ?? '';
+        const placeholder = new RegExp(`{{${key}}}`, 'g');
+
+        return result.replace(placeholder, replacement);
+      }, text);
+    }
 
     let buttons = keyboardConfig
       ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
@@ -195,9 +197,7 @@ export class TelegramService implements OnModuleInit {
     if (!vlessLink) return;
 
     context.session.payload.vlessLink = vlessLink;
-    await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE, {
-      vlessLink,
-    });
+    await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
   }
 
   async goBackRender(context: Context): Promise<void> {

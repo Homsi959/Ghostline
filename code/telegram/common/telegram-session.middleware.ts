@@ -3,10 +3,10 @@ import { Context, TelegramSession } from './telegram.types';
 /**
  * Значения по умолчанию для сессии Telegram.
  */
-const defaultTelegramSession: TelegramSession = {
+export const defaultTelegramSession: TelegramSession = {
   pageHistory: [],
   payload: {
-    vlessLink: '',
+    vlessLink: undefined,
   },
 };
 

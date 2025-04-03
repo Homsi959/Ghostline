@@ -54,6 +54,16 @@
             "id": "6767c221-14ec-4250-8dd6-03f1131d9c95",
             "email": "6767c221-14ec-4250-8dd6-03f1131d9c95",
             "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "dacf4757-e0a0-4d5e-98b9-5b5045c90f2b",
+            "email": "dacf4757-e0a0-4d5e-98b9-5b5045c90f2b",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "025eb335-a1f4-46f3-8ed3-cd870c1dc0da",
+            "email": "025eb335-a1f4-46f3-8ed3-cd870c1dc0da",
+            "flow": "xtls-rprx-vision"
           }
         ],
         "decryption": "none"
