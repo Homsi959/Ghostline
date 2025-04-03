@@ -5,11 +5,6 @@ import { Context } from './telegram.types';
  */
 const defaultTelegramSession = {
   pageHistory: [],
-  from: {
-    telegramId: 0,
-    isBot: false,
-    languageCode: 'en',
-  },
 };
 
 /**

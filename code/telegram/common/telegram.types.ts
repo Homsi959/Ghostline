@@ -44,7 +44,6 @@ export type TelegramMessageContext = Pick<
  */
 export type TelegramSession = {
   pageHistory: string[];
-  from: any;
 };
 
 /**

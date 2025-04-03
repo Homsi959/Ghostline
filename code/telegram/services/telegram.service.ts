@@ -66,8 +66,6 @@ export class TelegramService implements OnModuleInit {
         languageCode: from.language_code,
       };
 
-      context.session.from = sessionFrom;
-
       const telegramProfile = await this.findTelegramProfile(
         sessionFrom.telegramId,
       );
