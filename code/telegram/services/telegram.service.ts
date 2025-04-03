@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersDao } from 'code/database/dao/users.dao';
-import { TelegramProfilesDao } from 'code/database/dao';
+import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
 import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
@@ -20,6 +20,7 @@ export class TelegramService implements OnModuleInit {
     private readonly telegramSubscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
     private readonly configService: ConfigService,
+    private readonly subscriptionDao: SubscriptionDao,
   ) {}
 
   onModuleInit() {
@@ -66,10 +67,27 @@ export class TelegramService implements OnModuleInit {
       };
 
       context.session.from = sessionFrom;
-      await this.ensureUserExists(sessionFrom);
-    }
 
-    await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+      const telegramProfile = await this.findTelegramProfile(
+        sessionFrom.telegramId,
+      );
+
+      if (telegramProfile) {
+        const activeSubscribe =
+          await this.subscriptionDao.findActiveSubscriptionById(
+            telegramProfile.userId,
+          );
+
+        if (activeSubscribe) {
+          await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
+        } else {
+          await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+        }
+      } else {
+        await this.createUserWithTelegramProfile(sessionFrom);
+        await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+      }
+    }
   }
 
   async renderPage(
@@ -83,6 +101,7 @@ export class TelegramService implements OnModuleInit {
     }
 
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
+    const telegramId = context.from?.id;
     const renderedMessage = payload
       ? Object.entries(payload).reduce(
           (msg, [key, value]) =>
@@ -105,7 +124,10 @@ export class TelegramService implements OnModuleInit {
         reply_markup: buttons.reply_markup,
       });
 
-      this.logger.log(`Отрисована страница: ${pageKey}`, this);
+      this.logger.log(
+        `Для пользователя c telegramId: ${telegramId}, отрисована страница: ${pageKey}`,
+        this,
+      );
     } else {
       await context.reply(renderedMessage, buttons);
       this.logger.log(`Отправлено сообщение со страницей: ${pageKey}`, this);
@@ -114,30 +136,37 @@ export class TelegramService implements OnModuleInit {
     this.historyService.savePageHistory(context.session.pageHistory, pageKey);
   }
 
-  private async ensureUserExists(
+  private async findTelegramProfile(
+    telegramId: number,
+  ): Promise<SaveTelegramProfile | null> {
+    const telegramProfile =
+      await this.telegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
+
+    if (telegramProfile) {
+      this.logger.log(`Найден профиль Telegram c ID=${telegramId}`, this);
+      return telegramProfile;
+    } else {
+      this.logger.warn(`Не найден профиль Telegram c ID=${telegramId}`, this);
+      return null;
+    }
+  }
+
+  private async createUserWithTelegramProfile(
     telegramProfile: Omit<SaveTelegramProfile, 'userId'>,
   ): Promise<void> {
-    const exists =
-      await this.telegramProfilesDao.getTelegramProfileByTelegramId(
-        telegramProfile.telegramId,
-      );
+    const userId = await this.usersDao.createUser();
 
-    if (exists) {
+    if (userId) {
+      this.logger.log(`Создан пользователь с ID: ${userId}`, this);
+
+      await this.telegramProfilesDao.saveTelegramProfile({
+        ...telegramProfile,
+        userId,
+      });
       this.logger.log(
-        `Найден профиль Telegram для c ID=${telegramProfile.telegramId}`,
+        `Сохранен Telegram профиль с TelegramID: ${telegramProfile.telegramId}`,
         this,
       );
-    } else {
-      const userId = await this.usersDao.createUser();
-
-      if (userId) {
-        this.logger.log(`Создан пользователь с ID: ${userId}`, this);
-
-        await this.telegramProfilesDao.saveTelegramProfile({
-          ...telegramProfile,
-          userId,
-        });
-      }
     }
   }
 

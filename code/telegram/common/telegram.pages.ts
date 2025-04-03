@@ -11,6 +11,8 @@ export const PAGE_KEYS = {
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
   GET_VPN_KEY_PAGE: 'getVpnKeyPage', // Страница получения VPN ключа
   HOW_TO_CONNECT_PAGE: 'howToConnectPage', // Страница со ссылками на инструкции по подключению
+  ACTIVE_USER_HOME_PAGE: 'activeUserHomePage', // Страница для клиента у которого уже есть актуальная подписка
+  ACTIVE_USER_KEY_PAGE: 'activeUserKeyPage', // Страница с ключом для клиента у которого уже есть актуальная подписка
 } as const;
 
 /**
@@ -82,6 +84,16 @@ const MESSAGES = {
   HOW_TO_CONNECT_PAGE: `
   Выбирете свое устройство и у вас откроется статья с инструкцией
   `,
+  ACTIVE_USER_HOME_PAGE: `
+  🔓 У вас активна подписка!
+
+Вы в числе наших премиум-пользователей. Спасибо, что выбрали нас 🙌
+Теперь у вас есть полный доступ ко всем функциям сервиса:
+
+✅ Безлимитная скорость
+✅ Защищённое соединение
+✅ Поддержка всех устройств
+  `,
 };
 
 /**
@@ -108,6 +120,19 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: 'О сервисе',
     action: PAGE_KEYS.ABOUT_SERVICE_PAGE,
   },
+  HOW_TO_CONNECT: {
+    text: 'Как подключить?',
+    action: PAGE_KEYS.HOW_TO_CONNECT_PAGE,
+  },
+  GO_BACK: {
+    text: 'Назад',
+    action: ACTIONS_KEYS.GO_BACK,
+  },
+  MY_KEY: {
+    text: 'Мой ключ',
+    action: PAGE_KEYS.ACTIVE_USER_KEY_PAGE,
+  },
+  // Кнопки оформление подписки
   ACTIVATE_TRIAL: {
     text: 'Актив. на 7 дней', // Активировать бесплатно на 7 дней
     action: ACTIONS_KEYS.ACTIVATE_TRIAL,
@@ -123,10 +148,6 @@ export const BUTTONS: Record<string, TelegramButton> = {
   BUY_FOR_6_MONTHS: {
     text: '6 мес — 800 ₽',
     action: ACTIONS_KEYS.BUY_FOR_6_MONTHS,
-  },
-  HOW_TO_CONNECT: {
-    text: 'Как подключить?',
-    action: PAGE_KEYS.HOW_TO_CONNECT_PAGE,
   },
   // Кнопки с инструкциями подключения
   CONNECT_IOS: {
@@ -148,11 +169,6 @@ export const BUTTONS: Record<string, TelegramButton> = {
   CONNECT_MACOS: {
     text: 'MACOS',
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS,
-  },
-  // Кнопки с инструкциями подключения
-  GO_BACK: {
-    text: 'Назад',
-    action: ACTIONS_KEYS.GO_BACK,
   },
 };
 
@@ -206,6 +222,22 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_MACOS,
         BUTTONS.CONNECT_ANDROID_TV,
       ],
+      columns: 2,
+    },
+  },
+  [PAGE_KEYS.ACTIVE_USER_HOME_PAGE]: {
+    message: MESSAGES.ACTIVE_USER_HOME_PAGE,
+    goBackButton: false,
+    keyboardConfig: {
+      buttons: [BUTTONS.MY_KEY, BUTTONS.ABOUT_SERVICE],
+      columns: 2,
+    },
+  },
+  [PAGE_KEYS.ACTIVE_USER_KEY_PAGE]: {
+    message: MESSAGES.GET_VPN_KEY_PAGE,
+    goBackButton: true,
+    keyboardConfig: {
+      buttons: [BUTTONS.HOW_TO_CONNECT],
       columns: 2,
     },
   },
