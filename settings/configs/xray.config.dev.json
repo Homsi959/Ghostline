@@ -10,61 +10,6 @@
       "protocol": "vless",
       "settings": {
         "clients": [
-          {
-            "id": "56edf53d-2089-440c-90fe-30bc1b6c8e25",
-            "email": "56edf53d-2089-440c-90fe-30bc1b6c8e25",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "023af70a-9e5d-4b28-812c-36568e773f7a",
-            "email": "023af70a-9e5d-4b28-812c-36568e773f7a",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "d314e4c8-3070-479c-b9e6-2e55369da14e",
-            "email": "d314e4c8-3070-479c-b9e6-2e55369da14e",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "b413717c-1419-4b05-a482-1f30b7e01b2b",
-            "email": "b413717c-1419-4b05-a482-1f30b7e01b2b",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "4364df31-d32b-477e-82ab-5dfe92cf61d6",
-            "email": "4364df31-d32b-477e-82ab-5dfe92cf61d6",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "2c160337-cf17-4776-a887-bd2e90246ca8",
-            "email": "2c160337-cf17-4776-a887-bd2e90246ca8",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "70f22cbc-0146-4ab3-a063-1ca88da88944",
-            "email": "70f22cbc-0146-4ab3-a063-1ca88da88944",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "ee15d4c1-6379-4f4d-bc38-fb1ffe5ff26e",
-            "email": "ee15d4c1-6379-4f4d-bc38-fb1ffe5ff26e",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "6767c221-14ec-4250-8dd6-03f1131d9c95",
-            "email": "6767c221-14ec-4250-8dd6-03f1131d9c95",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "dacf4757-e0a0-4d5e-98b9-5b5045c90f2b",
-            "email": "dacf4757-e0a0-4d5e-98b9-5b5045c90f2b",
-            "flow": "xtls-rprx-vision"
-          },
-          {
-            "id": "025eb335-a1f4-46f3-8ed3-cd870c1dc0da",
-            "email": "025eb335-a1f4-46f3-8ed3-cd870c1dc0da",
-            "flow": "xtls-rprx-vision"
-          }
         ],
         "decryption": "none"
       },

@@ -220,7 +220,7 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
     message: MESSAGES.GET_VPN_KEY_PAGE,
-    goBackButton: true,
+    goBackButton: false,
     keyboardConfig: {
       buttons: [BUTTONS.HOW_TO_CONNECT],
       columns: 1,
