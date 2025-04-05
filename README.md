@@ -1,7 +1,7 @@
 # VPN Service
 
 <p align="center">
-  <img src="https://via.placeholder.com/600x150?text=VPN+Service" alt="VPN Service Logo" />
+  <img src="https://downloader.disk.yandex.ru/preview/bf689b0a73812d02514e1f368002e913a6ccb815cc51faa93fed13463582713b/67f178a6/Fu4uo8PRKLxPsZErg_0EMlp6KaOvtScnYN0H3ass1NwxaBv4fonP55VVJX9XFV2Q3_y2pLRjsnCfDihbdB5T-g%3D%3D?uid=0&filename=Ghostline%20logo%20%28PROD%29.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&owner_uid=0&tknv=v2&size=2048x2048" alt="Ghostline Logo" />
 </p>
 
 VPN Service — коммерческий проект, построенный на [NestJS](https://nestjs.com) с использованием чистого SQL (через [pg](https://node-postgres.com/)) и [PostgreSQL](https://www.postgresql.org). Проект включает функционал для создания защищённого VPN-соединения (на базе Xray с VLESS+Reality), а также интеграцию с Telegram для управления пользователями.
