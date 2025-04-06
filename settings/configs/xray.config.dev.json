@@ -10,6 +10,46 @@
       "protocol": "vless",
       "settings": {
         "clients": [
+          {
+            "id": "1ec14e99-bd52-4116-b4eb-7057853320a3",
+            "email": "1ec14e99-bd52-4116-b4eb-7057853320a3",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "b35d62cf-d48a-4b05-b94b-c5255d140ad4",
+            "email": "b35d62cf-d48a-4b05-b94b-c5255d140ad4",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "4492052f-0832-4181-a1b8-44029e1fa74e",
+            "email": "4492052f-0832-4181-a1b8-44029e1fa74e",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "1ed0503f-f422-4b3d-8363-1cc24b679eba",
+            "email": "1ed0503f-f422-4b3d-8363-1cc24b679eba",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "7f637966-b627-42c1-ae51-eede4608394d",
+            "email": "7f637966-b627-42c1-ae51-eede4608394d",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "241cf684-6910-4d33-a796-92320423e896",
+            "email": "241cf684-6910-4d33-a796-92320423e896",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "ed2d6457-ef3e-4cf6-985b-8b0753e92bf6",
+            "email": "ed2d6457-ef3e-4cf6-985b-8b0753e92bf6",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "fa5430cb-9109-4a90-9168-17f94f466d09",
+            "email": "fa5430cb-9109-4a90-9168-17f94f466d09",
+            "flow": "xtls-rprx-vision"
+          }
         ],
         "decryption": "none"
       },

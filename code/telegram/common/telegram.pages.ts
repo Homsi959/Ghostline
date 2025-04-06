@@ -116,11 +116,14 @@ const MESSAGES: Record<string, { text: string; dependencies?: string[] }> = {
  * Ссылки на инструкции для подключения
  */
 export const CONNECTION_INSTRUCTIONS_LINKS = {
-  HOW_TO_CONNECT_IOS: 'https://teletype.in/@shield_vpn/android',
-  HOW_TO_CONNECT_ANDROID: 'https://teletype.in/@shield_vpn/android',
-  HOW_TO_CONNECT_ANDROID_TV: 'https://teletype.in/@shield_vpn/android',
-  HOW_TO_CONNECT_WINDOWS: 'https://teletype.in/@shield_vpn/android',
-  HOW_TO_CONNECT_MACOS: 'https://teletype.in/@shield_vpn/android',
+  HOW_TO_CONNECT_IOS: 'https://teletype.in/@ghostline/iOS',
+  HOW_TO_CONNECT_ANDROID: 'https://teletype.in/@ghostline/Android',
+  HOW_TO_CONNECT_ANDROID_TV: 'https://teletype.in/@ghostline/android-tv',
+  HOW_TO_CONNECT_WINDOWS: 'https://teletype.in/@ghostline/Windows',
+  HOW_TO_CONNECT_MACOS_APPLE_SILICON:
+    'https://teletype.in/@ghostline/MacOS-Apple_Silicon',
+  HOW_TO_CONNECT_MACOS_INTEL: 'https://teletype.in/@ghostline/MacOS-Intel',
+  HOW_TO_CONNECT_HUAWEI: 'https://teletype.in/@ghostline/Huawei',
 } as const;
 
 /**
@@ -128,62 +131,68 @@ export const CONNECTION_INSTRUCTIONS_LINKS = {
  */
 export const BUTTONS: Record<string, TelegramButton> = {
   SUBSCRIBING: {
-    text: 'Пробный доступ', // Попробовать бесплатно
+    text: '🎁 Демо-доступ', // 13 символов
     action: PAGE_KEYS.SUBSCRIBING_PAGE,
   },
   ABOUT_SERVICE: {
-    text: 'О сервисе',
+    text: 'ℹ️ О сервисе', // 12 символов
     action: PAGE_KEYS.ABOUT_SERVICE_PAGE,
   },
   HOW_TO_CONNECT: {
-    text: 'Как подключить?',
+    text: '🔌 Подключение', // 14 символов
     action: PAGE_KEYS.HOW_TO_CONNECT_PAGE,
   },
   GO_BACK: {
-    text: 'Назад',
+    text: '🔙 Назад', // 7 символов
     action: ACTIONS_KEYS.GO_BACK,
   },
   MY_KEY: {
-    text: 'Мой ключ',
+    text: '🔑 Мой ключ', // 11 символов
     action: PAGE_KEYS.ACTIVE_USER_KEY_PAGE,
   },
+
   // Кнопки оформление подписки
   ACTIVATE_TRIAL: {
-    text: 'Актив. на 7 дней', // Активировать бесплатно на 7 дней
+    text: '🆓 7 дней пробно', // 15 символов
     action: ACTIONS_KEYS.ACTIVATE_TRIAL,
   },
   BUY_SUBSCRIPTION: {
-    text: 'Купить доступ', // Купить подписку
+    text: '💳 Купить доступ', // 15 символов
     action: PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE,
   },
   BUY_FOR_1_MONTH: {
-    text: '1 мес — 150 ₽',
+    text: '📅 1 мес — 150₽', // 15 символов
     action: ACTIONS_KEYS.BUY_FOR_1_MONTH,
   },
   BUY_FOR_6_MONTHS: {
-    text: '6 мес — 800 ₽',
+    text: '📆 6 мес — 800₽', // 15 символов
     action: ACTIONS_KEYS.BUY_FOR_6_MONTHS,
   },
+
   // Кнопки с инструкциями подключения
   CONNECT_IOS: {
-    text: 'IOS',
+    text: '📱 iOS', // 5 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_IOS,
   },
   CONNECT_ANDROID: {
-    text: 'ANDROID',
+    text: '🤖 Android', // 9 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID,
   },
   CONNECT_ANDROID_TV: {
-    text: 'ANDROID_TV',
+    text: '📺 Android TV', // 13 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID_TV,
   },
   CONNECT_WINDOWS: {
-    text: 'WINDOWS',
+    text: '🖥️ Windows', // 9 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_WINDOWS,
   },
-  CONNECT_MACOS: {
-    text: 'MACOS',
-    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS,
+  CONNECT_MACOS_INTEL: {
+    text: '🍏 MacOS Intel', // 14 символов
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS_INTEL,
+  },
+  CONNECT_MACOS_APPLE_SILICON: {
+    text: '🍏 MacOS Apple M', // 13 символов
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS_APPLE_SILICON,
   },
 };
 
@@ -234,8 +243,9 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_IOS,
         BUTTONS.CONNECT_ANDROID,
         BUTTONS.CONNECT_WINDOWS,
-        BUTTONS.CONNECT_MACOS,
         BUTTONS.CONNECT_ANDROID_TV,
+        BUTTONS.CONNECT_MACOS_INTEL,
+        BUTTONS.CONNECT_MACOS_APPLE_SILICON,
       ],
       columns: 2,
     },

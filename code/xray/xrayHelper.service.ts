@@ -50,6 +50,7 @@ export class XrayHelperService {
         );
       } catch {
         this.logger.warn(`Процесс Xray не удалось перезапустить`, this);
+        return false;
       }
       return true;
     } catch (error: unknown) {
@@ -100,13 +101,14 @@ export class XrayHelperService {
     }
 
     const query = [
-      'encryption=none',
       `security=${security}`,
       `flow=${flow}`,
       `pbk=${pbk}`,
       `sid=${shortId}`,
       `sni=${sni}`,
       'method=none',
+      'encryption=none',
+      'type=tcp',
     ].join('&');
 
     const vlessLink = `${protocol}://${userId}@${host}:443?${query}#${encodeURIComponent(tag)}`;

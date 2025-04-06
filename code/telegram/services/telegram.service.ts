@@ -40,7 +40,7 @@ export class TelegramService implements OnModuleInit {
       if (!keyboardConfig) continue;
 
       const tooLongButton = keyboardConfig.buttons.find(
-        ({ text }) => text.length > maxLength,
+        ({ text }) => Array.from(text).length > maxLength,
       );
 
       if (tooLongButton) {
