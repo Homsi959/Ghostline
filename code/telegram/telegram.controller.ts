@@ -6,7 +6,7 @@ import {
   ACTIONS_TO_SUBSCRIPTION,
   PURCHASE_ACTIONS,
 } from './common/telegram.actions';
-import { TelegramService, TelegramSubscribingService } from './services';
+import { TelegramService } from './services';
 import { Context } from './common/telegram.types';
 
 /**

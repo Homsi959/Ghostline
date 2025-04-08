@@ -30,7 +30,6 @@
     "nest-winston": "^1.10.2",
     "nestjs-telegraf": "^2.8.1",
     "pg": "^8.13.3",
-    "pm2": "^6.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "telegraf": "^4.16.3",
