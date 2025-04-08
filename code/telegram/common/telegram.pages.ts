@@ -150,7 +150,14 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '🔑 Мой ключ', // 11 символов
     action: PAGE_KEYS.ACTIVE_USER_KEY_PAGE,
   },
-
+  ACTIVE_USER_HOME: {
+    text: '🏠 Главная',
+    action: PAGE_KEYS.ACTIVE_USER_HOME_PAGE,
+  },
+  POLICY: {
+    text: 'Политика данных',
+    url: 'https://disk.yandex.ru/i/S0YHz-BGWjY6sQ',
+  },
   // Кнопки оформление подписки
   ACTIVATE_TRIAL: {
     text: '🆓 7 дней пробно', // 15 символов
@@ -203,7 +210,7 @@ export const telegramPages: TelegramPages = {
   [PAGE_KEYS.MAIN_PAGE]: {
     message: MESSAGES.MAIN_PAGE,
     keyboardConfig: {
-      buttons: [BUTTONS.SUBSCRIBING, BUTTONS.ABOUT_SERVICE],
+      buttons: [BUTTONS.SUBSCRIBING, BUTTONS.ABOUT_SERVICE, BUTTONS.POLICY],
       columns: 2,
     },
   },
@@ -237,7 +244,7 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.HOW_TO_CONNECT_PAGE]: {
     message: MESSAGES.HOW_TO_CONNECT_PAGE,
-    goBackButton: true,
+    goBackButton: false,
     keyboardConfig: {
       buttons: [
         BUTTONS.CONNECT_IOS,
@@ -246,6 +253,7 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_ANDROID_TV,
         BUTTONS.CONNECT_MACOS_INTEL,
         BUTTONS.CONNECT_MACOS_APPLE_SILICON,
+        BUTTONS.ACTIVE_USER_HOME,
       ],
       columns: 2,
     },
@@ -254,7 +262,7 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.ACTIVE_USER_HOME_PAGE,
     goBackButton: false,
     keyboardConfig: {
-      buttons: [BUTTONS.MY_KEY, BUTTONS.ABOUT_SERVICE],
+      buttons: [BUTTONS.MY_KEY, BUTTONS.ABOUT_SERVICE, BUTTONS.POLICY],
       columns: 2,
     },
   },
