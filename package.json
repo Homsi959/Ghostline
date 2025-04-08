@@ -1,17 +1,22 @@
 {
-  "name": "ghostline",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "description": "Backend for GhostlineVPN — secure and scalable VPN control panel built with NestJS.",
+  "author": "homsi ghostlinevpn@proton.me",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Homsi959/Ghostline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Homsi959/Ghostline/issues"
+  },
+  "homepage": "https://github.com/Homsi959/Ghostline",
   "scripts": {
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=production nest start",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
     "gen:activity": "ts-node scripts/generateActivity.ts",
     "clean:clients": "ts-node scripts/cleanupVpnClients.ts"
-    
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -25,6 +30,7 @@
     "nest-winston": "^1.10.2",
     "nestjs-telegraf": "^2.8.1",
     "pg": "^8.13.3",
+    "pm2": "^6.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "telegraf": "^4.16.3",
