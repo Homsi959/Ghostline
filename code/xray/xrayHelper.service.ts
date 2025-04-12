@@ -70,7 +70,8 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
-    const isDevLocal = this.configService.get<string>('NODE_ENV');
+    const isDevLocal =
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
     const flow = this.configService.get<string>('XRAY_FLOW');
     const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const host = this.configService.get<string>(
