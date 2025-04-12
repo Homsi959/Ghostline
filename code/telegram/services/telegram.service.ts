@@ -11,6 +11,8 @@ import { TelegramSubscribingService } from './telegram.subscribing.service';
 import { SubscriptionPlan } from 'code/database/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { XrayClientService } from 'code/xray/xrayClient.service';
+import { createReadStream } from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -105,6 +107,11 @@ export class TelegramService implements OnModuleInit {
     const { text, dependencies } = message;
     const telegramId = context.from?.id;
     const payload = context.session.payload;
+    const previewImagePath = path.resolve(
+      __dirname,
+      '../../../assets/bot/main.png',
+    );
+    const previewImageStream = createReadStream(previewImagePath);
     let renderedMessage = text;
 
     // Если у сообщения указаны зависимости — заменяем плейсхолдеры на значения из payload
@@ -126,17 +133,33 @@ export class TelegramService implements OnModuleInit {
     }
 
     if (context.callbackQuery && buttons) {
-      await context.editMessageText(renderedMessage, {
-        parse_mode: 'HTML',
-        reply_markup: buttons.reply_markup,
-      });
+      await context.editMessageMedia(
+        {
+          type: 'photo',
+          media: { source: previewImageStream },
+          caption: renderedMessage,
+          parse_mode: 'HTML',
+        },
+        {
+          reply_markup: buttons?.reply_markup,
+        },
+      );
 
       this.logger.log(
         `Для пользователя c telegramId: ${telegramId}, отрисована страница: ${pageKey}`,
         this,
       );
     } else {
-      await context.reply(renderedMessage, buttons);
+      await context.replyWithPhoto(
+        { source: previewImageStream },
+        {
+          caption: renderedMessage,
+          parse_mode: 'HTML',
+          reply_markup: buttons?.reply_markup?.inline_keyboard
+            ? { inline_keyboard: buttons.reply_markup.inline_keyboard }
+            : undefined,
+        },
+      );
       this.logger.log(`Отправлено сообщение со страницей: ${pageKey}`, this);
     }
 
