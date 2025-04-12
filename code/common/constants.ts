@@ -29,11 +29,16 @@ export const USER_3X_UI = 'USER_3X_UI';
 export const PASSWORD_3X_UI = 'PASSWORD_3X_UI';
 
 /**
- * Режим разработки
+ * Режим разработки локально
  */
-export const DEVELOPMENT = 'development';
+export const DEVELOPMENT_LOCAL = 'dev.local';
+
+/**
+ * Режим разработки локально
+ */
+export const DEVELOPMENT_REMOTE = 'dev.remote';
 
 /**
  * Режим производства
  */
-export const PRODUCTION = 'production';
+export const PRODUCTION = 'prod';

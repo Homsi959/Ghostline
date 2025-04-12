@@ -72,7 +72,7 @@ export class XrayClientService implements OnModuleInit {
 
       clients.push(...newClients);
       config.inbounds[0].settings.clients = clients;
-      this.xrayHelperService.writeFile(this.xrayPath, config);
+      await this.xrayHelperService.writeFile(this.xrayPath, config);
 
       return this.xrayHelperService.restartXray();
     } catch (error: unknown) {

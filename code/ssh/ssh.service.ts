@@ -61,19 +61,4 @@ export class SshService implements OnModuleInit {
       throw new Error(`SSH команда завершилась с ошибкой: ${error.message}`);
     }
   }
-
-  async uploadFile(localPath: string, remotePath: string): Promise<void> {
-    const scpCommand = `scp -i "${this.sshKeyPath}" "${localPath}" ${this.username}@${this.host}:"${remotePath}"`;
-
-    try {
-      await this.execAsync(scpCommand);
-      this.logger.log(
-        `Файл ${localPath} успешно отправлен на удаленный DEV сервер и записан в путь ${remotePath}`,
-        this,
-      );
-    } catch (error: any) {
-      this.logger.error(`Ошибка при отправке файла: ${error.message}`, this);
-      throw new Error(`Ошибка SCP: ${error.message}`);
-    }
-  }
 }

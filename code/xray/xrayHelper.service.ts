@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WinstonService } from 'code/logger/winston.service';
-import { writeFile } from 'fs';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
-import { DEVELOPMENT } from 'code/common/constants';
-import * as path from 'path';
+import { DEVELOPMENT_LOCAL } from 'code/common/constants';
 
 @Injectable()
 export class XrayHelperService {
@@ -23,40 +21,28 @@ export class XrayHelperService {
    */
   async restartXray(): Promise<boolean> {
     const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    const isDev = this.configService.get('NODE_ENV') == DEVELOPMENT;
+    const isDevLocal = this.configService.get('NODE_ENV') === DEVELOPMENT_LOCAL;
 
     if (!xrayConfigPath) {
       throw new Error('XRAY_CONFIG_PATH не задан');
     }
 
-    const configPath = path.isAbsolute(xrayConfigPath)
-      ? xrayConfigPath
-      : path.resolve(process.cwd(), xrayConfigPath);
-
     try {
-      try {
-        if (isDev) {
-          await this.sshService.uploadFile(
-            configPath,
-            '/usr/local/etc/xray/config.json',
-          );
-          await this.sshService.runCommand('sudo systemctl restart xray');
-        } else {
-          execSync('sudo systemctl restart xray');
-        }
-        this.logger.log(
-          `Xray на контуре ${isDev ? 'DEV' : 'PROD'} перезапущен`,
-          this,
-        );
-      } catch {
-        this.logger.warn(`Процесс Xray не удалось перезапустить`, this);
-        return false;
+      if (isDevLocal) {
+        await this.sshService.runCommand('sudo systemctl restart xray');
+      } else {
+        execSync('sudo systemctl restart xray');
       }
+
+      this.logger.log(
+        `Xray на контуре ${isDevLocal ? 'DEV' : 'PROD'} перезапущен`,
+        this,
+      );
       return true;
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Ошибка запуска Xray';
-      this.logger.error(`Не удалось запустить Xray: ${message}`, this);
+      const message = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Не удалось перезапустить Xray: ${message}`, this);
       return false;
     }
   }
@@ -84,11 +70,11 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
-    const isDev = this.configService.get<string>('NODE_ENV');
+    const isDevLocal = this.configService.get<string>('NODE_ENV');
     const flow = this.configService.get<string>('XRAY_FLOW');
     const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const host = this.configService.get<string>(
-      isDev ? 'VPS_DEV_HOST' : 'XRAY_LISTEN_IP',
+      isDevLocal ? 'VPS_DEV_HOST' : 'XRAY_LISTEN_IP',
     );
     const tag = this.configService.get<string>('XRAY_LINK_TAG');
 
@@ -128,11 +114,16 @@ export class XrayHelperService {
     options: ReadFileOptions = {},
   ): Promise<T> {
     const { asJson = false, encoding } = options;
+    const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+    const isDevLocal =
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
+    let content;
 
-    const content = await readFile(
-      filePath,
-      encoding ? { encoding } : undefined,
-    );
+    if (isDevLocal) {
+      content = await this.sshService.runCommand(`cat ${configPath}`);
+    } else {
+      content = await readFile(filePath, encoding ? { encoding } : undefined);
+    }
 
     if (asJson) {
       const jsonString =
@@ -149,17 +140,44 @@ export class XrayHelperService {
   }
 
   /**
-   * Перезаписывает конфиг Xray
-   * @param {config} - js объект на запись
-   * @return {boolean} - перезапуск прошел удачно или нет
+   * Записывает конфиг Xray локально или на удалённый сервер через SSH
+   * @param xrayPath - путь к локальному файлу
+   * @param config - JS-объект конфигурации Xray
    */
-  writeFile(xrayPath: string, config: XrayConfig) {
-    writeFile(xrayPath, JSON.stringify(config, null, 2), (err) => {
-      if (err) {
-        this.logger.error(`Ошибка записи файла: ${err.message}`, this);
-        throw err;
+  async writeFile(xrayPath: string, config: XrayConfig): Promise<void> {
+    const isDevLocal =
+      this.configService.get<string>('NODE_ENV') === DEVELOPMENT_LOCAL;
+
+    const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
+
+    if (!configPath) {
+      throw new Error('XRAY_CONFIG_PATH не задан');
+    }
+
+    const configContent = JSON.stringify(config, null, 2);
+
+    try {
+      if (isDevLocal) {
+        // Экранируем JSON, чтобы безопасно передать через SSH
+        const encoded = Buffer.from(configContent).toString('base64');
+        const command = `echo "${encoded}" | base64 -d | sudo tee ${configPath} > /dev/null`;
+
+        await this.sshService.runCommand(command);
+        this.logger.log(
+          `Файл Xray записан по SSH на путь: ${configPath}`,
+          this,
+        );
+      } else {
+        await writeFile(xrayPath, configContent);
+        this.logger.log(
+          `Файл Xray успешно записан локально: ${xrayPath}`,
+          this,
+        );
       }
-      this.logger.log(`Файл успешно записан: ${xrayPath}`, this);
-    });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Ошибка при записи Xray-файла: ${message}`, this);
+      throw err;
+    }
   }
 }
