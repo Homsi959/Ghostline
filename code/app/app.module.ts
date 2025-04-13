@@ -10,6 +10,7 @@ import { TelegramModule } from 'code/telegram/telegram.module';
 import { HttpModule } from '@nestjs/axios';
 import { initializeTelegramSession } from 'code/telegram/common/telegram-session.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SubscriptionModule } from 'code/subscription/subscription.module';
 
 /**
  * Основной модуль приложения.
@@ -31,6 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TelegramModule,
     HttpModule,
     ScheduleModule.forRoot(),
+    SubscriptionModule,
     // Загрузка конфигурации из переменных окружения
     ConfigModule.forRoot({
       envFilePath: `settings/envs/.env.${process.env.NODE_ENV || 'development'}`,

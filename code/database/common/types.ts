@@ -11,15 +11,22 @@ export interface ActivateSubscription {
 }
 
 /**
- * Активная подписка из БД
+ * Базовая структура подписки из БД
  */
-export interface ActiveSubscription {
-  status: SubscriptionStatus.ACTIVE;
+export interface Subscription {
   userId: string;
   plan: SubscriptionPlan;
-  startDate;
+  status: SubscriptionStatus;
+  startDate: Date;
   endDate: Date;
   createdAt: Date;
+}
+
+/**
+ * Только активная подписка
+ */
+export interface ActiveSubscription extends Subscription {
+  status: SubscriptionStatus.ACTIVE;
 }
 
 /**

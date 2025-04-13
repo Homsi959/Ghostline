@@ -42,11 +42,6 @@ export class XrayMonitoringService implements OnModuleInit {
    */
   @Cron('*/5 * * * *')
   async processCheckConnectionLimits() {
-    this.logger.log(
-      `Началась проверка на количество подключенных устройств`,
-      this,
-    );
-
     const logsPath = this.configService.get<string>('XRAY_LOGS_PATH');
     const vpnAccounts = await this.vpnAccountsDao.getAllVpnAccounts();
 

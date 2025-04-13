@@ -75,10 +75,9 @@ export class TelegramService implements OnModuleInit {
       );
 
       if (telegramProfile) {
-        const activeSubscribe =
-          await this.subscriptionDao.findActiveSubscriptionById(
-            telegramProfile.userId,
-          );
+        const activeSubscribe = await this.subscriptionDao.findActiveById(
+          telegramProfile.userId,
+        );
 
         if (activeSubscribe) {
           const vlessLink = await this.xrayClientService.generateVlessLink(

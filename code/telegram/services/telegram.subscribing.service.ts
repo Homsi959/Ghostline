@@ -34,8 +34,7 @@ export class TelegramSubscribingService {
     this.logger.log(`Найден профиль Telegram с ID=${telegramId}`, this);
 
     const userId = telegramProfile.userId;
-    const hasSubscription =
-      await this.subscriptionDao.findActiveSubscriptionById(userId);
+    const hasSubscription = await this.subscriptionDao.findActiveById(userId);
 
     if (hasSubscription) {
       this.logger.warn(
@@ -50,12 +49,7 @@ export class TelegramSubscribingService {
 
     if (!endDate) return;
 
-    const subscription = await this.createSubscription(
-      userId,
-      plan,
-      startDate,
-      endDate,
-    );
+    const subscription = await this.create(userId, plan, startDate, endDate);
 
     if (!subscription) return;
 
@@ -96,13 +90,13 @@ export class TelegramSubscribingService {
   /**
    * Создает подписку в БД.
    */
-  private async createSubscription(
+  private async create(
     userId: string,
     plan: SubscriptionPlan,
     start: Date,
     end: Date,
   ) {
-    const subscription = await this.subscriptionDao.createSubscription({
+    const subscription = await this.subscriptionDao.create({
       userId,
       plan,
       startDate: start,
