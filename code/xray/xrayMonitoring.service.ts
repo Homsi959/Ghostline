@@ -25,8 +25,12 @@ export class XrayMonitoringService implements OnModuleInit {
     private readonly xrayClientService: XrayClientService,
   ) {}
 
-  async onModuleInit() {
-    await this.processCheckConnectionLimits();
+  onModuleInit() {
+    setInterval(() => {
+      this.processCheckConnectionLimits().catch((error) => {
+        this.logger.error('Error in processCheckConnectionLimits:', error);
+      });
+    }, 1000);
   }
 
   /**

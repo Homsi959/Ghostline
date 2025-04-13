@@ -3,6 +3,7 @@ import { WinstonService } from 'code/logger/winston.service';
 import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
 import { SubscriptionPlan } from 'code/database/common/enums';
 import { XrayClientService } from 'code/xray/xrayClient.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class TelegramSubscribingService {
@@ -44,12 +45,17 @@ export class TelegramSubscribingService {
       return;
     }
 
-    const startDate = new Date();
+    const startDate = DateTime.utc();
     const endDate = this.calculateEndDate(startDate, plan);
 
     if (!endDate) return;
 
-    const subscription = await this.create(userId, plan, startDate, endDate);
+    const subscription = await this.subscriptionDao.create({
+      userId,
+      plan,
+      startDate: startDate.toJSDate(),
+      endDate: endDate.toJSDate(),
+    });
 
     if (!subscription) return;
 
@@ -64,58 +70,20 @@ export class TelegramSubscribingService {
    * Вычисляет дату окончания подписки в зависимости от типа плана.
    */
   private calculateEndDate(
-    startDate: Date,
+    startDate: DateTime,
     plan: SubscriptionPlan,
-  ): Date | null {
-    const endDate = new Date(startDate);
-
+  ): DateTime | null {
     switch (plan) {
       case SubscriptionPlan.TRIAL:
-        endDate.setDate(startDate.getDate() + 7);
-        break;
+        return startDate.plus({ days: 7 });
       case SubscriptionPlan.ONE_MONTH:
-        endDate.setUTCMonth(startDate.getUTCMonth() + 1);
-        break;
+        return startDate.plus({ months: 1 });
       case SubscriptionPlan.SIX_MONTHS:
-        endDate.setUTCMonth(startDate.getUTCMonth() + 6);
-        break;
+        return startDate.plus({ months: 6 });
       default:
         this.logger.error(`Неизвестный тип подписки: ${String(plan)}`);
         return null;
     }
-
-    return endDate;
-  }
-
-  /**
-   * Создает подписку в БД.
-   */
-  private async create(
-    userId: string,
-    plan: SubscriptionPlan,
-    start: Date,
-    end: Date,
-  ) {
-    const subscription = await this.subscriptionDao.create({
-      userId,
-      plan,
-      startDate: start,
-      endDate: end,
-    });
-
-    if (!subscription) {
-      this.logger.warn(
-        `Не удалось создать подписку: план ${plan}, пользователь ${userId}`,
-        this,
-      );
-      return null;
-    }
-
-    this.logger.log(
-      `Подписка активирована для пользователя ${userId} на план ${plan}`,
-      this,
-    );
-    return subscription;
   }
 
   /**
