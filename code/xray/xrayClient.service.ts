@@ -85,35 +85,44 @@ export class XrayClientService implements OnModuleInit {
   }
 
   /**
-   * Удаляет в конфгурационном файле Xray клиента
-   * @param {userId} - uuid пользователя
-   * @return {boolean} - удаление прошло удачно или нет
+   * Удаляет клиента из конфигурационного файла Xray по userId.
+   *
+   * @param userId - UUID пользователя
+   * @returns true, если клиент успешно удалён и Xray перезапущен; иначе false
    */
   async removeClient(userId: string): Promise<boolean> {
     try {
       const config = await this.xrayHelperService.readFile<XrayConfig>(
         this.xrayPath,
-        {
-          asJson: true,
-        },
+        { asJson: true },
       );
-      const clients = config.inbounds[0].settings.clients || [];
-      const filtered = clients.filter((c) => c.id != userId);
 
-      if (filtered.length == clients.length) {
-        this.logger.warn(`Клиент ${userId} не найден`, this);
+      const clients = config.inbounds[0].settings.clients || [];
+
+      const clientExists = clients.some((client) => client.id === userId);
+      if (!clientExists) {
+        this.logger.warn(`Клиент с ID ${userId} не найден в конфиге`, this);
         return false;
       }
 
-      config.inbounds[0].settings.clients = filtered;
-      this.xrayHelperService.writeFile(this.xrayPath, config);
+      const updatedClients = clients.filter((client) => client.id !== userId);
+      config.inbounds[0].settings.clients = updatedClients;
 
-      return this.xrayHelperService.restartXray();
-    } catch (error: unknown) {
-      const errMsg =
-        error instanceof Error ? error.message : 'Неизвестная ошибка';
+      await this.xrayHelperService.writeFile(this.xrayPath, config);
 
-      this.logger.error(`Ошибка при удалении клиента: ${errMsg}`, this);
+      const restarted = await this.xrayHelperService.restartXray();
+      if (!restarted) {
+        this.logger.error(`Файл обновлён, но Xray не был перезапущен`, this);
+        return false;
+      }
+
+      return true;
+    } catch (error: any) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Ошибка при удалении клиента ${userId}: ${message}`,
+        this,
+      );
       return false;
     }
   }

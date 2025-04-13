@@ -28,7 +28,7 @@ export class SubscriptionDeactivationService implements OnModuleInit {
   private async checkAndDeactivateExpired() {
     const subscriptions = await this.subscriptionDao.findAll();
 
-    if (!subscriptions?.length) return;
+    if (!subscriptions) return;
 
     for (const { userId, endDate, status } of subscriptions) {
       const nowUtc = DateTime.utc();

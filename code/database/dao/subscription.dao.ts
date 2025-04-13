@@ -121,7 +121,7 @@ export class SubscriptionDao {
       if (rows.length == 0) return null;
 
       const activeSubscriptions: Subscription[] = rows.map((row) => ({
-        status: SubscriptionStatus.ACTIVE,
+        status: row.status,
         userId: row.user_id,
         plan: row.plan,
         startDate: row.start_date,
