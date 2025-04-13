@@ -4,6 +4,7 @@ import { SubscriptionStatus } from 'code/database/common/enums';
 import { SubscriptionDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { XrayClientService } from 'code/xray/xrayClient.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class SubscriptionDeactivationService implements OnModuleInit {
@@ -26,14 +27,13 @@ export class SubscriptionDeactivationService implements OnModuleInit {
   @Cron('* * * * *')
   private async checkAndDeactivateExpired() {
     const subscriptions = await this.subscriptionDao.findAll();
-    const nowUtc = new Date();
-    const moscowOffsetMs = 3 * 60 * 60 * 1000;
-    const nowMoscow = new Date(nowUtc.getTime() + moscowOffsetMs);
 
-    if (!subscriptions) return;
+    if (!subscriptions?.length) return;
 
     for (const { userId, endDate, status } of subscriptions) {
-      const isExpired = nowMoscow > new Date(endDate);
+      const nowUtc = DateTime.utc();
+      const endDateUtc = DateTime.fromJSDate(new Date(endDate)).toUTC();
+      const isExpired = nowUtc > endDateUtc;
 
       if (isExpired && status !== SubscriptionStatus.EXPIRED) {
         try {
@@ -41,7 +41,7 @@ export class SubscriptionDeactivationService implements OnModuleInit {
           await this.xrayClientService.removeClient(userId);
 
           this.logger.warn(
-            `Подписка пользователя ${userId} деактивирована: срок действия истёк (${endDate.toISOString()})`,
+            `Подписка пользователя ${userId} деактивирована: срок действия истёк (${endDateUtc.toISO()})`,
             this,
           );
         } catch (error: any) {

@@ -28,6 +28,7 @@
     "@nestjs/schedule": "^5.0.1",
     "axios": "^1.8.3",
     "dotenv": "^16.4.7",
+    "luxon": "^3.6.1",
     "nest-winston": "^1.10.2",
     "nestjs-telegraf": "^2.8.1",
     "pg": "^8.13.3",
