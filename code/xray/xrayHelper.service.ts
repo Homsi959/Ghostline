@@ -115,13 +115,12 @@ export class XrayHelperService {
     options: ReadFileOptions = {},
   ): Promise<T> {
     const { asJson = false, encoding } = options;
-    const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
     const isDevLocal =
       this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
     let content;
 
     if (isDevLocal) {
-      content = await this.sshService.runCommand(`cat ${configPath}`);
+      content = await this.sshService.runCommand(`cat ${filePath}`);
     } else {
       content = await readFile(filePath, encoding ? { encoding } : undefined);
     }

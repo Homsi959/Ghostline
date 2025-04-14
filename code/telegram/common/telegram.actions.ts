@@ -4,7 +4,6 @@ import { SubscriptionPlan } from 'code/database/common/enums';
  * Экшены, связанные с оформлением подписки
  */
 export const PURCHASE_ACTIONS_KEYS = {
-  ACTIVATE_TRIAL: 'activateTrial', // Активировать на 7 дней
   BUY_FOR_1_MONTH: 'buyFor1Month', // Купить на 1 месяц
   BUY_FOR_6_MONTHS: 'buyFor6Months', // Купить на 6 месяцев
 } as const;
@@ -14,6 +13,7 @@ export const PURCHASE_ACTIONS_KEYS = {
  */
 export const ACTIONS_KEYS = {
   GO_BACK: 'goBack', // Назад
+  ACTIVATE_TRIAL: 'activateTrial', // Активировать на 7 дней
   ...PURCHASE_ACTIONS_KEYS,
 } as const;
 
@@ -24,7 +24,6 @@ export const ACTIONS_KEYS = {
  * Только эти ключи допустимы в объекте ACTIONS_TO_SUBSCRIPTION.
  */
 type PurchaseActionKey =
-  | typeof ACTIONS_KEYS.ACTIVATE_TRIAL
   | typeof ACTIONS_KEYS.BUY_FOR_1_MONTH
   | typeof ACTIONS_KEYS.BUY_FOR_6_MONTHS;
 
@@ -35,7 +34,6 @@ export const ACTIONS_TO_SUBSCRIPTION: Record<
   PurchaseActionKey,
   SubscriptionPlan
 > = {
-  [ACTIONS_KEYS.ACTIVATE_TRIAL]: SubscriptionPlan.TRIAL,
   [ACTIONS_KEYS.BUY_FOR_1_MONTH]: SubscriptionPlan.ONE_MONTH,
   [ACTIONS_KEYS.BUY_FOR_6_MONTHS]: SubscriptionPlan.SIX_MONTHS,
 };

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE_TOKEN } from 'code/common/constants';
 import { WinstonService } from 'code/logger/winston.service';
 import { Pool } from 'pg';
-import { VpnAccount } from '../common/types';
+import { CreateVpnAccount, VpnAccount } from '../common/types';
 import { VpnAccountEntity } from '../common/entities';
 
 /**
@@ -23,7 +23,7 @@ export class VpnAccountsDao {
    * Получает список всех VPN-аккаунтов из базы данных.
    * @returns Массив объектов VPN-аккаунтов или null, если ничего не найдено.
    */
-  async getAllVpnAccounts(): Promise<VpnAccount[] | null> {
+  async findAll(): Promise<VpnAccount[] | null> {
     const query = {
       name: 'get-all-vpn_accounts',
       text: `SELECT * FROM vpn_accounts`,
@@ -44,7 +44,7 @@ export class VpnAccountsDao {
         createdAt: acc.created_at,
         userId: acc.user_id,
         flow: acc.flow,
-        isBlocked: acc.isBlocked,
+        isBlocked: acc.is_blocked,
         devicesLimit: acc.devices_limit,
       }));
 
@@ -55,6 +55,71 @@ export class VpnAccountsDao {
 
       this.logger.error(`Не удалось получить VPN аккаунты: ${errMsg}`, this);
       return null;
+    }
+  }
+
+  /**
+   * Создаёт новый VPN-аккаунт в базе данных.
+   *
+   * @returns true, если успешно добавлен, иначе выбрасывает исключение.
+   */
+  async create({
+    userId,
+    sni,
+    server,
+    publicKey,
+    port,
+    isBlocked,
+    flow,
+    devicesLimit,
+  }: CreateVpnAccount): Promise<boolean> {
+    const values = [
+      server,
+      port,
+      publicKey,
+      sni,
+      userId,
+      flow,
+      isBlocked,
+      devicesLimit,
+    ];
+
+    const query = {
+      name: 'create-vpn_account',
+      text: `INSERT INTO vpn_accounts (
+            server,
+            port,
+            public_key,
+            sni,
+            user_id,
+            flow,
+            is_blocked,
+            devices_limit
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
+      values,
+    };
+
+    try {
+      await this.db.query(query);
+      return true;
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : 'Неизвестная ошибка';
+
+      this.logger.error(
+        `Ошибка при создании VPN-аккаунта: ${errMsg}. Данные: ${JSON.stringify({
+          server,
+          port,
+          publicKey,
+          sni,
+          userId,
+          flow,
+          isBlocked,
+          devicesLimit,
+        })}`,
+        this,
+      );
+      throw new Error('Не удалось создать VPN-аккаунт');
     }
   }
 }

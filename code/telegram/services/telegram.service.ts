@@ -202,7 +202,7 @@ export class TelegramService implements OnModuleInit {
   /**
    * Вызывает метод для оформления подписки
    */
-  async subscribe({
+  async processPurchase({
     telegramId,
     plan,
     context,
@@ -215,6 +215,22 @@ export class TelegramService implements OnModuleInit {
       telegramId,
       plan,
     });
+
+    if (!vlessLink) return;
+
+    context.session.payload.vlessLink = vlessLink;
+    await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
+  }
+
+  async getTrial({
+    telegramId,
+    context,
+  }: {
+    telegramId: number;
+    context: Context;
+  }) {
+    const vlessLink =
+      await this.telegramSubscribingService.getTrialVpnAccount(telegramId);
 
     if (!vlessLink) return;
 

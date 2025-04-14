@@ -133,7 +133,7 @@ export class XrayClientService implements OnModuleInit {
    */
   private async loadVpnAccountsFromDb() {
     try {
-      const vpnAccounts = await this.vpnAccountsDao.getAllVpnAccounts();
+      const vpnAccounts = await this.vpnAccountsDao.findAll();
 
       if (!vpnAccounts || vpnAccounts.length == 0) {
         this.logger.warn(`VPN-аккаунты не найдены в базе данных.`, this);

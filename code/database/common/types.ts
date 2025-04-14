@@ -64,3 +64,5 @@ export interface VpnAccount {
   devicesLimit: number;
   isBlocked: boolean;
 }
+
+export type CreateVpnAccount = Omit<VpnAccount, 'createdAt'>;

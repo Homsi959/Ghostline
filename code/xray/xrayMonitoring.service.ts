@@ -25,12 +25,8 @@ export class XrayMonitoringService implements OnModuleInit {
     private readonly xrayClientService: XrayClientService,
   ) {}
 
-  onModuleInit() {
-    setInterval(() => {
-      this.processCheckConnectionLimits().catch((error) => {
-        this.logger.error('Error in processCheckConnectionLimits:', error);
-      });
-    }, 1000);
+  async onModuleInit() {
+    await this.processCheckConnectionLimits();
   }
 
   /**
@@ -47,16 +43,24 @@ export class XrayMonitoringService implements OnModuleInit {
   @Cron('*/5 * * * *')
   async processCheckConnectionLimits() {
     const logsPath = this.configService.get<string>('XRAY_LOGS_PATH');
-    const vpnAccounts = await this.vpnAccountsDao.getAllVpnAccounts();
+    const vpnAccounts = await this.vpnAccountsDao.findAll();
 
     if (!logsPath || !vpnAccounts) return;
 
-    const logsText = await this.xrayHelperService.readFile<string>(logsPath, {
-      encoding: 'utf8',
-    });
+    let logsText: string;
+
+    try {
+      logsText = await this.xrayHelperService.readFile<string>(logsPath, {
+        encoding: 'utf8',
+      });
+    } catch (err) {
+      this.logger.error(`Ошибка при чтении логов: ${err.message}`, this);
+      return;
+    }
+
     const logsConnections = this.parseLogs(logsText);
-    const limitedConnections = logsConnections.map(
-      ({ userId, connections }) => {
+    const limitedConnections: LimitedConnection[] = logsConnections
+      .map(({ userId, connections }) => {
         const account = vpnAccounts.find((acc) => acc.userId === userId);
 
         if (!account) {
@@ -64,19 +68,22 @@ export class XrayMonitoringService implements OnModuleInit {
             `Лимит пользователя ${userId} на подключения устройств в БД не найден`,
             this,
           );
-          throw new Error(
-            `Лимит пользователя ${userId} на подключения устройств в БД не найден`,
-          );
+          return null;
         }
+
+        const uniqueIPs = [
+          ...new Set(connections.map((connection) => connection.ip)),
+        ];
 
         return {
           userId,
-          IPs: connections.map(({ ip }) => ip),
+          IPs: uniqueIPs,
           limit: account.devicesLimit,
           isBlocked: account.isBlocked,
         };
-      },
-    );
+      })
+      .filter((item): item is LimitedConnection => item !== null);
+
     const vpnAccessDecision =
       this.handleOverLimitConnections(limitedConnections);
 
@@ -97,11 +104,6 @@ export class XrayMonitoringService implements OnModuleInit {
       );
       await this.xrayClientService.addVpnAccounts([userId]);
     }
-
-    this.logger.log(
-      `Закончена проверка на количество подключенных устройств`,
-      this,
-    );
   }
 
   /**
@@ -111,19 +113,34 @@ export class XrayMonitoringService implements OnModuleInit {
    * @returns - готовый объект логов
    */
   private parseLogs(logText: string): ConnectionLogs {
-    const lines = logText.trim().split('\n');
     const logMap = new Map<string, ConnectionInfo[]>();
     const result: ConnectionLogs = [];
 
-    for (const line of lines) {
+    // Разбиваем по совпадению даты, сохраняя дату в начало строки
+    const entries = logText.split(/(?=\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/g);
+
+    for (const entry of entries) {
+      const line = entry.trim();
+      if (!line) continue;
+
       const regex =
-        /^(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})(?:\.\d+)? from ([\d.]+):(\d+) accepted (tcp|udp):([\d.]+:\d+) \[([^\]]+)\] email: (.+)$/;
+        /^(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})(?:\.\d+)? from (?:(tcp):)?([\d.]+):(\d+) accepted (tcp|udp):([\w.-]+:\d+) \[([^\]]+)\] email: ([0-9a-fA-F\-]+)$/;
+
       const match = line.match(regex);
 
       if (!match) continue;
 
-      const [, dateConnection, ip, port, protocol, appointment, inbound, uuid] =
-        match;
+      const [
+        ,
+        dateConnection,
+        tcpFlag,
+        ip,
+        port,
+        protocol,
+        appointment,
+        inbound,
+        uuid,
+      ] = match;
       const connection: ConnectionInfo = {
         ip,
         port,

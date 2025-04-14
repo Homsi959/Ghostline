@@ -8,6 +8,7 @@ import {
 } from './common/telegram.actions';
 import { TelegramService } from './services';
 import { Context } from './common/telegram.types';
+import { SubscriptionPlan } from 'code/database/common/enums';
 
 /**
  * Контроллер для обработки событий в Telegram-боте.
@@ -89,17 +90,42 @@ export class TelegramBotController {
 
     const { data: action } = callback;
     const { id: telegramId } = context.callbackQuery.from;
-    const plan = ACTIONS_TO_SUBSCRIPTION[action];
+    const plan = ACTIONS_TO_SUBSCRIPTION[action] as SubscriptionPlan;
 
     if (!plan) {
       this.logger.error(`Некорректный action: ${action}`, this);
       return;
     }
 
-    await this.telegramService.subscribe({
+    await this.telegramService.processPurchase({
       context,
       telegramId,
       plan,
+    });
+  }
+
+  @Action(ACTIONS_KEYS.ACTIVATE_TRIAL)
+  async getTrial(context: Context) {
+    const callback = context.callbackQuery;
+
+    if (!(callback && 'data' in callback)) {
+      this.logger.error(
+        `Отсутствует data (то есть action) в callbackQuery`,
+        this,
+      );
+      return;
+    }
+
+    if (!(callback && 'from' in callback)) {
+      this.logger.error(`Отсутствует from в callbackQuery`, this);
+      return;
+    }
+
+    const { id: telegramId } = context.callbackQuery.from;
+
+    await this.telegramService.getTrial({
+      telegramId,
+      context,
     });
   }
 }
