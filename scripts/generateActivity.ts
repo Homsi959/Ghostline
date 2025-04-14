@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { performance } from 'perf_hooks';
 
 const execAsync = promisify(exec);
-const NUM_CLIENTS = 50;
+const NUM_CLIENTS = 5;
 const INTERVAL_MS = 1000;
 const TARGET_URLS = [
   'https://www.google.com',

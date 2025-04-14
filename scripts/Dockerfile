@@ -1,4 +1,4 @@
-≠FROM teddysun/xray
+FROM teddysun/xray
 
 RUN apk add --no-cache curl
 

@@ -8,7 +8,33 @@
       "port": 443,
       "protocol": "vless",
       "settings": {
-        "clients": [],
+        "clients": [
+          {
+            "id": "185d61ff-20ba-4c1e-8eaf-6a29be6000b5",
+            "email": "185d61ff-20ba-4c1e-8eaf-6a29be6000b5",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "f85ec783-f192-4cc3-97f7-32b288b672ff",
+            "email": "f85ec783-f192-4cc3-97f7-32b288b672ff",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "d476cad1-e7e0-4d13-ac6a-233def70dcc0",
+            "email": "d476cad1-e7e0-4d13-ac6a-233def70dcc0",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "ee3bf059-f5b5-4277-929d-51373e5b806a",
+            "email": "ee3bf059-f5b5-4277-929d-51373e5b806a",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "9a1382e1-ee90-4e1b-a85e-b73043f40c31",
+            "email": "9a1382e1-ee90-4e1b-a85e-b73043f40c31",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
         "decryption": "none"
       },
       "streamSettings": {

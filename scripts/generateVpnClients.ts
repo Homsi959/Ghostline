@@ -4,15 +4,12 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 
-const NUM_CLIENTS = 50;
+const NUM_CLIENTS = 5;
 const CONFIG_TEMPLATE_PATH = path.resolve(
   __dirname,
-  '../settings/configs/xray-client.config.dev.json',
+  'xray-client.config.dev.json',
 );
-const DOCKERFILE_PATH = path.resolve(
-  __dirname,
-  '../settings/configs/Dockerfile',
-);
+const DOCKERFILE_PATH = path.resolve(__dirname, 'Dockerfile');
 const XRAY_CONFIG_PATH = path.resolve(
   __dirname,
   '../settings/configs/xray.config.dev.json',
