@@ -2,3 +2,4 @@ export * from './users.dao';
 export * from './subscription.dao';
 export * from './telegramProfiles.dao';
 export * from './vpnAccounts.dao';
+export * from './payments.dao';

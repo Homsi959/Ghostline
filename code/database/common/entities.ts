@@ -45,6 +45,8 @@ export interface PaymentEntity {
   status: string;
   created_at: Date;
   user_id: string;
+  description: string;
+  paid_at: Date | null;
 }
 
 /**

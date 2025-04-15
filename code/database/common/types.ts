@@ -66,3 +66,16 @@ export interface VpnAccount {
 }
 
 export type CreateVpnAccount = Omit<VpnAccount, 'createdAt'>;
+
+export type Transaction = {
+  id: number;
+  amount: number;
+  currency: string;
+  paymentMethod: string;
+  transactionId: string;
+  status: string;
+  createdAt: Date;
+  userId: string;
+  description: string;
+  paidAt: Date | null;
+};

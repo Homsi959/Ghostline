@@ -3,10 +3,16 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { PaymentRoboPayload, ReceiptRoboItem, SignaturePayload } from './types';
 import { DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE } from 'code/common/constants';
+import { PaymentsDao } from 'code/database/dao';
+import { WinstonService } from 'code/logger/winston.service';
 
 @Injectable()
 export class RobokassaService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly paymentsDao: PaymentsDao,
+    private readonly logger: WinstonService,
+  ) {}
 
   /**
    * Генерирует ссылку на оплату Robokassa по переданным данным.
@@ -24,7 +30,7 @@ export class RobokassaService {
 
     const { amount, description } = payload;
     const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
-    const invId = String(123123); // TODO: заменить на динамический ID при необходимости
+    const invId = String(928374); // TODO: заменить на динамический ID при необходимости
     const encodedReceipt = this.getEncodedReceipt({
       name: description,
       sum: amount,
@@ -44,12 +50,33 @@ export class RobokassaService {
       InvId: invId,
       Description: description,
       Culture: ROBO_CULTURE,
-      IsTest: isDev ? '1' : '0',
+      IsTest: '0',
       SignatureValue: signature,
       Receipt: encodedReceipt,
     });
 
     return `${ROBO_PAYMENT_URL}?${params.toString()}`;
+  }
+
+  /**
+   * Проверяет существование транзакции по переданному идентификатору.
+   * Используется перед отправкой ответа Robokassa на ResultURL.
+   *
+   * @param id - Значение transaction_id, которое передал провайдер (например, Robokassa InvId)
+   * @returns Возвращает transactionId, если найдена запись, иначе null
+   */
+  async findTransactionIdIfExists(id: string): Promise<string | null> {
+    const transaction = await this.paymentsDao.findByTransactionId(id);
+
+    if (transaction) {
+      this.logger.log(
+        `✅ Транзакция найдена для подтверждения Robokassa: ${JSON.stringify(transaction)}`,
+      );
+      return transaction.transactionId;
+    }
+
+    this.logger.error(`⚠️ Транзакция с transactionId=${id} не найдена`);
+    return null;
   }
 
   /**
