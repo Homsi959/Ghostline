@@ -55,7 +55,7 @@ export class SshService implements OnModuleInit {
       }
 
       this.logger.log(
-        `Команда на DEV сервере успешно выполнена: ${command}`,
+        `Команда на DEV сервере успешно выполнена: ${command.slice(0, 100)}${command.length > 100 ? '...' : ''}`,
         this,
       );
       return stdout.trim();

@@ -165,4 +165,39 @@ export class TelegramSubscribingService {
 
     return added;
   }
+
+  /**
+   * Создаёт подписку в базе данных с учётом московского времени.
+   *
+   * @param userId ID пользователя
+   * @param plan План подписки (платный или любой)
+   * @returns ID созданной подписки
+   * @throws Если расчёт даты или создание не удалось
+   */
+  private async createSubscription(
+    userId: string,
+    plan: PaidSubscriptionPlan | SubscriptionPlan,
+  ): Promise<string> {
+    const start = DateTime.now().setZone('Europe/Moscow');
+    const end = this.calculateEndDate(start, plan);
+
+    if (!end) {
+      throw new Error(
+        `Не удалось рассчитать дату окончания подписки для плана "${plan}"`,
+      );
+    }
+
+    const subscriptionId = await this.subscriptionDao.create({
+      userId,
+      plan,
+      startDate: start.toJSDate(),
+      endDate: end.toJSDate(),
+    });
+
+    if (!subscriptionId) {
+      throw new Error(`Не удалось создать подписку для пользователя ${userId}`);
+    }
+
+    return subscriptionId;
+  }
 }
