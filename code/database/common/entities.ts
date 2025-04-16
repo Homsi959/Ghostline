@@ -1,4 +1,9 @@
-import { SubscriptionPlan, SubscriptionStatus } from './enums';
+import {
+  PaymentMethod,
+  PaymentStatus,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from './enums';
 
 /**
  * Схема таблицы пользователя (таблица users)
@@ -39,12 +44,14 @@ export interface TelegramProfileEntity {
 export interface PaymentEntity {
   id: number;
   amount: number;
-  currency: string;
-  payment_method: string;
+  currency: 'RUB';
+  payment_method: PaymentMethod;
   transaction_id: string;
-  status: string;
+  status: PaymentStatus;
   created_at: Date;
   user_id: string;
+  description: string;
+  paid_at: Date | null;
 }
 
 /**

@@ -1,4 +1,9 @@
-import { SubscriptionPlan, SubscriptionStatus } from './enums';
+import {
+  PaymentMethod,
+  PaymentStatus,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from './enums';
 
 /**
  * Данные на создание подписки
@@ -66,3 +71,25 @@ export interface VpnAccount {
 }
 
 export type CreateVpnAccount = Omit<VpnAccount, 'createdAt'>;
+
+export type Transaction = {
+  id: number;
+  amount: number;
+  currency: 'RUB';
+  paymentMethod: PaymentMethod;
+  transactionId: string;
+  status: PaymentStatus;
+  createdAt: Date;
+  userId: string;
+  description: string;
+  paidAt: Date | null;
+};
+
+/**
+ * Тип для создания новой транзакции.
+ * Устанавливает фиксированный статус 'pending'.
+ */
+export type CreateTransaction = Omit<
+  Transaction,
+  'createdAt' | 'id' | 'paidAt' | 'status'
+>;

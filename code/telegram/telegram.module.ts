@@ -9,6 +9,7 @@ import {
 import { DatabaseModule } from 'code/database/database.module';
 import { XrayModule } from 'code/xray/xray.module';
 import { XrayClientService } from 'code/xray/xrayClient.service';
+import { PaymentsModule } from 'code/payments/payments.module';
 
 /**
  * Модуль для работы с Telegram-ботом.
@@ -17,7 +18,7 @@ import { XrayClientService } from 'code/xray/xrayClient.service';
  * Он включает контроллер и сервис для работы с запросами и взаимодействия с Telegram API.
  */
 @Module({
-  imports: [HttpModule, DatabaseModule, XrayModule],
+  imports: [HttpModule, DatabaseModule, XrayModule, PaymentsModule],
   providers: [
     TelegramBotController,
     TelegramService,
