@@ -44,9 +44,12 @@ export class SubscriptionDeactivationService implements OnModuleInit {
             `Подписка пользователя ${userId} деактивирована: срок действия истёк (${endDateUtc.toISO()})`,
             this,
           );
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+
           this.logger.error(
-            `Ошибка при деактивации подписки userId=${userId}: ${error.message}`,
+            `Ошибка при деактивации подписки userId=${userId}: ${errorMessage}`,
             this,
           );
         }

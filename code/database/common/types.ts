@@ -89,7 +89,4 @@ export type Transaction = {
  * Тип для создания новой транзакции.
  * Устанавливает фиксированный статус 'pending'.
  */
-export type CreateTransaction = Omit<
-  Transaction,
-  'createdAt' | 'id' | 'paidAt' | 'status'
->;
+export type CreateTransaction = Omit<Transaction, 'id' | 'paidAt' | 'status'>;

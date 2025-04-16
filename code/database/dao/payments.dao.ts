@@ -83,6 +83,7 @@ export class PaymentsDao {
     paymentMethod,
     transactionId,
     userId,
+    createdAt,
   }: CreateTransaction): Promise<Transaction> {
     const query = {
       name: 'create-payment',
@@ -94,8 +95,9 @@ export class PaymentsDao {
         payment_method,
         status,
         transaction_id,
-        user_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        user_id,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `,
       values: [
@@ -106,6 +108,7 @@ export class PaymentsDao {
         PaymentStatus.PENDING,
         transactionId,
         userId,
+        createdAt,
       ],
     };
 

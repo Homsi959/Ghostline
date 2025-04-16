@@ -12,6 +12,7 @@ import { DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE } from 'code/common/constants';
 import { PaymentsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { PaymentMethod } from 'code/database/common/enums';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class RobokassaService {
@@ -40,6 +41,7 @@ export class RobokassaService {
       0,
       10,
     );
+    const nowMoscow = DateTime.now().setZone('Europe/Moscow').toJSDate();
     const encodedReceipt = this.getEncodedReceipt({
       name: description,
       sum: amount,
@@ -72,6 +74,7 @@ export class RobokassaService {
       paymentMethod: PaymentMethod.ROBOKASSA,
       transactionId: invId,
       userId,
+      createdAt: nowMoscow,
     });
 
     if (!newTransaction) {
