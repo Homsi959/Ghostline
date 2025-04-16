@@ -81,3 +81,37 @@ export function levelFormatted(level: string): string {
   const formatedLevel = `[${normalizedLevel}]`;
   return formatedLevel.padEnd(9);
 }
+
+/**
+ * Преобразует вложенный объект в плоский объект с ключами через точку.
+ *
+ * @param obj - Вложенный объект.
+ * @param result - Внутренний параметр для накопления результата.
+ * @returns Плоский объект с путями в виде ключей.
+ */
+export function flattenObject(
+  obj: Record<string, any>,
+  result: Record<string, any> = {},
+): Record<string, any> {
+  for (const [key, value] of Object.entries(obj)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      !(value instanceof Date)
+    ) {
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value) &&
+        !(value instanceof Date)
+      ) {
+        flattenObject(value as Record<string, any>, result);
+      }
+    } else {
+      result[key] = value as unknown;
+    }
+  }
+
+  return result;
+}

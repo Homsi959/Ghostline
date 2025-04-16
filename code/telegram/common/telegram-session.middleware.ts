@@ -7,6 +7,10 @@ export const defaultTelegramSession: TelegramSession = {
   pageHistory: [],
   payload: {
     vlessLink: undefined,
+    payment: {
+      plan: undefined,
+      amount: undefined,
+    },
   },
 };
 
