@@ -41,11 +41,7 @@ export class TelegramBotController {
    */
   @Action(/^.*Page$/g)
   async renderPage(context: Context): Promise<void> {
-    if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
-      this.logger.error(`Отсутствует data в callbackQuery`, this);
-      return;
-    }
-    const page = context.callbackQuery?.data;
+    const page = context.callbackQuery.data;
 
     await this.telegramService.renderPage(context, page);
   }
@@ -58,11 +54,6 @@ export class TelegramBotController {
    */
   @Action(ACTIONS_KEYS.GO_BACK)
   async goBack(context: Context) {
-    if (!(context.callbackQuery && 'data' in context.callbackQuery)) {
-      this.logger.error(`Отсутствует data в callbackQuery`, this);
-      return;
-    }
-
     await this.telegramService.goBackRender(context);
   }
 
@@ -73,22 +64,7 @@ export class TelegramBotController {
    */
   @Action(PURCHASE_ACTIONS)
   async handlePurchase(context: Context) {
-    const callback = context.callbackQuery;
-
-    if (!(callback && 'data' in callback)) {
-      this.logger.error(
-        `Отсутствует data (то есть action) в callbackQuery`,
-        this,
-      );
-      return;
-    }
-
-    if (!(callback && 'from' in callback)) {
-      this.logger.error(`Отсутствует from в callbackQuery`, this);
-      return;
-    }
-
-    const { data: action } = callback;
+    const { data: action } = context.callbackQuery;
     const { id: telegramId } = context.callbackQuery.from;
     const plan = ACTIONS_TO_SUBSCRIPTION[action] as PaidSubscriptionPlan;
 
@@ -106,21 +82,6 @@ export class TelegramBotController {
 
   @Action(ACTIONS_KEYS.ACTIVATE_TRIAL)
   async getTrial(context: Context) {
-    const callback = context.callbackQuery;
-
-    if (!(callback && 'data' in callback)) {
-      this.logger.error(
-        `Отсутствует data (то есть action) в callbackQuery`,
-        this,
-      );
-      return;
-    }
-
-    if (!(callback && 'from' in callback)) {
-      this.logger.error(`Отсутствует from в callbackQuery`, this);
-      return;
-    }
-
     const { id: telegramId } = context.callbackQuery.from;
 
     await this.telegramService.getTrial({

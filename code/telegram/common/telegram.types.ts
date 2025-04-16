@@ -1,4 +1,5 @@
 import { Context as TelegrafContext } from 'telegraf';
+import { CallbackQuery } from 'telegraf/types';
 
 /**
  * Тип для описания кнопок Telegram, где можно выбрать либо action, либо url, но не оба одновременно.
@@ -50,6 +51,7 @@ export type TelegramSession = {
 /** Расширенный интерфейс контекста Telegraf, добавляющий типизацию для сессии пользователя. */
 export interface Context extends TelegrafContext {
   session: TelegramSession;
+  callbackQuery: CallbackQuery.DataQuery;
 }
 
 /** Сообщение страницы с текстом и необязательными переменными для подстановки */
