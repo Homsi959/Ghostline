@@ -15,7 +15,7 @@ export class RobokassaController {
     const { SignatureValue, InvId } = body;
     const verifyPayload = {
       signatureValue: SignatureValue,
-      transactionId: InvId,
+      invId: InvId,
     };
     const transactionId =
       await this.robokassaService.verifyTransaction(verifyPayload);

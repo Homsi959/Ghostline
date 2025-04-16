@@ -7,6 +7,9 @@ export interface PaymentRoboPayload {
 
   /** Назначение платежа, например: "Подписка GhostlineVPN на 1 месяц" */
   description: string;
+
+  /** uuid пользователя */
+  userId: string;
 }
 
 /**
@@ -49,6 +52,6 @@ export enum TypeSignature {
 }
 
 export interface RobokassaResult {
-  transactionId: string;
+  invId: string;
   signatureValue: string;
 }

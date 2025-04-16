@@ -11,6 +11,7 @@ import {
 import { DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE } from 'code/common/constants';
 import { PaymentsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
+import { PaymentMethod } from 'code/database/common/enums';
 
 @Injectable()
 export class RobokassaService {
@@ -25,7 +26,7 @@ export class RobokassaService {
    * @param payload Данные для создания платежа (сумма, описание).
    * @returns Сформированная ссылка на оплату.
    */
-  generatePaymentLink(payload: PaymentRoboPayload): string {
+  async generatePaymentLink(payload: PaymentRoboPayload): Promise<string> {
     const {
       ROBO_PAYMENT_URL,
       ROBO_CULTURE,
@@ -33,7 +34,7 @@ export class RobokassaService {
       ROBO_PASSWORD_PAY,
       NODE_ENV,
     } = this.getRequiredEnv();
-    const { amount, description } = payload;
+    const { amount, description, userId } = payload;
     const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
     const invId = `${Date.now()}${Math.floor(Math.random() * 1000)}`.slice(
       0,
@@ -64,6 +65,20 @@ export class RobokassaService {
       Receipt: encodedReceipt,
     });
 
+    const newTransaction = await this.paymentsDao.create({
+      amount,
+      currency: 'RUB',
+      description,
+      paymentMethod: PaymentMethod.ROBOKASSA,
+      transactionId: invId,
+      userId,
+    });
+
+    if (!newTransaction) {
+      this.logger.error(`Не удалось сохранить транзакцию в БД`, this);
+      throw new Error('Не удалось сохранить транзакцию');
+    }
+
     return `${ROBO_PAYMENT_URL}?${params.toString()}`;
   }
 
@@ -72,15 +87,14 @@ export class RobokassaService {
    * @returns ID транзакции, если подпись валидна, иначе null.
    */
   async verifyTransaction({
-    transactionId,
+    invId,
     signatureValue,
   }: RobokassaResult): Promise<string | null> {
-    const transaction =
-      await this.paymentsDao.findByTransactionId(transactionId);
+    const transaction = await this.paymentsDao.findByTransactionId(invId);
     const password = this.configService.get<string>('ROBO_PASSWORD_CHECK');
 
     if (!transaction) {
-      this.logger.warn(`Транзакция не найдена: ${transactionId}`, this);
+      this.logger.warn(`Транзакция не найдена: ${invId}`, this);
       return null;
     }
 
@@ -89,23 +103,29 @@ export class RobokassaService {
       return null;
     }
 
-    const { amount } = transaction;
+    const { amount, transactionId } = transaction;
 
     const expectedSignature = this.getSignature(
       {
         outSum: amount,
-        invId: transactionId,
+        invId,
         password,
       },
       TypeSignature.SIGCHECK,
     );
 
-    if (expectedSignature == signatureValue) {
+    if (expectedSignature === signatureValue) {
+      this.logger.log(
+        `Подпись транзакции верифицирована - ${expectedSignature}`,
+        this,
+      );
       return transactionId;
     }
 
     this.logger.error(
-      `Подпись не совпала для транзакции: ${transactionId}`,
+      `Подпись не совпала для транзакции: ${invId}. 
+      expectedSignature - ${expectedSignature}
+      signatureValue - ${signatureValue}`,
       this,
     );
     return null;
