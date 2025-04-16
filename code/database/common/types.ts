@@ -1,4 +1,5 @@
 import {
+  PaidSubscriptionPlan,
   PaymentMethod,
   PaymentStatus,
   SubscriptionPlan,
@@ -10,7 +11,7 @@ import {
  */
 export interface ActivateSubscription {
   userId: string;
-  plan: SubscriptionPlan;
+  plan: SubscriptionPlan | PaidSubscriptionPlan;
   startDate: Date;
   endDate: Date;
 }
@@ -20,7 +21,7 @@ export interface ActivateSubscription {
  */
 export interface Subscription {
   userId: string;
-  plan: SubscriptionPlan;
+  plan: SubscriptionPlan | PaidSubscriptionPlan;
   status: SubscriptionStatus;
   startDate: Date;
   endDate: Date;

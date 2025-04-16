@@ -8,7 +8,10 @@ import {
 } from './common/telegram.actions';
 import { TelegramService } from './services';
 import { Context } from './common/telegram.types';
-import { SubscriptionPlan } from 'code/database/common/enums';
+import {
+  PaidSubscriptionPlan,
+  SubscriptionPlan,
+} from 'code/database/common/enums';
 
 /**
  * Контроллер для обработки событий в Telegram-боте.
@@ -90,7 +93,7 @@ export class TelegramBotController {
 
     const { data: action } = callback;
     const { id: telegramId } = context.callbackQuery.from;
-    const plan = ACTIONS_TO_SUBSCRIPTION[action] as SubscriptionPlan;
+    const plan = ACTIONS_TO_SUBSCRIPTION[action] as PaidSubscriptionPlan;
 
     if (!plan) {
       this.logger.error(`Некорректный action: ${action}`, this);

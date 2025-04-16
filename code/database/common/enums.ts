@@ -50,6 +50,14 @@ export enum SubscriptionPlan {
 }
 
 /**
+ * Платные типы подписок (без триала).
+ */
+export enum PaidSubscriptionPlan {
+  ONE_MONTH = SubscriptionPlan.ONE_MONTH,
+  SIX_MONTHS = SubscriptionPlan.SIX_MONTHS,
+}
+
+/**
  * Статусы подписок.
  */
 export enum SubscriptionStatus {
