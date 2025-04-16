@@ -23,19 +23,32 @@ export interface ReceiptRoboItem {
 /**
  * Параметры для формирования подписи SignatureValue.
  */
+/**
+ * Параметры для формирования подписи SignatureValue.
+ */
 export interface SignaturePayload {
-  /** Идентификатор магазина в Robokassa */
-  merchantLogin: string;
+  /** Идентификатор магазина в Robokassa (используется для подписи при отправке ссылки) */
+  merchantLogin?: string;
 
-  /** Сумма платежа */
+  /** Сумма платежа в формате 0.00 */
   outSum: number;
 
-  /** Уникальный номер счёта */
+  /** Уникальный номер счёта (обычно совпадает с transaction_id / InvId) */
   invId: string;
 
-  /** Чек, закодированный в строку */
-  receipt: string;
+  /** Строка с фискальным чеком (если используется фискализация) */
+  receipt?: string;
 
-  /** Пароль для подписи (Пароль #1 из настроек магазина) */
+  /** Пароль для подписи (Пароль #1 или #2 из настроек Robokassa) */
   password: string;
+}
+
+export enum TypeSignature {
+  SIGPAY = 'sigPay',
+  SIGCHECK = 'sigCheck',
+}
+
+export interface RobokassaResult {
+  transactionId: string;
+  signatureValue: string;
 }

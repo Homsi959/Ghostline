@@ -1,7 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { RobokassaService } from './robokassa.service';
-import { TransformShpParamsPipe } from './pipes/transform-shp-params.pipe';
 import { RobokassaResultDto } from './dto';
 
 @Controller('')
@@ -10,13 +9,17 @@ export class RobokassaController {
 
   @Post('/api/robokassa/result')
   async handleResult(
-    @Body(new TransformShpParamsPipe()) body: RobokassaResultDto,
+    @Body() body: RobokassaResultDto,
     @Res() response: Response,
   ) {
-    const { transactionId } = body;
-    const exists =
-      await this.robokassaService.findTransactionIdIfExists(transactionId);
+    const { SignatureValue, InvId } = body;
+    const verifyPayload = {
+      signatureValue: SignatureValue,
+      transactionId: InvId,
+    };
+    const transactionId =
+      await this.robokassaService.verifyTransaction(verifyPayload);
 
-    response.status(200).send(`OK${exists}`);
+    response.status(200).send(`OK${transactionId}`);
   }
 }
