@@ -8,7 +8,7 @@ import { TelegramHistoryService } from './telegram.history.service';
 import { Context } from '../common/telegram.types';
 import { SaveTelegramProfile } from 'code/database/common/types';
 import { TelegramSubscribingService } from './telegram.subscribing.service';
-import { SubscriptionPlan } from 'code/database/common/enums';
+import { PaidSubscriptionPlan } from 'code/database/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { XrayClientService } from 'code/xray/xrayClient.service';
 import { createReadStream } from 'fs';
@@ -208,9 +208,15 @@ export class TelegramService implements OnModuleInit {
     context,
   }: {
     telegramId: number;
-    plan: SubscriptionPlan;
+    plan: PaidSubscriptionPlan;
     context: Context;
   }) {
+    // метод вернул ссылку на оплату
+    // отрисуй клиенту страницу где будет эта ссылка и сообщение соотвествующее
+    // а так же кнопка, я оплатил. По нажатию которой должна пройти проверка на то,
+    // реально ли клиент оплатил
+    // Если да - сгенерируй ему ссылку и отрисуй соотвествующую страницу
+    // Если нет - отрисуй что он не оплатил
     const vlessLink = await this.telegramSubscribingService.processPurchase({
       telegramId,
       plan,

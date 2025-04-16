@@ -8,10 +8,7 @@ import {
 } from './common/telegram.actions';
 import { TelegramService } from './services';
 import { Context } from './common/telegram.types';
-import {
-  PaidSubscriptionPlan,
-  SubscriptionPlan,
-} from 'code/database/common/enums';
+import { PaidSubscriptionPlan } from 'code/database/common/enums';
 
 /**
  * Контроллер для обработки событий в Telegram-боте.
