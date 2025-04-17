@@ -1,7 +1,7 @@
 import { BUTTONS } from 'code/telegram/common/telegram.pages';
-import { TelegramButton } from 'code/telegram/common/telegram.types';
 import { Markup } from 'telegraf';
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/types';
+import { BuildInlineKeyboardOptions } from './types';
 
 /**
  * Создаёт Telegram клавиатуру из массива кнопок с заданным количеством колонок.
@@ -10,25 +10,51 @@ import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/types';
  * @param columns - Количество колонок (по умолчанию 1).
  * @returns - Telegram клавиатура.
  */
-export function buildInlineKeyboard(
-  arr: TelegramButton[],
-  columns: number = 1,
-): Markup.Markup<InlineKeyboardMarkup> {
+export function buildInlineKeyboard({
+  arr,
+  columns,
+  payload,
+}: BuildInlineKeyboardOptions): Markup.Markup<InlineKeyboardMarkup> {
+  const flatPayload = flattenObject(payload);
+
   const keyboard = arr.reduce<InlineKeyboardButton[][]>((acc, item, index) => {
-    // Находим индекс текущей колонки, деля на количество колонок
     const columnIndex = Math.floor(index / columns);
 
-    // Если колонка еще не существует, создаем новый массив для нее
+    for (const keyItem in item) {
+      if (Object.prototype.hasOwnProperty.call(item, keyItem)) {
+        const field = item[keyItem] as string | undefined;
+
+        if (typeof field === 'string') {
+          const match = field.match(/{{(.*?)}}/);
+
+          if (match) {
+            const exists = match[1];
+            const value = flatPayload[exists] as string | number | undefined;
+
+            item[keyItem] = field.replace(
+              new RegExp(`{{${exists}}}`, 'g'),
+              value !== undefined ? String(value) : '',
+            );
+          }
+        }
+      }
+    }
+
     if (!acc[columnIndex]) {
       acc[columnIndex] = [];
     }
 
-    // Добавляем кнопку в соответствующую колонку
+    if (!item.url && !item.action) {
+      console.warn(`❌ Кнопка без действия: ${JSON.stringify(item)}`);
+      return acc;
+    }
+
     acc[columnIndex].push(
-      'action' in item
-        ? Markup.button.callback(item.text, item.action || '')
-        : Markup.button.url(item.text, item.url),
+      item.url
+        ? Markup.button.url(item.text, item.url)
+        : Markup.button.callback(item.text, item.action || ''),
     );
+
     return acc;
   }, []);
 

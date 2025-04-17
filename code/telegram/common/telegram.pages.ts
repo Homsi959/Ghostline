@@ -191,6 +191,10 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '💬 Поддержка',
     url: 'https://t.me/GhostlineSupport',
   },
+  PAY: {
+    text: '💳 Оплатить',
+    url: '{{paymentLink}}',
+  },
   // Кнопки оформление подписки
   ACTIVATE_TRIAL: {
     text: '🆓 7 дней пробно', // 15 символов
@@ -321,7 +325,7 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.PAYMENT_PAGE,
     goBackButton: true,
     keyboardConfig: {
-      buttons: [],
+      buttons: [BUTTONS.PAY],
       columns: 2,
     },
   },

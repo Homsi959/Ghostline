@@ -5,13 +5,7 @@ import { Context, TelegramSession } from './telegram.types';
  */
 export const defaultTelegramSession: TelegramSession = {
   pageHistory: [],
-  payload: {
-    vlessLink: undefined,
-    payment: {
-      plan: undefined,
-      amount: undefined,
-    },
-  },
+  payload: {},
 };
 
 /**
