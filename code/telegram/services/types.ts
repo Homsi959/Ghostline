@@ -1,4 +1,5 @@
 import { SubscriptionPlan } from 'code/database/common/enums';
+import { Context } from '../common/telegram.types';
 
 export interface ActivatedSubscription {
   telegramId: number;
@@ -13,4 +14,5 @@ export interface VpnAccessDecision {
 export interface CreateActiveVpnAccess {
   userId: string;
   plan: SubscriptionPlan;
+  context: Context;
 }

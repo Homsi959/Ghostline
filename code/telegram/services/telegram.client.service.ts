@@ -252,6 +252,7 @@ export class TelegramService implements OnModuleInit {
       const vlessLink = await this.createActiveVpnAccess({
         userId: transaction.userId,
         plan,
+        context,
       });
 
       if (vlessLink) context.session.payload.vlessLink = vlessLink;
@@ -274,9 +275,11 @@ export class TelegramService implements OnModuleInit {
   async createActiveVpnAccess({
     userId,
     plan,
+    context,
   }: CreateActiveVpnAccess): Promise<string> {
-    this.logger.log(`Активация VPN-доступа для userId=${userId}`, this);
-
+    const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
+    const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
+    const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
     const subscriptionId = await this.subscriptionService.create({
       userId,
       plan,
@@ -314,7 +317,22 @@ export class TelegramService implements OnModuleInit {
       throw new Error('Ошибка генерации VLESS-ссылки');
     }
 
-    this.logger.log(`Ссылка сгенерирована для userId=${userId}`, this);
+    context.session.payload.vlessLink = vlessLink;
+
+    const vpnAccountPayload = {
+      userId,
+      sni: 'www.microsoft.com',
+      server: XRAY_LISTEN_IP,
+      publicKey: XRAY_PUBLIC_KEY,
+      port: '443',
+      isBlocked: false,
+      flow: XRAY_FLOW,
+      devicesLimit: 3,
+    };
+
+    // @ts-ignore
+    await this.vpnAccountsDao.create(vpnAccountPayload);
+    this.logger.log(`🛠️ VPN-аккаунт создан для userId=${userId}`, this);
 
     return vlessLink;
   }
@@ -390,65 +408,5 @@ export class TelegramService implements OnModuleInit {
     }
 
     await this.renderPage(context, prevPage);
-  }
-
-  /**
-   * Создаёт VPN-аккаунт для пользователя на основе Telegram ID, если у него нет активной подписки.
-   * Генерирует и возвращает VLESS-ссылку для подключения к VPN.
-   *
-   * @param telegramId - Telegram ID пользователя
-   * @returns Сгенерированная VLESS-ссылка или `void`, если создание невозможно
-   */
-  async createVpnAccount(telegramId: number): Promise<string | void> {
-    const telegramProfile =
-      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
-        telegramId,
-      );
-
-    if (!telegramProfile) {
-      this.logger.error(
-        `Telegram-профиль не найден (telegramId=${telegramId})`,
-        this,
-      );
-      return;
-    }
-
-    this.logger.log(
-      `Найден Telegram-профиль: telegramId=${telegramId}, userId=${telegramProfile.userId}`,
-      this,
-    );
-
-    const userId = telegramProfile.userId;
-    const hasSubscription = await this.subscriptionDao.findActiveById(userId);
-
-    if (hasSubscription) {
-      this.logger.warn(
-        `Пользователь userId=${userId} уже имеет активную подписку`,
-        this,
-      );
-      return;
-    }
-
-    const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
-    const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
-    const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
-
-    const vpnAccountPayload = {
-      userId,
-      sni: 'www.microsoft.com',
-      server: XRAY_LISTEN_IP,
-      publicKey: XRAY_PUBLIC_KEY,
-      port: '443',
-      isBlocked: false,
-      flow: XRAY_FLOW,
-      devicesLimit: 3,
-    };
-
-    // @ts-ignore
-    await this.vpnAccountsDao.create(vpnAccountPayload);
-
-    this.logger.log(`🛠️ VPN-аккаунт создан для userId=${userId}`, this);
-
-    return this.xrayClientService.generateVlessLink(userId);
   }
 }
