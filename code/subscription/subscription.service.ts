@@ -38,7 +38,7 @@ export class SubscriptionService implements OnModuleInit {
     plan,
   }: {
     userId: string;
-    plan: PaidSubscriptionPlan | SubscriptionPlan;
+    plan: SubscriptionPlan;
   }): Promise<string> {
     const start = DateTime.now().setZone('Europe/Moscow');
     const end = this.calculateEndDate(start, plan);

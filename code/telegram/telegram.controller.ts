@@ -89,4 +89,9 @@ export class TelegramBotController {
       context,
     });
   }
+
+  @Action(ACTIONS_KEYS.CHECK_PAYMENT)
+  async checkPayment(context: Context) {
+    await this.telegramService.handlePaymentCheck(context);
+  }
 }

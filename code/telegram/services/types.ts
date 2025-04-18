@@ -9,3 +9,8 @@ export interface VpnAccessDecision {
   toBan: string[];
   toUnban: string[];
 }
+
+export interface CreateActiveVpnAccess {
+  userId: string;
+  plan: SubscriptionPlan;
+}

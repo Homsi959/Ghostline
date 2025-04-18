@@ -5,6 +5,7 @@ import { Pool } from 'pg';
 import { CreateTransaction, Transaction } from '../common/types';
 import { PaymentEntity } from '../common/entities';
 import { PaymentStatus } from '../common/enums';
+import { DateTime } from 'luxon';
 
 /**
  * DAO транзакции оплаты.
@@ -21,31 +22,53 @@ export class PaymentsDao {
   ) {}
 
   /**
-   * Ищет транзакцию по её идентификатору (transaction_id).
-   * Используется для обработки уведомлений от платёжных систем (например, Robokassa).
+   * Ищет транзакции по заданным параметрам. Можно передавать любую комбинацию полей.
    *
-   * @param id - Уникальный идентификатор транзакции (transaction_id)
-   * @returns Объект транзакции или null, если не найдено
-   * @throws Ошибка, если запрос к базе завершился с ошибкой
+   * @param filters - Объект с критериями поиска.
+   * @returns Первая найденная транзакция или null.
+   * @throws Ошибка при обращении к базе данных.
    */
-  async findByTransactionId(id: string): Promise<Transaction | null> {
+  async find(filters: Partial<Transaction>): Promise<Transaction | null> {
+    const conditions: string[] = [];
+    const values: any[] = [];
+
+    let index = 1;
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value === undefined || value === null) continue;
+
+      let column = key;
+      if (key === 'paymentMethod') column = 'payment_method';
+      else if (key === 'transactionId') column = 'transaction_id';
+      else if (key === 'createdAt') column = 'created_at';
+      else if (key === 'userId') column = 'user_id';
+      else if (key === 'paidAt') column = 'paid_at';
+
+      conditions.push(`${column} = $${index++}`);
+      values.push(value);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
     const query = {
-      name: 'find-by-transaction-id',
       text: `
-      SELECT * 
-      FROM payments
-      WHERE transaction_id = $1
-    `,
-      values: [id],
+          SELECT * 
+          FROM payments
+          ${whereClause}
+          LIMIT 1
+        `,
+      values,
     };
 
     try {
       const { rows } = await this.db.query<PaymentEntity>(query);
 
-      if (rows.length == 0) return null;
+      if (rows.length === 0) return null;
 
       const row = rows[0];
-      const transaction: Transaction = {
+
+      return {
         id: row.id,
         amount: Number(row.amount),
         currency: row.currency,
@@ -57,15 +80,15 @@ export class PaymentsDao {
         description: row.description,
         paidAt: row.paid_at,
       };
-
-      return transaction;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
 
       this.logger.error(
-        `Не удалось получить транзакцию из БД (id=${id}): ${errorMessage}`,
+        `Не удалось получить транзакцию: ${errorMessage}`,
+        this,
       );
+
       throw new Error('Ошибка при получении транзакции из базы данных');
     }
   }
@@ -133,6 +156,56 @@ export class PaymentsDao {
         error instanceof Error ? error.message : 'Unknown error';
 
       throw new Error(`Ошибка при создании платежа: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Обновляет статус оплаты по идентификатору транзакции.
+   *
+   * @param transactionId - Идентификатор транзакции (InvId).
+   * @param status - Новый статус транзакции.
+   * @returns ID обновлённой записи или null, если ничего не обновилось.
+   */
+  async changeStatus(
+    transactionId: string,
+    status: PaymentStatus,
+  ): Promise<string | null> {
+    const paidAt = DateTime.now().setZone('Europe/Moscow').toJSDate();
+    const query = {
+      name: 'change-status-payment',
+      text: `
+        UPDATE payments
+        SET status = $2,
+            paid_at = $3
+        WHERE transaction_id = $1
+        RETURNING id;
+      `,
+      values: [transactionId, status, paidAt],
+    };
+
+    try {
+      const { rows } = await this.db.query(query);
+
+      if (rows.length == 0) {
+        this.logger.warn(
+          `Транзакция с ID ${transactionId} не найдена для обновления`,
+          this,
+        );
+        return null;
+      }
+
+      this.logger.log(
+        `Статус оплаты обновлён: transactionId=${transactionId}, status=${status}`,
+        this,
+      );
+
+      return transactionId;
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при обновлении статуса оплаты: ${(error as Error).message}`,
+        this,
+      );
+      throw new Error('Ошибка при обновлении статуса оплаты');
     }
   }
 }

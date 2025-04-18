@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import {
+  CreatedPaymentTransaction,
   PaymentRoboPayload,
   ReceiptRoboItem,
   RobokassaResult,
@@ -11,7 +12,7 @@ import {
 import { DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE } from 'code/common/constants';
 import { PaymentsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
-import { PaymentMethod } from 'code/database/common/enums';
+import { PaymentMethod, PaymentStatus } from 'code/database/common/enums';
 import { DateTime } from 'luxon';
 
 @Injectable()
@@ -27,7 +28,9 @@ export class RobokassaService {
    * @param payload Данные для создания платежа (сумма, описание).
    * @returns Сформированная ссылка на оплату.
    */
-  async generatePaymentLink(payload: PaymentRoboPayload): Promise<string> {
+  async createPaymentTransaction(
+    payload: PaymentRoboPayload,
+  ): Promise<CreatedPaymentTransaction> {
     const {
       ROBO_PAYMENT_URL,
       ROBO_CULTURE,
@@ -82,7 +85,10 @@ export class RobokassaService {
       throw new Error('Не удалось сохранить транзакцию');
     }
 
-    return `${ROBO_PAYMENT_URL}?${params.toString()}`;
+    return {
+      link: `${ROBO_PAYMENT_URL}?${params.toString()}`,
+      invId,
+    };
   }
 
   /**
@@ -93,7 +99,7 @@ export class RobokassaService {
     invId,
     signatureValue,
   }: RobokassaResult): Promise<string | null> {
-    const transaction = await this.paymentsDao.findByTransactionId(invId);
+    const transaction = await this.paymentsDao.find({ transactionId: invId });
     const password = this.configService.get<string>('ROBO_PASSWORD_CHECK');
 
     if (!transaction) {
@@ -118,6 +124,7 @@ export class RobokassaService {
     );
 
     if (expectedSignature === signatureValue) {
+      await this.paymentsDao.changeStatus(invId, PaymentStatus.PAID);
       this.logger.log(
         `Подпись транзакции верифицирована - ${expectedSignature}`,
         this,

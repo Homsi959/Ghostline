@@ -55,3 +55,8 @@ export interface RobokassaResult {
   invId: string;
   signatureValue: string;
 }
+
+export type CreatedPaymentTransaction = {
+  link: string;
+  invId: string;
+};

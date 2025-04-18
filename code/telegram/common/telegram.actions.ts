@@ -14,6 +14,7 @@ export const PURCHASE_ACTIONS_KEYS = {
 export const ACTIONS_KEYS = {
   GO_BACK: 'goBack', // Назад
   ACTIVATE_TRIAL: 'activateTrial', // Активировать на 7 дней
+  CHECK_PAYMENT: 'checkPayment', // Проверить оплатил ли клиент чек
   ...PURCHASE_ACTIONS_KEYS,
 } as const;
 
