@@ -1,18 +1,34 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersDao } from 'code/database/dao/users.dao';
-import { SubscriptionDao, TelegramProfilesDao } from 'code/database/dao';
+import {
+  PaymentsDao,
+  SubscriptionDao,
+  TelegramProfilesDao,
+  VpnAccountsDao,
+} from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
-import { addGoBackButton, buildInlineKeyboard } from 'code/common/utils';
-import { PAGE_KEYS, telegramPages } from '../common/telegram.pages';
+import {
+  addGoBackButton,
+  buildInlineKeyboard,
+  flattenObject,
+} from 'code/common/utils';
+import { MESSAGES, PAGE_KEYS, telegramPages } from '../common/telegram.pages';
 import { TelegramHistoryService } from './telegram.history.service';
 import { Context } from '../common/telegram.types';
 import { SaveTelegramProfile } from 'code/database/common/types';
-import { TelegramSubscribingService } from './telegram.subscribing.service';
-import { PaidSubscriptionPlan } from 'code/database/common/enums';
+import {
+  PaidSubscriptionPlan,
+  PaymentStatus,
+  SubscriptionPlan,
+} from 'code/database/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { XrayClientService } from 'code/xray/xrayClient.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
+import { RobokassaService } from 'code/payments/robokassa.service';
+import { PAID_PLANS } from 'code/subscription/types';
+import { SubscriptionService } from 'code/subscription/subscription.service';
+import { CreateActiveVpnAccess } from './types';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -20,11 +36,14 @@ export class TelegramService implements OnModuleInit {
     private readonly usersDao: UsersDao,
     private readonly telegramProfilesDao: TelegramProfilesDao,
     private readonly historyService: TelegramHistoryService,
-    private readonly telegramSubscribingService: TelegramSubscribingService,
     private readonly logger: WinstonService,
     private readonly configService: ConfigService,
     private readonly subscriptionDao: SubscriptionDao,
     private readonly xrayClientService: XrayClientService,
+    private readonly robokassaService: RobokassaService,
+    private readonly subscriptionService: SubscriptionService,
+    private readonly vpnAccountsDao: VpnAccountsDao,
+    private readonly paymentsDao: PaymentsDao,
   ) {}
 
   onModuleInit() {
@@ -105,7 +124,7 @@ export class TelegramService implements OnModuleInit {
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
     const { text, dependencies } = message;
     const telegramId = context.from?.id;
-    const payload = context.session.payload;
+    const payload = flattenObject(context.session.payload);
     const previewImagePath = path.resolve(
       __dirname,
       '../../../assets/bot/main.png',
@@ -113,10 +132,12 @@ export class TelegramService implements OnModuleInit {
     const previewImageStream = createReadStream(previewImagePath);
     let renderedMessage = text;
 
+    // TODO сделай заменю зависимостей по аналогии с кнопками
     // Если у сообщения указаны зависимости — заменяем плейсхолдеры на значения из payload
     if (dependencies?.length) {
       renderedMessage = dependencies.reduce((result, key) => {
-        const replacement = payload?.[key as keyof typeof payload] ?? '';
+        const replacement =
+          typeof payload?.[key] === 'string' ? payload[key] : '';
         const placeholder = new RegExp(`{{${key}}}`, 'g');
 
         return result.replace(placeholder, replacement);
@@ -124,7 +145,11 @@ export class TelegramService implements OnModuleInit {
     }
 
     let buttons = keyboardConfig
-      ? buildInlineKeyboard(keyboardConfig.buttons, keyboardConfig.columns)
+      ? buildInlineKeyboard({
+          columns: keyboardConfig.columns ?? 1,
+          arr: keyboardConfig.buttons,
+          payload: context.session.payload,
+        })
       : undefined;
 
     if (goBackButton) {
@@ -169,7 +194,9 @@ export class TelegramService implements OnModuleInit {
     telegramId: number,
   ): Promise<SaveTelegramProfile | null> {
     const telegramProfile =
-      await this.telegramProfilesDao.getTelegramProfileByTelegramId(telegramId);
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
 
     if (telegramProfile) {
       this.logger.log(`Найден профиль Telegram c ID=${telegramId}`, this);
@@ -199,10 +226,107 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
+  async handlePaymentCheck(context: Context): Promise<void> {
+    const transactionId = context.session.payload.payment?.transactionId;
+    const rawPlan = context.session.payload.payment?.plan;
+    const isValidPlan = Object.values(SubscriptionPlan).includes(
+      rawPlan as SubscriptionPlan,
+    );
+
+    if (!isValidPlan) {
+      this.logger.warn(`Недопустимый план в сессии: ${rawPlan}`, this);
+      throw new Error('Некорректный тарифный план');
+    }
+
+    const plan = rawPlan as SubscriptionPlan;
+    if (!transactionId) {
+      throw new Error('Отсутсвует transactionId');
+    }
+
+    const transaction = await this.paymentsDao.find({
+      transactionId,
+      status: PaymentStatus.PAID,
+    });
+
+    if (transaction && plan) {
+      const vlessLink = await this.createActiveVpnAccess({
+        userId: transaction.userId,
+        plan,
+      });
+
+      if (vlessLink) context.session.payload.vlessLink = vlessLink;
+      await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
+    } else {
+      await context.answerCbQuery(MESSAGES.PAYMENT_IS_NOT_PAID.text, {
+        show_alert: true,
+      });
+    }
+  }
+
   /**
-   * Вызывает метод для оформления подписки
+   * Активирует доступ к VPN: создаёт подписку, VPN-аккаунт и генерирует VLESS-ссылку.
+   *
+   * @param userId - Идентификатор пользователя.
+   * @param plan - Выбранный тарифный план.
+   * @returns VLESS-ссылка для подключения.
+   * @throws Ошибка, если на любом этапе активация невозможна.
    */
-  async processPurchase({
+  async createActiveVpnAccess({
+    userId,
+    plan,
+  }: CreateActiveVpnAccess): Promise<string> {
+    this.logger.log(`Активация VPN-доступа для userId=${userId}`, this);
+
+    const subscriptionId = await this.subscriptionService.create({
+      userId,
+      plan,
+    });
+
+    if (!subscriptionId) {
+      this.logger.error(
+        `Не удалось создать подписку для userId=${userId}`,
+        this,
+      );
+      throw new Error('Не удалось создать подписку');
+    }
+
+    this.logger.log(`Подписка создана (id=${subscriptionId})`, this);
+
+    const vpnCreated = await this.xrayClientService.addVpnAccounts([userId]);
+
+    if (!vpnCreated) {
+      this.logger.error(
+        `Не удалось создать VPN-аккаунт для userId=${userId}`,
+        this,
+      );
+      throw new Error('Не удалось создать VPN-аккаунт');
+    }
+
+    this.logger.log(`VPN-аккаунт создан для userId=${userId}`, this);
+
+    const vlessLink = await this.xrayClientService.generateVlessLink(userId);
+
+    if (!vlessLink) {
+      this.logger.error(
+        `Не удалось сгенерировать VLESS-ссылку для userId=${userId}`,
+        this,
+      );
+      throw new Error('Ошибка генерации VLESS-ссылки');
+    }
+
+    this.logger.log(`Ссылка сгенерирована для userId=${userId}`, this);
+
+    return vlessLink;
+  }
+
+  /**
+   * Инициализирует процесс оплаты подписки: создаёт ссылку на оплату,
+   * сохраняет данные в сессию и отображает пользователю страницу оплаты.
+   *
+   * @param telegramId - Telegram ID пользователя
+   * @param plan - Выбранный тарифный план
+   */
+  async initiateSubscriptionPayment({
     telegramId,
     plan,
     context,
@@ -210,22 +334,35 @@ export class TelegramService implements OnModuleInit {
     telegramId: number;
     plan: PaidSubscriptionPlan;
     context: Context;
-  }) {
-    // метод вернул ссылку на оплату
-    // отрисуй клиенту страницу где будет эта ссылка и сообщение соотвествующее
-    // а так же кнопка, я оплатил. По нажатию которой должна пройти проверка на то,
-    // реально ли клиент оплатил
-    // Если да - сгенерируй ему ссылку и отрисуй соотвествующую страницу
-    // Если нет - отрисуй что он не оплатил
-    const vlessLink = await this.telegramSubscribingService.processPurchase({
-      telegramId,
-      plan,
+  }): Promise<void> {
+    const { description, amount } = PAID_PLANS[plan];
+    const telegramProfile =
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
+
+    if (!telegramProfile || !plan) {
+      this.logger.error(`Telegram профиль не найден`);
+      return;
+    }
+
+    const payment = await this.robokassaService.createPaymentTransaction({
+      userId: telegramProfile.userId,
+      description,
+      amount,
     });
 
-    if (!vlessLink) return;
-
-    context.session.payload.vlessLink = vlessLink;
-    await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
+    if (payment) {
+      context.session.payload = {
+        payment: {
+          plan,
+          paymentLink: payment.link,
+          transactionId: payment.invId,
+          amount: String(amount),
+        },
+      };
+      await this.renderPage(context, PAGE_KEYS.PAYMENT_PAGE);
+    }
   }
 
   async getTrial({
@@ -235,12 +372,12 @@ export class TelegramService implements OnModuleInit {
     telegramId: number;
     context: Context;
   }) {
-    const vlessLink =
-      await this.telegramSubscribingService.getTrialVpnAccount(telegramId);
+    // const vlessLink =
+    //   await this.telegramSubscribingService.getTrialVpnAccount(telegramId);
 
-    if (!vlessLink) return;
+    // if (!vlessLink) return;
 
-    context.session.payload.vlessLink = vlessLink;
+    // context.session.payload.vlessLink = vlessLink;
     await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
   }
 
@@ -253,5 +390,65 @@ export class TelegramService implements OnModuleInit {
     }
 
     await this.renderPage(context, prevPage);
+  }
+
+  /**
+   * Создаёт VPN-аккаунт для пользователя на основе Telegram ID, если у него нет активной подписки.
+   * Генерирует и возвращает VLESS-ссылку для подключения к VPN.
+   *
+   * @param telegramId - Telegram ID пользователя
+   * @returns Сгенерированная VLESS-ссылка или `void`, если создание невозможно
+   */
+  async createVpnAccount(telegramId: number): Promise<string | void> {
+    const telegramProfile =
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
+
+    if (!telegramProfile) {
+      this.logger.error(
+        `Telegram-профиль не найден (telegramId=${telegramId})`,
+        this,
+      );
+      return;
+    }
+
+    this.logger.log(
+      `Найден Telegram-профиль: telegramId=${telegramId}, userId=${telegramProfile.userId}`,
+      this,
+    );
+
+    const userId = telegramProfile.userId;
+    const hasSubscription = await this.subscriptionDao.findActiveById(userId);
+
+    if (hasSubscription) {
+      this.logger.warn(
+        `Пользователь userId=${userId} уже имеет активную подписку`,
+        this,
+      );
+      return;
+    }
+
+    const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
+    const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
+    const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
+
+    const vpnAccountPayload = {
+      userId,
+      sni: 'www.microsoft.com',
+      server: XRAY_LISTEN_IP,
+      publicKey: XRAY_PUBLIC_KEY,
+      port: '443',
+      isBlocked: false,
+      flow: XRAY_FLOW,
+      devicesLimit: 3,
+    };
+
+    // @ts-ignore
+    await this.vpnAccountsDao.create(vpnAccountPayload);
+
+    this.logger.log(`🛠️ VPN-аккаунт создан для userId=${userId}`, this);
+
+    return this.xrayClientService.generateVlessLink(userId);
   }
 }
