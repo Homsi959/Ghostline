@@ -1,5 +1,9 @@
 import { Context as TelegrafContext } from 'telegraf';
 import { CallbackQuery } from 'telegraf/types';
+import {
+  PaidSubscriptionPlan,
+  SubscriptionPlan,
+} from 'code/database/common/enums';
 
 /**
  * Тип для описания кнопок Telegram, где можно выбрать либо action, либо url, но не оба одновременно.
@@ -47,7 +51,7 @@ export type TelegramSession = {
     vlessLink?: string;
     paymentLink?: string;
     payment?: {
-      plan?: string;
+      plan?: SubscriptionPlan | PaidSubscriptionPlan;
       amount?: string;
     };
   };

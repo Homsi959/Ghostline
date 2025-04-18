@@ -73,10 +73,10 @@ export class TelegramBotController {
       return;
     }
 
-    await this.telegramService.processPurchase({
-      context,
+    await this.telegramService.initiateSubscriptionPayment({
       telegramId,
       plan,
+      context,
     });
   }
 

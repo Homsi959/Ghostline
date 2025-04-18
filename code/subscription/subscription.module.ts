@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { SubscriptionDeactivationService } from './subscription-deactivation.service';
+import { SubscriptionService } from './subscription.service';
 import { XrayModule } from 'code/xray/xray.module';
 
 @Module({
   imports: [XrayModule],
-  providers: [SubscriptionDeactivationService],
+  providers: [SubscriptionService],
+  exports: [SubscriptionService],
 })
 export class SubscriptionModule {}

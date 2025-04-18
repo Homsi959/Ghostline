@@ -70,7 +70,7 @@ export class TelegramProfilesDao {
    * @param userId - идентификатор клиента.
    * @returns найденный профиль или null.
    */
-  async getTelegramProfileByTelegramId(
+  async findTelegramProfileByTelegramId(
     telegramId: number,
   ): Promise<TelegramProfile | null> {
     const query = {
