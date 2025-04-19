@@ -252,7 +252,6 @@ export class TelegramService implements OnModuleInit {
       const vlessLink = await this.createActiveVpnAccess({
         userId: transaction.userId,
         plan,
-        context,
       });
 
       if (vlessLink) context.session.payload.vlessLink = vlessLink;
@@ -275,7 +274,6 @@ export class TelegramService implements OnModuleInit {
   async createActiveVpnAccess({
     userId,
     plan,
-    context,
   }: CreateActiveVpnAccess): Promise<string> {
     const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
     const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
@@ -316,8 +314,6 @@ export class TelegramService implements OnModuleInit {
       );
       throw new Error('Ошибка генерации VLESS-ссылки');
     }
-
-    context.session.payload.vlessLink = vlessLink;
 
     const vpnAccountPayload = {
       userId,
@@ -390,12 +386,27 @@ export class TelegramService implements OnModuleInit {
     telegramId: number;
     context: Context;
   }) {
-    // const vlessLink =
-    //   await this.telegramSubscribingService.getTrialVpnAccount(telegramId);
+    const telegramProfile =
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
 
-    // if (!vlessLink) return;
+    if (!telegramProfile) {
+      this.logger.error(`Отсутсвуте telegramProfile`, this);
+      throw new Error(`Отсутсвуте telegramProfile`);
+    }
 
-    // context.session.payload.vlessLink = vlessLink;
+    const vlessLink = await this.createActiveVpnAccess({
+      userId: telegramProfile.userId,
+      plan: SubscriptionPlan.TRIAL,
+    });
+
+    if (!vlessLink) {
+      this.logger.error(`Не удалось сгенерировать vlessLink`, this);
+      throw new Error(`Не удалось сгенерировать vlessLink`);
+    }
+
+    context.session.payload.vlessLink = vlessLink;
     await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
   }
 
