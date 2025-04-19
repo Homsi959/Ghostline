@@ -96,7 +96,6 @@ export class XrayClientService implements OnModuleInit {
         this.xrayPath,
         { asJson: true },
       );
-
       const clients = config.inbounds[0].settings.clients || [];
 
       const clientExists = clients.some((client) => client.id === userId);

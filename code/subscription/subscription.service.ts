@@ -5,7 +5,7 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from 'code/database/common/enums';
-import { SubscriptionDao } from 'code/database/dao';
+import { SubscriptionDao, VpnAccountsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { XrayClientService } from 'code/xray/xrayClient.service';
 import { DateTime } from 'luxon';
@@ -15,6 +15,7 @@ export class SubscriptionService implements OnModuleInit {
   constructor(
     private readonly subscriptionDao: SubscriptionDao,
     private readonly xrayClientService: XrayClientService,
+    private readonly vpnAccountsDao: VpnAccountsDao,
     private readonly logger: WinstonService,
   ) {}
 
@@ -86,7 +87,7 @@ export class SubscriptionService implements OnModuleInit {
   /**
    * Проверяет подписки каждую минуту и деактивирует истёкшие.
    */
-  @Cron('* * * * *')
+  @Cron('*/1 * * * *')
   private async checkAndDeactivateExpired() {
     const subscriptions = await this.subscriptionDao.findAll();
 
@@ -101,6 +102,7 @@ export class SubscriptionService implements OnModuleInit {
         try {
           await this.subscriptionDao.markAsExpired(userId);
           await this.xrayClientService.removeClient(userId);
+          await this.vpnAccountsDao.toggleVpnAccountBlock(userId, true);
 
           this.logger.warn(
             `Подписка пользователя ${userId} деактивирована: срок действия истёк (${endDateUtc.toISO()})`,

@@ -12,6 +12,9 @@ import { VpnAccountsDao } from 'code/database/dao';
 import { VpnAccessDecision } from 'code/telegram/services/types';
 import { XrayClientService } from './xrayClient.service';
 import { Cron } from '@nestjs/schedule';
+import { DEVELOPMENT_LOCAL } from 'code/common/constants';
+import { SshService } from 'code/ssh/ssh.service';
+import { execSync } from 'child_process';
 
 @Injectable()
 export class XrayMonitoringService implements OnModuleInit {
@@ -23,6 +26,7 @@ export class XrayMonitoringService implements OnModuleInit {
     private readonly xrayHelperService: XrayHelperService,
     private readonly vpnAccountsDao: VpnAccountsDao,
     private readonly xrayClientService: XrayClientService,
+    private readonly sshService: SshService,
   ) {}
 
   async onModuleInit() {
@@ -40,11 +44,13 @@ export class XrayMonitoringService implements OnModuleInit {
    * 4. Вычисляет, какие UUID нужно заблокировать или разблокировать.
    * 5. Выполняет блокировку/разблокировку соответствующих клиентов.
    */
-  @Cron('*/5 * * * *')
+  @Cron('*/1 * * * *')
   async processCheckConnectionLimits() {
     const logsPath = this.configService.get<string>('XRAY_LOGS_PATH');
     const vpnAccounts = await this.vpnAccountsDao.findAll();
-
+    const isDevLocal =
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
+    const commandCleanLogsFile = '> /usr/local/etc/xray/logs/access.log';
     if (!logsPath || !vpnAccounts) return;
 
     let logsText: string;
@@ -53,8 +59,10 @@ export class XrayMonitoringService implements OnModuleInit {
       logsText = await this.xrayHelperService.readFile<string>(logsPath, {
         encoding: 'utf8',
       });
-    } catch (err) {
-      this.logger.error(`Ошибка при чтении логов: ${err.message}`, this);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+
+      this.logger.error(`Ошибка при чтении логов: ${errorMessage}`, this);
       return;
     }
 
@@ -93,6 +101,7 @@ export class XrayMonitoringService implements OnModuleInit {
         `Превышен лимит подключений. Блокировка: ${userId}`,
         this,
       );
+      await this.vpnAccountsDao.toggleVpnAccountBlock(userId, true);
       await this.xrayClientService.removeClient(userId);
     }
 
@@ -102,7 +111,16 @@ export class XrayMonitoringService implements OnModuleInit {
         `Подключения в пределах нормы. Разблокировка: ${userId}`,
         this,
       );
+      await this.vpnAccountsDao.toggleVpnAccountBlock(userId, false);
       await this.xrayClientService.addVpnAccounts([userId]);
+    }
+
+    if (logsText != '') {
+      if (isDevLocal) {
+        await this.sshService.runCommand(commandCleanLogsFile);
+      } else {
+        execSync(commandCleanLogsFile);
+      }
     }
   }
 

@@ -122,4 +122,54 @@ export class VpnAccountsDao {
       throw new Error('Не удалось создать VPN-аккаунт');
     }
   }
+
+  /**
+   * Обновляет статус блокировки VPN-аккаунта пользователя.
+   *
+   * @param userId - Идентификатор пользователя.
+   * @param isBlocked - Статус блокировки (true — заблокирован, false — разблокирован).
+   * @returns true, если статус успешно обновлён, иначе false.
+   */
+  async toggleVpnAccountBlock(
+    userId: string,
+    isBlocked: boolean,
+  ): Promise<boolean> {
+    const query = {
+      name: 'update-vpn-account-block-status',
+      text: `
+        UPDATE vpn_accounts
+        SET is_blocked = $2
+        WHERE user_id = $1
+        RETURNING id;
+      `,
+      values: [userId, isBlocked],
+    };
+
+    try {
+      const { rows } = await this.db.query(query);
+
+      if (rows.length === 0) {
+        this.logger.warn(
+          `VPN-аккаунт для userId=${userId} не найден при попытке обновить is_blocked=${isBlocked}`,
+          this,
+        );
+        return false;
+      }
+
+      this.logger.log(
+        `VPN-аккаунт обновлён: userId=${userId}, is_blocked=${isBlocked}`,
+        this,
+      );
+      return true;
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : 'Неизвестная ошибка';
+
+      this.logger.error(
+        `Ошибка при обновлении блокировки VPN-аккаунта (userId=${userId}): ${errMsg}`,
+        this,
+      );
+      return false;
+    }
+  }
 }
