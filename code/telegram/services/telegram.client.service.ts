@@ -122,7 +122,7 @@ export class TelegramService implements OnModuleInit {
     }
 
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
-    const { text, dependencies } = message;
+    const { text } = message;
     const telegramId = context.from?.id;
     const payload = flattenObject(context.session.payload);
     const previewImagePath = path.resolve(
@@ -130,19 +130,15 @@ export class TelegramService implements OnModuleInit {
       '../../../assets/bot/main.png',
     );
     const previewImageStream = createReadStream(previewImagePath);
-    let renderedMessage = text;
-
-    // TODO сделай заменю зависимостей по аналогии с кнопками
-    // Если у сообщения указаны зависимости — заменяем плейсхолдеры на значения из payload
-    if (dependencies?.length) {
-      renderedMessage = dependencies.reduce((result, key) => {
-        const replacement =
-          typeof payload?.[key] === 'string' ? payload[key] : '';
-        const placeholder = new RegExp(`{{${key}}}`, 'g');
-
-        return result.replace(placeholder, replacement);
-      }, text);
-    }
+    const renderedMessage = text.replace(
+      /{{(.*?)}}/g,
+      (_match: string, key: string): string => {
+        const value = (payload as Record<string, unknown>)?.[key];
+        return typeof value === 'string' || typeof value === 'number'
+          ? String(value)
+          : '';
+      },
+    );
 
     let buttons = keyboardConfig
       ? buildInlineKeyboard({
