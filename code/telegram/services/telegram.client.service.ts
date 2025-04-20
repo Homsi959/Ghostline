@@ -20,6 +20,7 @@ import {
   PaidSubscriptionPlan,
   PaymentStatus,
   SubscriptionPlan,
+  SubscriptionStatus,
 } from 'code/database/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { XrayClientService } from 'code/xray/xrayClient.service';
@@ -94,19 +95,29 @@ export class TelegramService implements OnModuleInit {
       );
 
       if (telegramProfile) {
-        const activeSubscribe = await this.subscriptionDao.findActiveById(
-          telegramProfile.userId,
-        );
+        const subscribe = await this.subscriptionDao.find({
+          userId: telegramProfile.userId,
+        });
 
-        if (activeSubscribe) {
-          const vlessLink = await this.xrayClientService.generateVlessLink(
-            telegramProfile.userId,
-          );
+        switch (subscribe?.status) {
+          case SubscriptionStatus.ACTIVE:
+          case SubscriptionStatus.EXPIRED: {
+            const vlessLink = await this.xrayClientService.generateVlessLink(
+              telegramProfile.userId,
+            );
 
-          context.session.payload.vlessLink = vlessLink;
-          await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
-        } else {
-          await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+            context.session.payload.vlessLink = vlessLink;
+            await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
+            break;
+          }
+          default: {
+            this.logger.warn(
+              `Подписка не найдена или имеет неподдерживаемый статус для userId=${telegramProfile.userId}`,
+              this,
+            );
+            await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+            break;
+          }
         }
       } else {
         await this.createUserWithTelegramProfile(sessionFrom);
@@ -258,6 +269,39 @@ export class TelegramService implements OnModuleInit {
         show_alert: true,
       });
     }
+  }
+
+  async activeSubscription(context: Context): Promise<boolean> {
+    const telegramId = context.callbackQuery.from.id;
+    const telegramProfile =
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
+
+    if (!telegramProfile) {
+      throw new Error(
+        'Профиль Telegram не найден для данного идентификатора Telegram',
+      );
+    }
+
+    const subscription = await this.subscriptionDao.find({
+      userId: telegramProfile.userId,
+      status: SubscriptionStatus.ACTIVE,
+    });
+
+    return Boolean(subscription);
+  }
+
+  async renderProtectedPage(context: Context, page: string) {
+    const activeSubscription = await this.activeSubscription(context);
+
+    if (page == PAGE_KEYS.ACTIVE_USER_KEY_PAGE && !activeSubscription) {
+      await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+
+      return;
+    }
+
+    await this.renderPage(context, page);
   }
 
   /**
@@ -416,12 +460,13 @@ export class TelegramService implements OnModuleInit {
       throw new Error(`Отсутсвуте telegramProfile`);
     }
 
-    const subscriptionTrial = await this.subscriptionDao.findTrialByUserId(
-      telegramProfile.userId,
-    );
+    const subscriptionTrial = await this.subscriptionDao.find({
+      userId: telegramProfile.userId,
+      plan: SubscriptionPlan.TRIAL,
+    });
 
     if (subscriptionTrial) {
-      await this.renderPage(context, PAGE_KEYS.REPEATED_TRIAL_ATTEMPT);
+      await this.renderPage(context, PAGE_KEYS.REPEATED_TRIAL_ATTEMPT_PAGE);
       this.logger.warn(
         `Попытка получить повторно триал версию клиенту с telegramId = ${telegramId}`,
         this,

@@ -43,7 +43,7 @@ export class TelegramBotController {
   async renderPage(context: Context): Promise<void> {
     const page = context.callbackQuery.data;
 
-    await this.telegramService.renderPage(context, page);
+    await this.telegramService.renderProtectedPage(context, page);
   }
 
   /**

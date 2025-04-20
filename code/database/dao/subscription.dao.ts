@@ -137,24 +137,43 @@ export class SubscriptionDao {
   }
 
   /**
-   * Ищет активную триальную подписку пользователя.
+   * Ищет подписку по заданным параметрам. Можно передавать любую комбинацию полей.
    *
-   * @param userId - Идентификатор пользователя.
-   * @returns Объект подписки или null, если триал не найден.
-   * @throws Ошибка при запросе к базе данных.
+   * @param filters - Объект с критериями поиска.
+   * @returns Первая найденная подписка или null.
+   * @throws Ошибка при обращении к базе данных.
    */
-  async findTrialByUserId(userId: string): Promise<Subscription | null> {
+  async find(filters: Partial<Subscription>): Promise<Subscription | null> {
+    const conditions: string[] = [];
+    const values: any[] = [];
+
+    let index = 1;
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value === undefined || value === null) continue;
+
+      let column = key;
+      if (key === 'userId') column = 'user_id';
+      else if (key === 'startDate') column = 'start_date';
+      else if (key === 'endDate') column = 'end_date';
+      else if (key === 'createdAt') column = 'created_at';
+
+      conditions.push(`${column} = $${index++}`);
+      values.push(value);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
     const query = {
-      name: 'find-trial-subscription',
       text: `
-      SELECT *
+      SELECT * 
       FROM subscriptions
-      WHERE user_id = $1
-        AND plan = 'trial'
-        AND status = 'active'
-      LIMIT 1;
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT 1
     `,
-      values: [userId],
+      values,
     };
 
     try {
@@ -163,22 +182,22 @@ export class SubscriptionDao {
       if (rows.length === 0) return null;
 
       const row = rows[0];
+
       return {
-        status: row.status,
         userId: row.user_id,
         plan: row.plan,
+        status: row.status,
         startDate: row.start_date,
         endDate: row.end_date,
         createdAt: row.created_at,
       };
-    } catch (error: any) {
-      const message =
+    } catch (error) {
+      const errorMessage =
         error instanceof Error ? error.message : 'Неизвестная ошибка';
-      this.logger.error(
-        `Ошибка при получении триальной подписки пользователя ${userId}: ${message}`,
-        this,
-      );
-      throw new Error('Ошибка при получении триальной подписки');
+
+      this.logger.error(`Не удалось получить подписку: ${errorMessage}`, this);
+
+      throw new Error('Ошибка при получении подписки из базы данных');
     }
   }
 

@@ -14,7 +14,8 @@ export const PAGE_KEYS = {
   HOW_TO_CONNECT_PAGE: 'howToConnectPage', // Страница со ссылками на инструкции по подключению
   ACTIVE_USER_HOME_PAGE: 'activeUserHomePage', // Страница для клиента у которого уже есть актуальная подписка
   ACTIVE_USER_KEY_PAGE: 'activeUserKeyPage', // Страница с ключом для клиента у которого уже есть актуальная подписка
-  REPEATED_TRIAL_ATTEMPT: 'repeatedTrialAttempt', // Страница где говорится о том, что клиент пытается повтороно получить триал версию
+  REPEATED_TRIAL_ATTEMPT_PAGE: 'repeatedTrialAttemptPage', // Страница где говорится о том, что клиент пытается повтороно получить триал версию
+  SUBSCRIPTION_IS_EXPIRED: 'subsribitionIsExpired', // Страница о истекшей подписки
 } as const;
 
 /**
@@ -166,6 +167,21 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
 
 Если возникли вопросы — мы всегда рядом, нажмите «Поддержка».
   `,
+
+  SUBSCRIPTION_IS_EXPIRED: `
+<b>⌛ Срок вашей подписки истёк</b>
+
+Вы использовали весь оплаченный период, и доступ к VPN временно приостановлен.
+
+<b>Но вы можете снова вернуться в сеть без ограничений — за считанные секунды:</b>
+
+<b>📦 Доступные тарифы:</b>  
+• 1 месяц — 190 ₽  
+• 6 месяцев — 990 ₽
+
+Нажмите кнопку ниже, чтобы продлить доступ и продолжить пользоваться GhostlineVPN.
+Если возникли вопросы — наша поддержка всегда на связи.
+`,
 };
 
 /**
@@ -361,15 +377,19 @@ export const telegramPages: TelegramPages = {
       columns: 1,
     },
   },
-  [PAGE_KEYS.REPEATED_TRIAL_ATTEMPT]: {
-    message: MESSAGES.REPEATED_TRIAL_ATTEMPT,
+  [PAGE_KEYS.REPEATED_TRIAL_ATTEMPT_PAGE]: {
+    message: MESSAGES.REPEATED_TRIAL_ATTEMPT_PAGE,
     goBackButton: true,
     keyboardConfig: {
-      buttons: [
-        BUTTONS.BUY_FOR_1_MONTH,
-        BUTTONS.BUY_FOR_6_MONTHS,
-        BUTTONS.SUPPORT,
-      ],
+      buttons: [BUTTONS.BUY_SUBSCRIPTION],
+      columns: 2,
+    },
+  },
+  [PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED]: {
+    message: MESSAGES.SUBSCRIPTION_IS_EXPIRED,
+    goBackButton: true,
+    keyboardConfig: {
+      buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
       columns: 2,
     },
   },
