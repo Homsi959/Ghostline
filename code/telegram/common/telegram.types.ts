@@ -24,7 +24,7 @@ type TelegramButtonConfig = {
  * Тип для описания страницы Telegram.
  */
 type TelegramPage = {
-  message: PageMessage; // Сообщение, которое будет отображено на странице
+  message: string; // Сообщение, которое будет отображено на странице
   keyboardConfig?: TelegramButtonConfig; // Конфигурация клавиатуры с кнопками
   goBackButton?: boolean; // Опциональная кнопка "Назад"
 };
@@ -64,11 +64,5 @@ export interface Context extends TelegrafContext {
   callbackQuery: CallbackQuery.DataQuery;
 }
 
-/** Сообщение страницы с текстом и необязательными переменными для подстановки */
-type PageMessage = {
-  text: string;
-  dependencies?: string[];
-};
-
 /** Мапа сообщений для всех Telegram-страниц */
-export type TelegramPageMessages = Record<string, PageMessage>;
+export type TelegramPageMessages = Record<string, string>;

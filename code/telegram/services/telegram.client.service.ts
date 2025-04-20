@@ -122,7 +122,6 @@ export class TelegramService implements OnModuleInit {
     }
 
     const { message, keyboardConfig, goBackButton } = telegramPages[pageKey];
-    const { text } = message;
     const telegramId = context.from?.id;
     const payload = flattenObject(context.session.payload);
     const previewImagePath = path.resolve(
@@ -130,9 +129,11 @@ export class TelegramService implements OnModuleInit {
       '../../../assets/bot/main.png',
     );
     const previewImageStream = createReadStream(previewImagePath);
-    const renderedMessage = text.replace(
+
+    // Заменяем только те плейсхолдеры, для которых есть значение в payload
+    const renderedMessage = message.replace(
       /{{(.*?)}}/g,
-      (_match: string, key: string): string => {
+      (_match, key: string): string => {
         const value = (payload as Record<string, unknown>)?.[key];
         return typeof value === 'string' || typeof value === 'number'
           ? String(value)
@@ -253,7 +254,7 @@ export class TelegramService implements OnModuleInit {
       if (vlessLink) context.session.payload.vlessLink = vlessLink;
       await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
     } else {
-      await context.answerCbQuery(MESSAGES.PAYMENT_IS_NOT_PAID.text, {
+      await context.answerCbQuery(MESSAGES.PAYMENT_IS_NOT_PAID, {
         show_alert: true,
       });
     }
