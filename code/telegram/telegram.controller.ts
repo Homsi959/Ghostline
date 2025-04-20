@@ -84,7 +84,7 @@ export class TelegramBotController {
   async getTrial(context: Context) {
     const { id: telegramId } = context.callbackQuery.from;
 
-    await this.telegramService.getTrial({
+    await this.telegramService.activateTrialAccess({
       telegramId,
       context,
     });

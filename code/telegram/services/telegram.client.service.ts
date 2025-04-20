@@ -278,6 +278,22 @@ export class TelegramService implements OnModuleInit {
     const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
     const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
+    const activeVpnAccount = await this.xrayClientService.findActiveOne(userId);
+
+    if (activeVpnAccount) {
+      this.logger.warn(`VPN-аккаунт уже существует для userId=${userId}`, this);
+      const existingLink =
+        await this.xrayClientService.generateVlessLink(userId);
+
+      if (!existingLink) {
+        throw new Error(
+          'Ошибка генерации VLESS-ссылки для существующего аккаунта',
+        );
+      }
+
+      return existingLink;
+    }
+
     const subscriptionId = await this.subscriptionService.create({
       userId,
       plan,
@@ -285,13 +301,16 @@ export class TelegramService implements OnModuleInit {
 
     if (!subscriptionId) {
       this.logger.error(
-        `Не удалось создать подписку для userId=${userId}`,
+        `Не удалось создать подписку для userId=${userId} c плано = ${plan}`,
         this,
       );
       throw new Error('Не удалось создать подписку');
     }
 
-    this.logger.log(`Подписка создана (id=${subscriptionId})`, this);
+    this.logger.log(
+      `Подписка с планом ${plan} создана (id=${subscriptionId})`,
+      this,
+    );
 
     const vpnCreated = await this.xrayClientService.addVpnAccounts([userId]);
 
@@ -317,7 +336,7 @@ export class TelegramService implements OnModuleInit {
 
     const vpnAccountPayload = {
       userId,
-      sni: 'www.microsoft.com',
+      sni: 'www.microsoft.com', // TODO: вынести в конфиг
       server: XRAY_LISTEN_IP,
       publicKey: XRAY_PUBLIC_KEY,
       port: '443',
@@ -328,7 +347,11 @@ export class TelegramService implements OnModuleInit {
 
     // @ts-ignore
     await this.vpnAccountsDao.create(vpnAccountPayload);
-    this.logger.log(`🛠️ VPN-аккаунт создан для userId=${userId}`, this);
+
+    this.logger.log(
+      `🛠️ VPN-аккаунт зарегистрирован в БД для userId=${userId}`,
+      this,
+    );
 
     return vlessLink;
   }
@@ -379,7 +402,7 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  async getTrial({
+  async activateTrialAccess({
     telegramId,
     context,
   }: {
@@ -394,6 +417,19 @@ export class TelegramService implements OnModuleInit {
     if (!telegramProfile) {
       this.logger.error(`Отсутсвуте telegramProfile`, this);
       throw new Error(`Отсутсвуте telegramProfile`);
+    }
+
+    const subscriptionTrial = await this.subscriptionDao.findTrialByUserId(
+      telegramProfile.userId,
+    );
+
+    if (subscriptionTrial) {
+      await this.renderPage(context, PAGE_KEYS.REPEATED_TRIAL_ATTEMPT);
+      this.logger.warn(
+        `Попытка получить повторно триал версию клиенту с telegramId = ${telegramId}`,
+        this,
+      );
+      return;
     }
 
     const vlessLink = await this.createActiveVpnAccess({

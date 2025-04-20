@@ -137,6 +137,52 @@ export class SubscriptionDao {
   }
 
   /**
+   * Ищет активную триальную подписку пользователя.
+   *
+   * @param userId - Идентификатор пользователя.
+   * @returns Объект подписки или null, если триал не найден.
+   * @throws Ошибка при запросе к базе данных.
+   */
+  async findTrialByUserId(userId: string): Promise<Subscription | null> {
+    const query = {
+      name: 'find-trial-subscription',
+      text: `
+      SELECT *
+      FROM subscriptions
+      WHERE user_id = $1
+        AND plan = 'trial'
+        AND status = 'active'
+      LIMIT 1;
+    `,
+      values: [userId],
+    };
+
+    try {
+      const { rows } = await this.db.query<SubscriptionEntity>(query);
+
+      if (rows.length === 0) return null;
+
+      const row = rows[0];
+      return {
+        status: row.status,
+        userId: row.user_id,
+        plan: row.plan,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        createdAt: row.created_at,
+      };
+    } catch (error: any) {
+      const message =
+        error instanceof Error ? error.message : 'Неизвестная ошибка';
+      this.logger.error(
+        `Ошибка при получении триальной подписки пользователя ${userId}: ${message}`,
+        this,
+      );
+      throw new Error('Ошибка при получении триальной подписки');
+    }
+  }
+
+  /**
    * Обновляет статус подписки на 'expired' для указанного пользователя.
    * Используется при окончании срока действия подписки.
    *
