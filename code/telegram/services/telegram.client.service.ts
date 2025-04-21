@@ -283,7 +283,7 @@ export class TelegramService implements OnModuleInit {
   }
 
   async activeSubscription(context: Context): Promise<boolean> {
-    const telegramId = context.callbackQuery.from.id;
+    const telegramId = context.from?.id ?? context.callbackQuery?.from?.id;
     const telegramProfile =
       await this.telegramProfilesDao.findTelegramProfileByTelegramId(
         telegramId,
@@ -304,7 +304,7 @@ export class TelegramService implements OnModuleInit {
   }
 
   async renderProtectedPage(context: Context, page: string): Promise<void> {
-    const telegramId = context.callbackQuery.from.id;
+    const telegramId = context.from?.id ?? context.callbackQuery?.from?.id;
     const telegramProfile =
       await this.telegramProfilesDao.findTelegramProfileByTelegramId(
         telegramId,
