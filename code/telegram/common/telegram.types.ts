@@ -49,6 +49,7 @@ export type TelegramSession = {
   pageHistory: string[];
   payload: {
     vlessLink?: string;
+    endDateSubscription?: string;
     payment?: {
       paymentLink?: string;
       transactionId?: string;

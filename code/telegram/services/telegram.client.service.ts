@@ -30,6 +30,7 @@ import { RobokassaService } from 'code/payments/robokassa.service';
 import { PAID_PLANS } from 'code/subscription/types';
 import { SubscriptionService } from 'code/subscription/subscription.service';
 import { CreateActiveVpnAccess } from './types';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -83,45 +84,55 @@ export class TelegramService implements OnModuleInit {
       this,
     );
 
-    if (from) {
-      const sessionFrom: Omit<SaveTelegramProfile, 'userId'> = {
-        isBot: from.is_bot,
-        telegramId: from.id,
-        languageCode: from.language_code,
-      };
+    if (!from) return;
 
-      const telegramProfile = await this.findTelegramProfile(
-        sessionFrom.telegramId,
-      );
+    const sessionFrom: Omit<SaveTelegramProfile, 'userId'> = {
+      isBot: from.is_bot,
+      telegramId: from.id,
+      languageCode: from.language_code,
+    };
 
-      if (telegramProfile) {
-        const subscribe = await this.subscriptionDao.find({
-          userId: telegramProfile.userId,
-        });
+    const telegramProfile = await this.findTelegramProfile(
+      sessionFrom.telegramId,
+    );
 
-        switch (subscribe?.status) {
-          case SubscriptionStatus.ACTIVE:
-          case SubscriptionStatus.EXPIRED: {
-            const vlessLink = await this.xrayClientService.generateVlessLink(
-              telegramProfile.userId,
-            );
+    if (!telegramProfile) {
+      await this.createUserWithTelegramProfile(sessionFrom);
+      await this.renderProtectedPage(context, PAGE_KEYS.MAIN_PAGE);
+      return;
+    }
 
-            context.session.payload.vlessLink = vlessLink;
-            await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
-            break;
-          }
-          default: {
-            this.logger.warn(
-              `Подписка не найдена или имеет неподдерживаемый статус для userId=${telegramProfile.userId}`,
-              this,
-            );
-            await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
-            break;
-          }
+    const subscription = await this.subscriptionDao.find({
+      userId: telegramProfile.userId,
+    });
+
+    const userId = telegramProfile.userId;
+
+    switch (subscription?.status) {
+      case SubscriptionStatus.ACTIVE:
+      case SubscriptionStatus.EXPIRED: {
+        const vlessLink =
+          await this.xrayClientService.generateVlessLink(userId);
+        context.session.payload.vlessLink = vlessLink;
+
+        if (subscription.endDate) {
+          const endDateFormatted = DateTime.fromJSDate(subscription.endDate)
+            .setLocale('ru')
+            .toFormat('dd.MM.yyyy');
+
+          context.session.payload.endDateSubscription = endDateFormatted;
         }
-      } else {
-        await this.createUserWithTelegramProfile(sessionFrom);
+
+        await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
+        break;
+      }
+      default: {
+        this.logger.warn(
+          `Подписка не найдена или имеет неподдерживаемый статус для userId=${userId}`,
+          this,
+        );
         await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+        break;
       }
     }
   }
@@ -292,13 +303,40 @@ export class TelegramService implements OnModuleInit {
     return Boolean(subscription);
   }
 
-  async renderProtectedPage(context: Context, page: string) {
-    const activeSubscription = await this.activeSubscription(context);
+  async renderProtectedPage(context: Context, page: string): Promise<void> {
+    const telegramId = context.callbackQuery.from.id;
+    const telegramProfile =
+      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
+        telegramId,
+      );
 
-    if (page == PAGE_KEYS.ACTIVE_USER_KEY_PAGE && !activeSubscription) {
-      await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
-
+    if (!telegramProfile) {
+      await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
       return;
+    }
+
+    const userId = telegramProfile.userId;
+
+    if (page === PAGE_KEYS.ACTIVE_USER_KEY_PAGE) {
+      const isActive = await this.activeSubscription(context);
+
+      if (!isActive) {
+        await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+        return;
+      }
+    }
+
+    if (page === PAGE_KEYS.ACTIVE_USER_HOME_PAGE) {
+      const activeSubscription =
+        await this.subscriptionDao.findActiveById(userId);
+
+      if (activeSubscription?.endDate) {
+        const endDateFormatted = DateTime.fromJSDate(activeSubscription.endDate)
+          .setLocale('ru')
+          .toFormat('dd.MM.yyyy');
+
+        context.session.payload.endDateSubscription = endDateFormatted;
+      }
     }
 
     await this.renderPage(context, page);
