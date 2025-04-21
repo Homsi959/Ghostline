@@ -247,7 +247,7 @@ export class TelegramService implements OnModuleInit {
 
   async handlePaymentCheck(context: Context): Promise<void> {
     const transactionId = context.session.payload.payment?.transactionId;
-    const rawPlan = context.session.payload.payment?.plan;
+    const rawPlan = context.session.payload.payment?.selectedPlan;
     const isValidPlan = Object.values(SubscriptionPlan).includes(
       rawPlan as SubscriptionPlan,
     );
@@ -471,7 +471,8 @@ export class TelegramService implements OnModuleInit {
     if (payment) {
       context.session.payload = {
         payment: {
-          plan,
+          selectedPlan: plan,
+          descriptionPlan: PAID_PLANS[plan].description,
           paymentLink: payment.link,
           transactionId: payment.invId,
           amount: String(amount),

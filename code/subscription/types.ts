@@ -11,10 +11,10 @@ export const PAID_PLANS: Record<
 > = {
   [SubscriptionPlan.ONE_MONTH]: {
     description: 'Подписка на 1 месяц',
-    amount: 180,
+    amount: 190,
   },
   [SubscriptionPlan.SIX_MONTHS]: {
     description: 'Подписка на 6 месяцев',
-    amount: 900,
+    amount: 990,
   },
 };

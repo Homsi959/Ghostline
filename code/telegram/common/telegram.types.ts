@@ -53,7 +53,8 @@ export type TelegramSession = {
     payment?: {
       paymentLink?: string;
       transactionId?: string;
-      plan?: SubscriptionPlan | PaidSubscriptionPlan;
+      selectedPlan?: SubscriptionPlan | PaidSubscriptionPlan;
+      descriptionPlan?: string;
       amount?: string;
     };
   };
