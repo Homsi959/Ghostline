@@ -328,7 +328,7 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
     message: MESSAGES.GET_VPN_KEY_PAGE,
-    goBackButton: false,
+    goBackButton: true,
     keyboardConfig: {
       buttons: [BUTTONS.HOW_TO_CONNECT],
       columns: 1,
@@ -336,7 +336,7 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.HOW_TO_CONNECT_PAGE]: {
     message: MESSAGES.HOW_TO_CONNECT_PAGE,
-    goBackButton: false,
+    goBackButton: true,
     keyboardConfig: {
       buttons: [
         BUTTONS.CONNECT_IOS,
