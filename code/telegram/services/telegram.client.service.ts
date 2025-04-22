@@ -98,7 +98,6 @@ export class TelegramService implements OnModuleInit {
 
     if (!telegramProfile) {
       await this.createUserWithTelegramProfile(sessionFrom);
-      await this.renderProtectedPage(context, PAGE_KEYS.MAIN_PAGE);
       return;
     }
 
@@ -123,7 +122,10 @@ export class TelegramService implements OnModuleInit {
           context.session.payload.endDateSubscription = endDateFormatted;
         }
 
-        await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
+        await this.renderProtectedPage(
+          context,
+          PAGE_KEYS.ACTIVE_USER_HOME_PAGE,
+        );
         break;
       }
       default: {
@@ -131,7 +133,7 @@ export class TelegramService implements OnModuleInit {
           `Подписка не найдена или имеет неподдерживаемый статус для userId=${userId}`,
           this,
         );
-        await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
+        await this.renderProtectedPage(context, PAGE_KEYS.HOME_PAGE);
         break;
       }
     }
@@ -309,37 +311,54 @@ export class TelegramService implements OnModuleInit {
       await this.telegramProfilesDao.findTelegramProfileByTelegramId(
         telegramId,
       );
+    const isActive = await this.activeSubscription(context);
 
     if (!telegramProfile) {
-      await this.renderPage(context, PAGE_KEYS.MAIN_PAGE);
       return;
     }
 
     const userId = telegramProfile.userId;
 
-    if (page === PAGE_KEYS.ACTIVE_USER_KEY_PAGE) {
-      const isActive = await this.activeSubscription(context);
+    switch (page) {
+      case PAGE_KEYS.ACTIVE_USER_KEY_PAGE:
+        {
+          if (!isActive) {
+            await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+          } else {
+            await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_KEY_PAGE);
+          }
+        }
+        break;
 
-      if (!isActive) {
-        await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
-        return;
+      case PAGE_KEYS.HOME_PAGE: {
+        if (isActive) {
+          const activeSubscription =
+            await this.subscriptionDao.findActiveById(userId);
+
+          if (activeSubscription?.endDate) {
+            const endDateFormatted = DateTime.fromJSDate(
+              activeSubscription.endDate,
+            )
+              .setLocale('ru')
+              .toFormat('dd.MM.yyyy');
+
+            context.session.payload.endDateSubscription = endDateFormatted;
+          }
+
+          await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
+          break;
+        }
+
+        await this.renderPage(context, PAGE_KEYS.HOME_PAGE);
+        break;
       }
+
+      default:
+        {
+          await this.renderPage(context, page);
+        }
+        break;
     }
-
-    if (page === PAGE_KEYS.ACTIVE_USER_HOME_PAGE) {
-      const activeSubscription =
-        await this.subscriptionDao.findActiveById(userId);
-
-      if (activeSubscription?.endDate) {
-        const endDateFormatted = DateTime.fromJSDate(activeSubscription.endDate)
-          .setLocale('ru')
-          .toFormat('dd.MM.yyyy');
-
-        context.session.payload.endDateSubscription = endDateFormatted;
-      }
-    }
-
-    await this.renderPage(context, page);
   }
 
   /**

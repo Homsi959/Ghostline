@@ -5,7 +5,7 @@ import { ACTIONS_KEYS } from './telegram.actions';
  * Названия страниц
  */
 export const PAGE_KEYS = {
-  MAIN_PAGE: 'mainPage', // Главная страница
+  HOME_PAGE: 'homePage', // Главная страница
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
   SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
@@ -22,7 +22,7 @@ export const PAGE_KEYS = {
  * Тексты сообщений для различных страниц
  */
 export const MESSAGES: Record<string, string> = {
-  MAIN_PAGE: `
+  HOME_PAGE: `
 <b>👋 Добро пожаловать в GhostlineVPN!</b>
 
 Мы создали этот VPN, чтобы вы чувствовали свободу и безопасность в интернете. Никаких блокировок, ограничений и лишних шагов — только чистый доступ ко всему, что вам нужно.
@@ -229,9 +229,9 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '🔑 Мой ключ', // 11 символов
     action: PAGE_KEYS.ACTIVE_USER_KEY_PAGE,
   },
-  ACTIVE_USER_HOME: {
+  HOME_PAGE: {
     text: '🏠 Главная',
-    action: PAGE_KEYS.ACTIVE_USER_HOME_PAGE,
+    action: PAGE_KEYS.HOME_PAGE,
   },
   POLICY: {
     text: 'Договор оферты',
@@ -298,8 +298,8 @@ export const BUTTONS: Record<string, TelegramButton> = {
  * Структура страниц для рендера в Telegram, включая сообщения и кнопки
  */
 export const telegramPages: TelegramPages = {
-  [PAGE_KEYS.MAIN_PAGE]: {
-    message: MESSAGES.MAIN_PAGE,
+  [PAGE_KEYS.HOME_PAGE]: {
+    message: MESSAGES.HOME_PAGE,
     keyboardConfig: {
       buttons: [
         BUTTONS.SUBSCRIBING,
@@ -312,9 +312,12 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.SUBSCRIBING_PAGE]: {
     message: MESSAGES.SUBSCRIBING_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.ACTIVATE_TRIAL, BUTTONS.BUY_SUBSCRIPTION],
+      buttons: [
+        BUTTONS.ACTIVATE_TRIAL,
+        BUTTONS.BUY_SUBSCRIPTION,
+        BUTTONS.HOME_PAGE,
+      ],
       columns: 2,
     },
   },
@@ -324,23 +327,24 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE]: {
     message: MESSAGES.PURCHASE_OF_SUBSCRIPTION_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
+      buttons: [
+        BUTTONS.BUY_FOR_1_MONTH,
+        BUTTONS.BUY_FOR_6_MONTHS,
+        BUTTONS.HOME_PAGE,
+      ],
       columns: 2,
     },
   },
   [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
     message: MESSAGES.GET_VPN_KEY_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.HOW_TO_CONNECT],
+      buttons: [BUTTONS.HOW_TO_CONNECT, BUTTONS.HOME_PAGE],
       columns: 1,
     },
   },
   [PAGE_KEYS.HOW_TO_CONNECT_PAGE]: {
     message: MESSAGES.HOW_TO_CONNECT_PAGE,
-    goBackButton: true,
     keyboardConfig: {
       buttons: [
         BUTTONS.CONNECT_IOS,
@@ -349,14 +353,13 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_ANDROID_TV,
         BUTTONS.CONNECT_MACOS_INTEL,
         BUTTONS.CONNECT_MACOS_APPLE_SILICON,
-        BUTTONS.ACTIVE_USER_HOME,
+        BUTTONS.HOME_PAGE,
       ],
       columns: 2,
     },
   },
   [PAGE_KEYS.ACTIVE_USER_HOME_PAGE]: {
     message: MESSAGES.ACTIVE_USER_HOME_PAGE,
-    goBackButton: false,
     keyboardConfig: {
       buttons: [
         BUTTONS.MY_KEY,
@@ -369,33 +372,33 @@ export const telegramPages: TelegramPages = {
   },
   [PAGE_KEYS.ACTIVE_USER_KEY_PAGE]: {
     message: MESSAGES.GET_VPN_KEY_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.HOW_TO_CONNECT],
+      buttons: [BUTTONS.HOW_TO_CONNECT, BUTTONS.HOME_PAGE],
       columns: 1,
     },
   },
   [PAGE_KEYS.PAYMENT_PAGE]: {
     message: MESSAGES.PAYMENT_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.PAY, BUTTONS.CHECK_PAYMENT],
-      columns: 1,
+      buttons: [BUTTONS.PAY, BUTTONS.CHECK_PAYMENT, BUTTONS.HOME_PAGE],
+      columns: 2,
     },
   },
   [PAGE_KEYS.REPEATED_TRIAL_ATTEMPT_PAGE]: {
     message: MESSAGES.REPEATED_TRIAL_ATTEMPT_PAGE,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.BUY_SUBSCRIPTION],
+      buttons: [BUTTONS.BUY_SUBSCRIPTION, BUTTONS.HOME_PAGE],
       columns: 2,
     },
   },
   [PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED]: {
     message: MESSAGES.SUBSCRIPTION_IS_EXPIRED,
-    goBackButton: true,
     keyboardConfig: {
-      buttons: [BUTTONS.BUY_FOR_1_MONTH, BUTTONS.BUY_FOR_6_MONTHS],
+      buttons: [
+        BUTTONS.BUY_FOR_1_MONTH,
+        BUTTONS.BUY_FOR_6_MONTHS,
+        BUTTONS.HOME_PAGE,
+      ],
       columns: 2,
     },
   },
