@@ -160,7 +160,7 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
 Если вы точно оплатили — напишите в поддержку.
   `,
 
-  REPEATED_TRIAL_ATTEMPT: `
+  REPEATED_TRIAL_ATTEMPT_PAGE: `
 <b>🚫 Пробный период уже использован</b>
 
 Вы уже активировали бесплатную 7-дневную подписку ранее.
@@ -388,7 +388,7 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.REPEATED_TRIAL_ATTEMPT_PAGE,
     keyboardConfig: {
       buttons: [BUTTONS.BUY_SUBSCRIPTION, BUTTONS.HOME_PAGE],
-      columns: 2,
+      columns: 1,
     },
   },
   [PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED]: {
