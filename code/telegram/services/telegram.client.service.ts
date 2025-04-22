@@ -98,6 +98,7 @@ export class TelegramService implements OnModuleInit {
 
     if (!telegramProfile) {
       await this.createUserWithTelegramProfile(sessionFrom);
+      await this.renderProtectedPage(context, PAGE_KEYS.HOME_PAGE);
       return;
     }
 
@@ -126,14 +127,6 @@ export class TelegramService implements OnModuleInit {
           context,
           PAGE_KEYS.ACTIVE_USER_HOME_PAGE,
         );
-        break;
-      }
-      default: {
-        this.logger.warn(
-          `Подписка не найдена или имеет неподдерживаемый статус для userId=${userId}`,
-          this,
-        );
-        await this.renderProtectedPage(context, PAGE_KEYS.HOME_PAGE);
         break;
       }
     }

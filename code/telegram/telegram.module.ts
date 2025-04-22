@@ -4,7 +4,6 @@ import { TelegramBotController } from './telegram.controller';
 import { TelegramHistoryService, TelegramService } from './services';
 import { DatabaseModule } from 'code/database/database.module';
 import { XrayModule } from 'code/xray/xray.module';
-import { XrayClientService } from 'code/xray/xrayClient.service';
 import { PaymentsModule } from 'code/payments/payments.module';
 import { SubscriptionModule } from 'code/subscription/subscription.module';
 
@@ -22,11 +21,6 @@ import { SubscriptionModule } from 'code/subscription/subscription.module';
     PaymentsModule,
     SubscriptionModule,
   ],
-  providers: [
-    TelegramBotController,
-    TelegramService,
-    TelegramHistoryService,
-    XrayClientService,
-  ],
+  providers: [TelegramBotController, TelegramService, TelegramHistoryService],
 })
 export class TelegramModule {}

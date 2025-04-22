@@ -5,38 +5,36 @@ import { BuildInlineKeyboardOptions } from './types';
 
 /**
  * Создаёт Telegram клавиатуру из массива кнопок с заданным количеством колонок.
+ * Подставляет переменные из payload в шаблоны кнопок.
  *
  * @param arr - Массив кнопок.
  * @param columns - Количество колонок (по умолчанию 1).
+ * @param payload - Данные для подстановки в шаблоны кнопок.
  * @returns - Telegram клавиатура.
  */
 export function buildInlineKeyboard({
   arr,
-  columns,
+  columns = 1,
   payload,
 }: BuildInlineKeyboardOptions): Markup.Markup<InlineKeyboardMarkup> {
-  const flatPayload = flattenObject(payload);
+  const flatPayload: Record<string, string | number | boolean> = flattenObject(
+    payload ?? {},
+  );
 
-  const keyboard = arr.reduce<InlineKeyboardButton[][]>((acc, item, index) => {
+  const keyboard: InlineKeyboardButton[][] = arr.reduce((acc, item, index) => {
     const columnIndex = Math.floor(index / columns);
 
-    for (const keyItem in item) {
-      if (Object.prototype.hasOwnProperty.call(item, keyItem)) {
-        const field = item[keyItem] as string | undefined;
-
-        if (typeof field === 'string') {
-          const match = field.match(/{{(.*?)}}/);
-
-          if (match) {
-            const exists = match[1];
-            const value = flatPayload[exists] as string | number | undefined;
-
-            item[keyItem] = field.replace(
-              new RegExp(`{{${exists}}}`, 'g'),
-              value !== undefined ? String(value) : '',
-            );
-          }
-        }
+    const replacedButton: { [key: string]: string } = {};
+    for (const [key, value] of Object.entries(item)) {
+      if (typeof value === 'string') {
+        const replacedValue = value.replace(
+          /{{(.*?)}}/g,
+          (_match, keyName: string) => {
+            const replacement = flatPayload[keyName];
+            return replacement !== undefined ? String(replacement) : '';
+          },
+        );
+        replacedButton[key] = replacedValue;
       }
     }
 
@@ -44,19 +42,21 @@ export function buildInlineKeyboard({
       acc[columnIndex] = [];
     }
 
-    if (!item.url && !item.action) {
+    if (!replacedButton.url && !replacedButton.action) {
       console.warn(`❌ Кнопка без действия: ${JSON.stringify(item)}`);
       return acc;
     }
 
-    acc[columnIndex].push(
-      item.url
-        ? Markup.button.url(item.text, item.url)
-        : Markup.button.callback(item.text, item.action || ''),
-    );
+    const button = replacedButton.url
+      ? Markup.button.url(replacedButton.text, replacedButton.url)
+      : Markup.button.callback(
+          replacedButton.text,
+          replacedButton.action ?? '',
+        );
 
+    acc[columnIndex].push(button);
     return acc;
-  }, []);
+  }, [] as InlineKeyboardButton[][]);
 
   return Markup.inlineKeyboard(keyboard);
 }
