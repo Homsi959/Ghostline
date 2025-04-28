@@ -14,7 +14,7 @@
   "scripts": {
     "start:dev:local": "NODE_ENV=dev.local nest start --watch",
     "start:dev:remote": "nohup sh -c 'NODE_ENV=dev.remote nest start' &",
-    "start:build": "NODE_ENV=prod yarn build",
+    "start:prod": "NODE_ENV=prod nest build --prod",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
     "gen:activity": "ts-node scripts/generateActivity.ts",
     "clean:clients": "ts-node scripts/cleanupVpnClients.ts"
