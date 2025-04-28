@@ -98,38 +98,9 @@ export class TelegramService implements OnModuleInit {
 
     if (!telegramProfile) {
       await this.createUserWithTelegramProfile(sessionFrom);
-      await this.renderProtectedPage(context, PAGE_KEYS.HOME_PAGE);
-      return;
     }
 
-    const subscription = await this.subscriptionDao.find({
-      userId: telegramProfile.userId,
-    });
-
-    const userId = telegramProfile.userId;
-
-    switch (subscription?.status) {
-      case SubscriptionStatus.ACTIVE:
-      case SubscriptionStatus.EXPIRED: {
-        const vlessLink =
-          await this.xrayClientService.generateVlessLink(userId);
-        context.session.payload.vlessLink = vlessLink;
-
-        if (subscription.endDate) {
-          const endDateFormatted = DateTime.fromJSDate(subscription.endDate)
-            .setLocale('ru')
-            .toFormat('dd.MM.yyyy');
-
-          context.session.payload.endDateSubscription = endDateFormatted;
-        }
-
-        await this.renderProtectedPage(
-          context,
-          PAGE_KEYS.ACTIVE_USER_HOME_PAGE,
-        );
-        break;
-      }
-    }
+    await this.renderProtectedPage(context, PAGE_KEYS.HOME_PAGE);
   }
 
   async renderPage(context: Context, pageKey: string): Promise<void> {
@@ -277,13 +248,14 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  async activeSubscription(context: Context): Promise<boolean> {
+  async renderProtectedPage(context: Context, page: string): Promise<void> {
     const telegramId = context.from?.id ?? context.callbackQuery?.from?.id;
+    if (!telegramId) return;
+
     const telegramProfile =
       await this.telegramProfilesDao.findTelegramProfileByTelegramId(
         telegramId,
       );
-
     if (!telegramProfile) {
       throw new Error(
         'Профиль Telegram не найден для данного идентификатора Telegram',
@@ -292,65 +264,54 @@ export class TelegramService implements OnModuleInit {
 
     const subscription = await this.subscriptionDao.find({
       userId: telegramProfile.userId,
-      status: SubscriptionStatus.ACTIVE,
     });
 
-    return Boolean(subscription);
-  }
-
-  async renderProtectedPage(context: Context, page: string): Promise<void> {
-    const telegramId = context.from?.id ?? context.callbackQuery?.from?.id;
-    const telegramProfile =
-      await this.telegramProfilesDao.findTelegramProfileByTelegramId(
-        telegramId,
-      );
-    const isActive = await this.activeSubscription(context);
-
-    if (!telegramProfile) {
-      return;
-    }
-
-    const userId = telegramProfile.userId;
-
     switch (page) {
-      case PAGE_KEYS.ACTIVE_USER_KEY_PAGE:
-        {
-          if (!isActive) {
-            await this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
-          } else {
-            await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_KEY_PAGE);
-          }
-        }
-        break;
-
       case PAGE_KEYS.HOME_PAGE: {
-        if (isActive) {
-          const activeSubscription =
-            await this.subscriptionDao.findActiveById(userId);
+        if (!subscription) {
+          return this.renderPage(context, PAGE_KEYS.HOME_PAGE);
+        }
 
-          if (activeSubscription?.endDate) {
-            const endDateFormatted = DateTime.fromJSDate(
-              activeSubscription.endDate,
-            )
+        if (subscription.status === SubscriptionStatus.ACTIVE) {
+          if (subscription.endDate) {
+            const endDateFormatted = DateTime.fromJSDate(subscription.endDate)
               .setLocale('ru')
               .toFormat('dd.MM.yyyy');
 
             context.session.payload.endDateSubscription = endDateFormatted;
           }
-
-          await this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
-          break;
+          return this.renderPage(context, PAGE_KEYS.ACTIVE_USER_HOME_PAGE);
         }
 
-        await this.renderPage(context, PAGE_KEYS.HOME_PAGE);
-        break;
+        if (
+          subscription.status === SubscriptionStatus.EXPIRED &&
+          subscription.plan === SubscriptionPlan.TRIAL
+        ) {
+          return this.renderPage(context, PAGE_KEYS.WITHOUT_TRIAL_HOME_PAGE);
+        }
+
+        if (subscription.status === SubscriptionStatus.EXPIRED) {
+          return this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+        }
+
+        return this.renderPage(context, PAGE_KEYS.HOME_PAGE);
       }
 
-      default:
-        {
-          await this.renderPage(context, page);
+      case PAGE_KEYS.ACTIVE_USER_KEY_PAGE: {
+        if (subscription?.status === SubscriptionStatus.EXPIRED) {
+          return this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
         }
-        break;
+
+        const vlessLink = await this.xrayClientService.generateVlessLink(
+          telegramProfile.userId,
+        );
+        context.session.payload.vlessLink = vlessLink;
+        return this.renderPage(context, PAGE_KEYS.ACTIVE_USER_KEY_PAGE);
+      }
+
+      default: {
+        return this.renderPage(context, page);
+      }
     }
   }
 

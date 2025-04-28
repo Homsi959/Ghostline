@@ -6,13 +6,14 @@ import { ACTIONS_KEYS } from './telegram.actions';
  */
 export const PAGE_KEYS = {
   HOME_PAGE: 'homePage', // Главная страница
+  ACTIVE_USER_HOME_PAGE: 'activeUserHomePage', // Страница для клиента у которого уже есть актуальная подписка
+  WITHOUT_TRIAL_HOME_PAGE: 'withoutTrialHomePage', // Главная страница для клиента который использовал уже использовал триал и подписка не активна
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
   SUBSCRIBING_PAGE: 'subscribingPage', // Страница подписки
   PURCHASE_OF_SUBSCRIBING_PAGE: 'purchaseOfSubscribingPage', // Страница покупки подписки
   PAYMENT_PAGE: 'paymentPage', // Страница со ссылкой на оплату
   GET_VPN_KEY_PAGE: 'getVpnKeyPage', // Страница получения VPN ключа
   HOW_TO_CONNECT_PAGE: 'howToConnectPage', // Страница со ссылками на инструкции по подключению
-  ACTIVE_USER_HOME_PAGE: 'activeUserHomePage', // Страница для клиента у которого уже есть актуальная подписка
   ACTIVE_USER_KEY_PAGE: 'activeUserKeyPage', // Страница с ключом для клиента у которого уже есть актуальная подписка
   REPEATED_TRIAL_ATTEMPT_PAGE: 'repeatedTrialAttemptPage', // Страница где говорится о том, что клиент пытается повтороно получить триал версию
   SUBSCRIPTION_IS_EXPIRED: 'subsribitionIsExpired', // Страница о истекшей подписки
@@ -414,10 +415,18 @@ export const telegramPages: TelegramPages = {
   [PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED]: {
     message: MESSAGES.SUBSCRIPTION_IS_EXPIRED,
     keyboardConfig: {
+      buttons: [BUTTONS.BUY_SUBSCRIPTION, BUTTONS.HOME_PAGE],
+      columns: 1,
+    },
+  },
+  [PAGE_KEYS.WITHOUT_TRIAL_HOME_PAGE]: {
+    message: MESSAGES.WITHOUT_TRIAL_HOME_PAGE,
+    keyboardConfig: {
       buttons: [
-        BUTTONS.BUY_FOR_1_MONTH,
-        BUTTONS.BUY_FOR_6_MONTHS,
-        BUTTONS.HOME_PAGE,
+        BUTTONS.BUY_SUBSCRIPTION,
+        BUTTONS.ABOUT_SERVICE,
+        BUTTONS.POLICY,
+        BUTTONS.SUPPORT,
       ],
       columns: 2,
     },
