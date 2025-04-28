@@ -41,4 +41,4 @@ export const DEVELOPMENT_REMOTE = 'dev.remote';
 /**
  * Режим производства
  */
-export const PRODUCTION = 'prod';
+export const PRODUCTION = 'prodaction';
