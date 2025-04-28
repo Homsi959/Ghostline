@@ -29,7 +29,6 @@ import * as path from 'path';
 import { RobokassaService } from 'code/payments/robokassa.service';
 import { PAID_PLANS } from 'code/subscription/types';
 import { SubscriptionService } from 'code/subscription/subscription.service';
-import { CreateActiveVpnAccess } from './types';
 import { DateTime } from 'luxon';
 
 @Injectable()
@@ -228,18 +227,28 @@ export class TelegramService implements OnModuleInit {
       throw new Error('Отсутсвует transactionId');
     }
 
-    const transaction = await this.paymentsDao.find({
+    const paidTransaction = await this.paymentsDao.find({
       transactionId,
       status: PaymentStatus.PAID,
     });
 
-    if (transaction && plan) {
+    if (paidTransaction && plan) {
       const vlessLink = await this.createActiveVpnAccess({
-        userId: transaction.userId,
-        plan,
+        userId: paidTransaction.userId,
       });
 
       if (vlessLink) context.session.payload.vlessLink = vlessLink;
+
+      const subscriptionId = await this.subscriptionService.create({
+        userId: paidTransaction.userId,
+        plan,
+      });
+
+      this.logger.log(
+        `Подписка с планом ${plan} создана (id=${subscriptionId})`,
+        this,
+      );
+
       await this.renderPage(context, PAGE_KEYS.GET_VPN_KEY_PAGE);
     } else {
       await context.answerCbQuery(MESSAGES.PAYMENT_IS_NOT_PAID, {
@@ -250,6 +259,7 @@ export class TelegramService implements OnModuleInit {
 
   async renderProtectedPage(context: Context, page: string): Promise<void> {
     const telegramId = context.from?.id ?? context.callbackQuery?.from?.id;
+
     if (!telegramId) return;
 
     const telegramProfile =
@@ -291,7 +301,20 @@ export class TelegramService implements OnModuleInit {
         }
 
         if (subscription.status === SubscriptionStatus.EXPIRED) {
-          return this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+          const isUsedTrial = await this.subscriptionDao.find({
+            userId: telegramProfile.userId,
+            plan: SubscriptionPlan.TRIAL,
+          });
+
+          if (page === PAGE_KEYS.HOME_PAGE && !isUsedTrial) {
+            return this.renderPage(context, PAGE_KEYS.HOME_PAGE);
+          }
+
+          if (page === PAGE_KEYS.HOME_PAGE) {
+            return this.renderPage(context, PAGE_KEYS.WITHOUT_TRIAL_HOME_PAGE);
+          } else {
+            return this.renderPage(context, PAGE_KEYS.SUBSCRIPTION_IS_EXPIRED);
+          }
         }
 
         return this.renderPage(context, PAGE_KEYS.HOME_PAGE);
@@ -323,10 +346,7 @@ export class TelegramService implements OnModuleInit {
    * @returns VLESS-ссылка для подключения.
    * @throws Ошибка, если на любом этапе активация невозможна.
    */
-  async createActiveVpnAccess({
-    userId,
-    plan,
-  }: CreateActiveVpnAccess): Promise<string> {
+  async createActiveVpnAccess({ userId }: { userId: string }): Promise<string> {
     const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
     const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
@@ -345,24 +365,6 @@ export class TelegramService implements OnModuleInit {
 
       return existingLink;
     }
-
-    const subscriptionId = await this.subscriptionService.create({
-      userId,
-      plan,
-    });
-
-    if (!subscriptionId) {
-      this.logger.error(
-        `Не удалось создать подписку для userId=${userId} c плано = ${plan}`,
-        this,
-      );
-      throw new Error('Не удалось создать подписку');
-    }
-
-    this.logger.log(
-      `Подписка с планом ${plan} создана (id=${subscriptionId})`,
-      this,
-    );
 
     const vpnCreated = await this.xrayClientService.addVpnAccounts([userId]);
 
@@ -486,9 +488,13 @@ export class TelegramService implements OnModuleInit {
       return;
     }
 
-    const vlessLink = await this.createActiveVpnAccess({
+    await this.subscriptionService.create({
       userId: telegramProfile.userId,
       plan: SubscriptionPlan.TRIAL,
+    });
+
+    const vlessLink = await this.createActiveVpnAccess({
+      userId: telegramProfile.userId,
     });
 
     if (!vlessLink) {
