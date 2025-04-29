@@ -39,8 +39,10 @@ export class RobokassaService {
       NODE_ENV,
     } = this.getRequiredEnv();
     const { description, userId } = payload;
-    const amount = Number(payload.amount).toFixed(6);
     const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
+    const amount = isDev
+      ? String(payload.amount)
+      : Number(payload.amount).toFixed(6);
     const invId = `${Date.now()}${Math.floor(Math.random() * 1000)}`.slice(
       0,
       10,
@@ -102,6 +104,8 @@ export class RobokassaService {
   }: RobokassaResult): Promise<string | null> {
     const transaction = await this.paymentsDao.find({ transactionId: invId });
     const password = this.configService.get<string>('ROBO_PASSWORD_CHECK');
+    const { NODE_ENV } = this.getRequiredEnv();
+    const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
 
     if (!transaction) {
       this.logger.warn(`Транзакция не найдена: ${invId}`, this);
@@ -114,10 +118,9 @@ export class RobokassaService {
     }
 
     const { amount, transactionId } = transaction;
-
     const expectedSignature = this.getSignature(
       {
-        outSum: Number(amount).toFixed(6),
+        outSum: isDev ? String(amount) : Number(amount).toFixed(6),
         invId,
         password,
       },
