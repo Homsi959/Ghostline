@@ -38,7 +38,8 @@ export class RobokassaService {
       ROBO_PASSWORD_PAY,
       NODE_ENV,
     } = this.getRequiredEnv();
-    const { amount, description, userId } = payload;
+    const { description, userId } = payload;
+    const amount = Number(payload.amount).toFixed(6);
     const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
     const invId = `${Date.now()}${Math.floor(Math.random() * 1000)}`.slice(
       0,
@@ -71,7 +72,7 @@ export class RobokassaService {
     });
 
     const newTransaction = await this.paymentsDao.create({
-      amount,
+      amount: Number(amount),
       currency: 'RUB',
       description,
       paymentMethod: PaymentMethod.ROBOKASSA,
@@ -116,7 +117,7 @@ export class RobokassaService {
 
     const expectedSignature = this.getSignature(
       {
-        outSum: amount,
+        outSum: Number(amount).toFixed(6),
         invId,
         password,
       },

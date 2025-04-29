@@ -20,7 +20,7 @@ export interface ReceiptRoboItem {
   name: string;
 
   /** Сумма за товар или услугу */
-  sum: number;
+  sum: string;
 }
 
 /**
@@ -34,7 +34,7 @@ export interface SignaturePayload {
   merchantLogin?: string;
 
   /** Сумма платежа в формате 0.00 */
-  outSum: number;
+  outSum: string;
 
   /** Уникальный номер счёта (обычно совпадает с transaction_id / InvId) */
   invId: string;
