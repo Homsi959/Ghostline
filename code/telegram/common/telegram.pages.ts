@@ -56,7 +56,7 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
 
 <b>📞 Контакты:</b>  
 • Телефон: +7 (993) 909-19-98
-• Поддержка: ghostlinevpn@proton.me  
+• Почта: ghostlinevpn@proton.me  
 • Telegram: @GhostlineSupport
   `,
 
@@ -232,7 +232,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
     action: PAGE_KEYS.ABOUT_SERVICE_PAGE,
   },
   HOW_TO_CONNECT: {
-    text: '🔌 Подключение', // 14 символов
+    text: '🔌 Подключение',
     action: PAGE_KEYS.HOW_TO_CONNECT_PAGE,
   },
   GO_BACK: {
@@ -240,7 +240,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
     action: ACTIONS_KEYS.GO_BACK,
   },
   MY_KEY: {
-    text: '🔑 Мой ключ', // 11 символов
+    text: '🔑 Мой ключ',
     action: PAGE_KEYS.ACTIVE_USER_KEY_PAGE,
   },
   HOME_PAGE: {
@@ -248,7 +248,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
     action: PAGE_KEYS.HOME_PAGE,
   },
   POLICY: {
-    text: 'Договор оферты',
+    text: '📝 Договор оферты',
     url: 'https://disk.yandex.ru/i/S0YHz-BGWjY6sQ',
   },
   SUPPORT: {
@@ -300,7 +300,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_WINDOWS,
   },
   CONNECT_MACOS_INTEL: {
-    text: '🍏 MacOS Intel', // 14 символов
+    text: '🍏 MacOS Intel',
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS_INTEL,
   },
   CONNECT_MACOS_APPLE_SILICON: {
@@ -318,6 +318,7 @@ export const telegramPages: TelegramPages = {
     keyboardConfig: {
       buttons: [
         BUTTONS.SUBSCRIBING,
+        BUTTONS.BUY_SUBSCRIPTION,
         BUTTONS.ABOUT_SERVICE,
         BUTTONS.POLICY,
         BUTTONS.SUPPORT,
@@ -378,6 +379,7 @@ export const telegramPages: TelegramPages = {
     keyboardConfig: {
       buttons: [
         BUTTONS.MY_KEY,
+        BUTTONS.HOW_TO_CONNECT,
         BUTTONS.ABOUT_SERVICE,
         BUTTONS.POLICY,
         BUTTONS.SUPPORT,
