@@ -1,10 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { exec } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
-import { DEVELOPMENT } from 'code/common/constants';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class SshService implements OnModuleInit {
@@ -15,25 +15,18 @@ export class SshService implements OnModuleInit {
 
   constructor(
     private readonly logger: WinstonService,
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
   ) {}
 
   onModuleInit() {
-    if (this.configService.get<string>('NODE_ENV') == DEVELOPMENT)
-      this.sshInit();
+    if (this.config.isDev) this.sshInit();
   }
 
   private sshInit() {
-    const sshKeyPath = this.configService.get<string>(
-      'VPS_DEV_PRIVATE_KEY_PATH',
-    );
-    const host = this.configService.get<string>('VPS_DEV_HOST');
-    const username = this.configService.get<string>('VPS_DEV_USERNAME');
-
-    if (!sshKeyPath || !host || !username) {
-      this.logger.error('SSH параметры не заданы', this);
-      throw new Error('SSH параметры не заданы');
-    }
+    const sshKeyPath = this.config.vpsDev.privateKeyPath;
+    const host = this.config.db.host;
+    const username = this.config.vpsDev.username;
 
     this.sshKeyPath = path.resolve(process.cwd(), sshKeyPath);
     this.host = host;

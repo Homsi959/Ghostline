@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { readFile, writeFile } from 'fs/promises';
 import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
-import { DEVELOPMENT } from 'code/common/constants';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class XrayHelperService {
   constructor(
     private readonly logger: WinstonService,
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
     private readonly sshService: SshService,
   ) {}
 
@@ -20,22 +21,17 @@ export class XrayHelperService {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   async restartXray(): Promise<boolean> {
-    const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    const isDevLocal = this.configService.get('NODE_ENV') === DEVELOPMENT;
-
-    if (!xrayConfigPath) {
-      throw new Error('XRAY_CONFIG_PATH не задан');
-    }
+    const isDev = this.config.isDev;
 
     try {
-      if (isDevLocal) {
+      if (isDev) {
         await this.sshService.runCommand('sudo systemctl restart xray');
       } else {
         execSync('sudo systemctl restart xray');
       }
 
       this.logger.log(
-        `Xray на контуре ${isDevLocal ? 'DEV' : 'PROD'} перезапущен`,
+        `Xray на контуре ${isDev ? 'DEV' : 'PROD'} перезапущен`,
         this,
       );
       return true;
@@ -55,11 +51,7 @@ export class XrayHelperService {
    * @returns Сформированная строка VLESS-ссылки
    */
   async generateVlessLink(userId: string): Promise<string> {
-    const xrayPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    if (!xrayPath) {
-      throw new Error('Не найден путь к конфиг файлу Xray в env');
-    }
-
+    const xrayPath = this.config.xray.configPath;
     const config = await this.readFile<XrayConfig>(xrayPath, {
       asJson: true,
     });
@@ -70,22 +62,11 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
-    const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
-    const flow = this.configService.get<string>('XRAY_FLOW');
-    const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
-    const host = this.configService.get<string>(
-      isDevLocal ? 'VPS_DEV_HOST' : 'XRAY_LISTEN_IP',
-    );
-    const tag = this.configService.get<string>('XRAY_LINK_TAG');
-
-    if (!flow || !pbk || !host || !tag) {
-      this.logger.error(
-        'Не удалось сформировать ссылку — отсутствуют необходимые параметры',
-        this,
-      );
-      throw new Error('Недостаточно данных для генерации ссылки');
-    }
+    const isDev = this.config.isDev;
+    const flow = this.config.xray.flow;
+    const pbk = this.config.xray.publicKey;
+    const host = isDev ? this.config.vpsDev.host : this.config.xray.listenIp;
+    const tag = this.config.xray.linkTag;
 
     const query = [
       `security=${security}`,
@@ -115,11 +96,10 @@ export class XrayHelperService {
     options: ReadFileOptions = {},
   ): Promise<T> {
     const { asJson = false, encoding } = options;
-    const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
+    const isDev = this.config.isDev;
     let content;
 
-    if (isDevLocal) {
+    if (isDev) {
       content = await this.sshService.runCommand(`cat ${filePath}`);
     } else {
       content = await readFile(filePath, encoding ? { encoding } : undefined);
@@ -127,7 +107,9 @@ export class XrayHelperService {
 
     if (asJson) {
       const jsonString =
-        typeof content === 'string' ? content : content.toString('utf-8');
+        typeof content === 'string'
+          ? content
+          : (content.toString('utf-8') as string);
 
       try {
         return JSON.parse(jsonString) as T;
@@ -145,19 +127,12 @@ export class XrayHelperService {
    * @param config - JS-объект конфигурации Xray
    */
   async writeFile(xrayPath: string, config: XrayConfig): Promise<void> {
-    const isDevLocal =
-      this.configService.get<string>('NODE_ENV') === DEVELOPMENT;
-
-    const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-
-    if (!configPath) {
-      throw new Error('XRAY_CONFIG_PATH не задан');
-    }
-
+    const isDev = this.config.isDev;
+    const configPath = this.config.xray.configPath;
     const configContent = JSON.stringify(config, null, 2);
 
     try {
-      if (isDevLocal) {
+      if (isDev) {
         // Экранируем JSON, чтобы безопасно передать через SSH
         const encoded = Buffer.from(configContent).toString('base64');
         const command = `echo "${encoded}" | base64 -d | sudo tee ${configPath} > /dev/null`;

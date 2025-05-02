@@ -1,9 +1,9 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { createLogger, transports, format, Logger } from 'winston';
 import { TMetaDataLogs } from './winston.types';
-import { ConfigService } from '@nestjs/config';
-import { LOG_LEVEL_KEY } from 'code/common/constants';
 import { buildContext, levelFormatted } from 'code/common/utils';
+import { AppConfig } from 'code/config/types';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 
 /**
  * Сервис для работы с логированием с использованием библиотеки winston.
@@ -13,9 +13,12 @@ import { buildContext, levelFormatted } from 'code/common/utils';
 export class WinstonService implements LoggerService {
   private readonly logger: Logger;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    readonly config: AppConfig,
+  ) {
     this.logger = createLogger({
-      level: this.config.get<string>(LOG_LEVEL_KEY),
+      level: config.logLevel,
       format: format.combine(
         format((info) => {
           if (info.level == 'info') info.level = 'log';

@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 import {
   CreatedPaymentTransaction,
@@ -13,11 +12,14 @@ import { PaymentsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { PaymentMethod, PaymentStatus } from 'code/database/common/enums';
 import { DateTime } from 'luxon';
+import { AppConfig } from 'code/config/types';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 
 @Injectable()
 export class RobokassaService {
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
     private readonly paymentsDao: PaymentsDao,
     private readonly logger: WinstonService,
   ) {}
@@ -30,13 +32,9 @@ export class RobokassaService {
   async createPaymentTransaction(
     payload: PaymentRoboPayload,
   ): Promise<CreatedPaymentTransaction> {
-    const {
-      ROBO_PAYMENT_URL,
-      ROBO_CULTURE,
-      ROBO_MERCHANT_LOGIN,
-      ROBO_PASSWORD_PAY,
-      NODE_ENV: isDev,
-    } = this.getRequiredEnv();
+    const { passwordCheck, culture, merchantLogin, paymentUrl } =
+      this.config.robokassa;
+    const isDev = this.config.isDev;
     const { description, userId } = payload;
     const amount = isDev
       ? String(payload.amount)
@@ -52,20 +50,20 @@ export class RobokassaService {
     });
     const signature = this.getSignature(
       {
-        password: ROBO_PASSWORD_PAY,
+        password: passwordCheck,
         receipt: encodedReceipt,
         outSum: amount,
-        merchantLogin: ROBO_MERCHANT_LOGIN,
+        merchantLogin: merchantLogin,
         invId,
       },
       TypeSignature.SIGPAY,
     );
     const params = new URLSearchParams({
-      MerchantLogin: ROBO_MERCHANT_LOGIN,
+      MerchantLogin: merchantLogin,
       OutSum: String(amount),
       InvId: invId,
       Description: description,
-      Culture: ROBO_CULTURE,
+      Culture: culture,
       IsTest: isDev ? '1' : '0',
       SignatureValue: signature,
       Receipt: encodedReceipt,
@@ -87,7 +85,7 @@ export class RobokassaService {
     }
 
     return {
-      link: `${ROBO_PAYMENT_URL}?${params.toString()}`,
+      link: `${paymentUrl}?${params.toString()}`,
       invId,
     };
   }
@@ -101,8 +99,8 @@ export class RobokassaService {
     signatureValue,
   }: RobokassaResult): Promise<string | null> {
     const transaction = await this.paymentsDao.find({ transactionId: invId });
-    const password = this.configService.get<string>('ROBO_PASSWORD_CHECK');
-    const { NODE_ENV: isDev } = this.getRequiredEnv();
+    const password = this.config.robokassa.passwordPay;
+    const isDev = this.config.isDev;
 
     if (!transaction) {
       this.logger.warn(`Транзакция не найдена: ${invId}`, this);
@@ -207,28 +205,5 @@ export class RobokassaService {
       .update(signatureString)
       .digest('hex')
       .toUpperCase();
-  }
-
-  /**
-   * Получает необходимые переменные окружения и проверяет их наличие.
-   * @throws Ошибка, если хотя бы одна переменная не задана.
-   * @returns Объект с переменными.
-   */
-  private getRequiredEnv() {
-    const required = {
-      ROBO_PAYMENT_URL: this.configService.get<string>('ROBO_PAYMENT_URL'),
-      ROBO_CULTURE: this.configService.get<string>('ROBO_CULTURE'),
-      ROBO_MERCHANT_LOGIN: this.configService.get<string>(
-        'ROBO_MERCHANT_LOGIN',
-      ),
-      ROBO_PASSWORD_PAY: this.configService.get<string>('ROBO_PASSWORD_PAY'),
-      NODE_ENV: this.configService.get<string>('NODE_ENV'),
-    };
-
-    for (const [key, value] of Object.entries(required)) {
-      if (!value) throw new Error(`Переменная окружения ${key} не задана`);
-    }
-
-    return required as Record<keyof typeof required, string>;
   }
 }

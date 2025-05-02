@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersDao } from 'code/database/dao/users.dao';
 import {
   PaymentsDao,
@@ -22,7 +22,6 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from 'code/database/common/enums';
-import { ConfigService } from '@nestjs/config';
 import { XrayClientService } from 'code/xray/xrayClient.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
@@ -30,6 +29,8 @@ import { RobokassaService } from 'code/payments/robokassa.service';
 import { PAID_PLANS } from 'code/subscription/types';
 import { SubscriptionService } from 'code/subscription/subscription.service';
 import { DateTime } from 'luxon';
+import { AppConfig } from 'code/config/types';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -38,7 +39,8 @@ export class TelegramService implements OnModuleInit {
     private readonly telegramProfilesDao: TelegramProfilesDao,
     private readonly historyService: TelegramHistoryService,
     private readonly logger: WinstonService,
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
     private readonly subscriptionDao: SubscriptionDao,
     private readonly xrayClientService: XrayClientService,
     private readonly robokassaService: RobokassaService,
@@ -48,15 +50,7 @@ export class TelegramService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    const limitLengthButton = this.configService.get<string>(
-      'LIMIT_LENGTH_BUTTON',
-    );
-
-    if (!limitLengthButton) {
-      throw new Error('Не получен лимит из конфига');
-    }
-
-    const maxLength = Number(limitLengthButton);
+    const maxLength = Number(this.config.telegram.limitLengthButton);
 
     for (const { keyboardConfig } of Object.values(telegramPages)) {
       if (!keyboardConfig) continue;
@@ -347,9 +341,9 @@ export class TelegramService implements OnModuleInit {
    * @throws Ошибка, если на любом этапе активация невозможна.
    */
   async createActiveVpnAccess({ userId }: { userId: string }): Promise<string> {
-    const XRAY_LISTEN_IP = this.configService.get<string>('XRAY_LISTEN_IP');
-    const XRAY_PUBLIC_KEY = this.configService.get<string>('XRAY_PUBLIC_KEY');
-    const XRAY_FLOW = this.configService.get<string>('XRAY_FLOW');
+    const listenIp = this.config.xray.listenIp;
+    const publicKey = this.config.xray.publicKey;
+    const flow = this.config.xray.flow;
     const activeVpnAccount = await this.xrayClientService.findActiveOne(userId);
 
     if (activeVpnAccount) {
@@ -391,11 +385,11 @@ export class TelegramService implements OnModuleInit {
     const vpnAccountPayload = {
       userId,
       sni: 'www.microsoft.com', // TODO: вынести в конфиг
-      server: XRAY_LISTEN_IP,
-      publicKey: XRAY_PUBLIC_KEY,
+      server: listenIp,
+      publicKey,
       port: '443',
       isBlocked: false,
-      flow: XRAY_FLOW,
+      flow,
       devicesLimit: 3,
     };
 

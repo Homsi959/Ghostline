@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import {
   ConnectionInfo,
@@ -12,16 +11,18 @@ import { VpnAccountsDao } from 'code/database/dao';
 import { VpnAccessDecision } from 'code/telegram/services/types';
 import { XrayClientService } from './xrayClient.service';
 import { Cron } from '@nestjs/schedule';
-import { DEVELOPMENT } from 'code/common/constants';
 import { SshService } from 'code/ssh/ssh.service';
 import { execSync } from 'child_process';
+import { AppConfig } from 'code/config/types';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 
 @Injectable()
 export class XrayMonitoringService implements OnModuleInit {
   public xrayConfig: XrayConfig;
 
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
     private readonly logger: WinstonService,
     private readonly xrayHelperService: XrayHelperService,
     private readonly vpnAccountsDao: VpnAccountsDao,
@@ -46,10 +47,9 @@ export class XrayMonitoringService implements OnModuleInit {
    */
   @Cron('*/1 * * * *')
   async processCheckConnectionLimits() {
-    const logsPath = this.configService.get<string>('XRAY_LOGS_PATH');
+    const logsPath = this.config.xray.logsPath;
     const vpnAccounts = await this.vpnAccountsDao.findAll();
-    const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
+    const isDevLocal = this.config.isDev;
     const commandCleanLogsFile = '> /usr/local/etc/xray/logs/access.log';
     if (!logsPath || !vpnAccounts) return;
 

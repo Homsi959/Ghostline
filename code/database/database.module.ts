@@ -1,6 +1,5 @@
 import { Module, Global } from '@nestjs/common';
-import { DATABASE_TOKEN } from 'code/common/constants';
-import { ConfigService } from '@nestjs/config';
+import { CONFIG_PROVIDER_TOKEN, DATABASE_TOKEN } from 'code/common/constants';
 import { Pool } from 'pg';
 import {
   SubscriptionDao,
@@ -9,6 +8,7 @@ import {
   VpnAccountsDao,
   PaymentsDao,
 } from 'code/database/dao';
+import { AppConfig } from 'code/config/types';
 
 /**
  * Глобальный модуль базы данных.
@@ -22,14 +22,14 @@ import {
   providers: [
     {
       provide: DATABASE_TOKEN,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      inject: [CONFIG_PROVIDER_TOKEN],
+      useFactory: (config: AppConfig) => {
         return new Pool({
-          host: config.get<string>('DB_HOST'),
-          port: config.get<number>('DB_PORT'),
-          user: config.get<string>('DB_USER'),
-          password: config.get<string>('DB_PASSWORD'),
-          database: config.get<string>('DB_NAME'),
+          host: config.db.host,
+          port: config.db.port,
+          user: config.db.user,
+          password: config.db.password,
+          database: config.db.database,
         });
       },
     },

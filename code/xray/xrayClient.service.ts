@@ -1,16 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { WinstonService } from 'code/logger/winston.service';
 import { VpnAccountsDao } from 'code/database/dao';
 import { XrayHelperService } from './xrayHelper.service';
 import { XrayClient, XrayConfig } from './types';
+import { AppConfig } from 'code/config/types';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 
 @Injectable()
 export class XrayClientService implements OnModuleInit {
   private xrayPath: string;
 
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(CONFIG_PROVIDER_TOKEN)
+    private readonly config: AppConfig,
     private readonly logger: WinstonService,
     private readonly vpnAccountsDao: VpnAccountsDao,
     private readonly xrayHelperService: XrayHelperService,
@@ -23,7 +25,7 @@ export class XrayClientService implements OnModuleInit {
    * - Загружает VPN-аккаунты из базы данных.
    */
   async onModuleInit() {
-    const pathConfig = this.configService.get<string>('XRAY_CONFIG_PATH');
+    const pathConfig = this.config.xray.configPath;
 
     if (pathConfig) {
       this.xrayPath = pathConfig;
@@ -38,7 +40,7 @@ export class XrayClientService implements OnModuleInit {
    * @returns список добавленных UUID
    */
   async addVpnAccounts(userIDs: string[]): Promise<string[]> {
-    const flow = this.configService.get<string>('XRAY_FLOW');
+    const flow = this.config.xray.flow;
 
     if (!flow) {
       throw new Error('Не был получен flow для Xray');

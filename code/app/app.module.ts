@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'code/logger/winston.module';
-import { WinstonService } from 'code/logger/winston.service';
 import { DatabaseModule } from 'code/database/database.module';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { TELEGRAM_TOKEN } from 'code/common/constants';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 import { session } from 'telegraf';
 import { TelegramModule } from 'code/telegram/telegram.module';
 import { HttpModule } from '@nestjs/axios';
@@ -12,6 +11,8 @@ import { initializeTelegramSession } from 'code/telegram/common/telegram-session
 import { ScheduleModule } from '@nestjs/schedule';
 import { SubscriptionModule } from 'code/subscription/subscription.module';
 import { PaymentsModule } from 'code/payments/payments.module';
+import { ConfigModule } from 'code/config/config.module';
+import { AppConfig } from 'code/config/types';
 
 /**
  * Основной модуль приложения.
@@ -32,29 +33,20 @@ import { PaymentsModule } from 'code/payments/payments.module';
     WinstonModule,
     TelegramModule,
     HttpModule,
+    ConfigModule,
     ScheduleModule.forRoot(),
     SubscriptionModule,
     PaymentsModule,
     // Загрузка конфигурации из переменных окружения
-    ConfigModule.forRoot({
+    NestConfigModule.forRoot({
       envFilePath: `settings/envs/.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true,
     }),
     TelegrafModule.forRootAsync({
-      inject: [ConfigService, WinstonService],
-      useFactory: (configService: ConfigService, logger: WinstonService) => {
-        const token = configService.get<string>(TELEGRAM_TOKEN);
-
-        if (!token) {
-          logger.error('TELEGRAM_TOKEN не найден в .env');
-          throw new Error('TELEGRAM_TOKEN не найден в .env');
-        }
-
-        return {
-          token,
-          middlewares: [session(), initializeTelegramSession],
-        };
-      },
+      inject: [CONFIG_PROVIDER_TOKEN],
+      useFactory: (config: AppConfig) => ({
+        token: config.telegram.token,
+        middlewares: [session(), initializeTelegramSession],
+      }),
     }),
   ],
 })
