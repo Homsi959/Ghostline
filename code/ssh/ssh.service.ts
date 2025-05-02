@@ -54,10 +54,6 @@ export class SshService implements OnModuleInit {
         this.logger.warn(`stderr при выполнении команды: ${stderr}`, this);
       }
 
-      this.logger.log(
-        `Команда на DEV сервере успешно выполнена: ${command.slice(0, 100)}${command.length > 100 ? '...' : ''}`,
-        this,
-      );
       return stdout.trim();
     } catch (error: any) {
       this.logger.error(

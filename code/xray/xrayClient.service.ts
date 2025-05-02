@@ -35,7 +35,7 @@ export class XrayClientService implements OnModuleInit {
   /**
    * Добавляет в конфигурационный файл Xray новых клиентов
    * @param userIDs - список VPN-аккаунтов (uuid пользователей)
-   * @returns true, если добавлены новые клиенты; false — если нет
+   * @returns список добавленных UUID
    */
   async addVpnAccounts(userIDs: string[]): Promise<string[]> {
     const flow = this.configService.get<string>('XRAY_FLOW');
@@ -49,10 +49,11 @@ export class XrayClientService implements OnModuleInit {
         this.xrayPath,
         { asJson: true },
       );
-      const clients = config.inbounds[0]?.settings?.clients ?? [];
+
+      const currentClients = config.inbounds[0]?.settings?.clients ?? [];
       const newClients = userIDs
         .filter((userId) => {
-          const exists = clients.some((client) => client.id == userId);
+          const exists = currentClients.some((client) => client.id === userId);
           if (exists) {
             this.logger.warn(`Клиент ${userId} уже существует`, this);
             return false;
@@ -65,13 +66,21 @@ export class XrayClientService implements OnModuleInit {
           flow,
         }));
 
-      if (newClients.length == 0) {
+      if (newClients.length === 0) {
         this.logger.log(`Ни одного нового клиента не добавлено`, this);
-        return newClients.map(({ id }) => id);
+        return [];
       }
 
-      clients.push(...newClients);
-      config.inbounds[0].settings.clients = clients;
+      const allClients = [...currentClients, ...newClients];
+
+      // Удаляем дубликаты по UUID
+      const deduplicatedClients = allClients.filter(
+        (client, index, self) =>
+          self.findIndex((c) => c.id === client.id) === index,
+      );
+
+      config.inbounds[0].settings.clients = deduplicatedClients;
+
       await this.xrayHelperService.writeFile(this.xrayPath, config);
       await this.xrayHelperService.restartXray();
 
@@ -180,15 +189,15 @@ export class XrayClientService implements OnModuleInit {
       if (!vpnAccounts || vpnAccounts.length == 0) {
         this.logger.warn(`VPN-аккаунты не найдены в базе данных.`, this);
         return;
-      } else {
-        const vpnAccountsFiltered = vpnAccounts.map(({ userId }) => userId);
-
-        await this.addVpnAccounts(vpnAccountsFiltered);
-        this.logger.log(
-          `Загружено VPN-аккаунтов из БД в конфиг Xray: ${vpnAccounts.length}`,
-          this,
-        );
       }
+
+      const vpnAccountsFiltered = vpnAccounts.map(({ userId }) => userId);
+
+      await this.addVpnAccounts(vpnAccountsFiltered);
+      this.logger.log(
+        `Загружено VPN-аккаунтов из БД в конфиг Xray: ${vpnAccounts.length}`,
+        this,
+      );
     } catch (error: unknown) {
       const errMsg =
         error instanceof Error
