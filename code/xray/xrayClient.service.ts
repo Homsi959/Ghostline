@@ -42,10 +42,6 @@ export class XrayClientService implements OnModuleInit {
   async addVpnAccounts(userIDs: string[]): Promise<string[]> {
     const flow = this.config.xray.flow;
 
-    if (!flow) {
-      throw new Error('Не был получен flow для Xray');
-    }
-
     try {
       const config = await this.xrayHelperService.readFile<XrayConfig>(
         this.xrayPath,
