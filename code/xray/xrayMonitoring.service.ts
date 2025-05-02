@@ -12,7 +12,7 @@ import { VpnAccountsDao } from 'code/database/dao';
 import { VpnAccessDecision } from 'code/telegram/services/types';
 import { XrayClientService } from './xrayClient.service';
 import { Cron } from '@nestjs/schedule';
-import { DEVELOPMENT_LOCAL } from 'code/common/constants';
+import { DEVELOPMENT } from 'code/common/constants';
 import { SshService } from 'code/ssh/ssh.service';
 import { execSync } from 'child_process';
 
@@ -49,7 +49,7 @@ export class XrayMonitoringService implements OnModuleInit {
     const logsPath = this.configService.get<string>('XRAY_LOGS_PATH');
     const vpnAccounts = await this.vpnAccountsDao.findAll();
     const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
     const commandCleanLogsFile = '> /usr/local/etc/xray/logs/access.log';
     if (!logsPath || !vpnAccounts) return;
 

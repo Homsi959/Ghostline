@@ -9,7 +9,6 @@ import {
   SignaturePayload,
   TypeSignature,
 } from './types';
-import { DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE } from 'code/common/constants';
 import { PaymentsDao } from 'code/database/dao';
 import { WinstonService } from 'code/logger/winston.service';
 import { PaymentMethod, PaymentStatus } from 'code/database/common/enums';
@@ -36,10 +35,9 @@ export class RobokassaService {
       ROBO_CULTURE,
       ROBO_MERCHANT_LOGIN,
       ROBO_PASSWORD_PAY,
-      NODE_ENV,
+      NODE_ENV: isDev,
     } = this.getRequiredEnv();
     const { description, userId } = payload;
-    const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
     const amount = isDev
       ? String(payload.amount)
       : Number(payload.amount).toFixed(6);
@@ -104,8 +102,7 @@ export class RobokassaService {
   }: RobokassaResult): Promise<string | null> {
     const transaction = await this.paymentsDao.find({ transactionId: invId });
     const password = this.configService.get<string>('ROBO_PASSWORD_CHECK');
-    const { NODE_ENV } = this.getRequiredEnv();
-    const isDev = [DEVELOPMENT_LOCAL, DEVELOPMENT_REMOTE].includes(NODE_ENV);
+    const { NODE_ENV: isDev } = this.getRequiredEnv();
 
     if (!transaction) {
       this.logger.warn(`Транзакция не найдена: ${invId}`, this);

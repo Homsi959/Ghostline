@@ -14,31 +14,11 @@ export const LOG_LEVEL_KEY = 'LOG_LEVEL_KEY';
 export const DATABASE_TOKEN = 'PG_CONNECTION';
 
 /**
- * Базовый URL для работы с прокси панелью
+ * Режим разработки
  */
-export const BASE_URL_3X_UI = 'BASE_URL_3X_UI';
+export const DEVELOPMENT = 'development';
 
 /**
- * Идентификатор для пользовательского интерфейса 3X.
- */
-export const USER_3X_UI = 'USER_3X_UI';
-
-/**
- * Идентификатор для пароля пользовательского интерфейса 3X.
- */
-export const PASSWORD_3X_UI = 'PASSWORD_3X_UI';
-
-/**
- * Режим разработки локально
- */
-export const DEVELOPMENT_LOCAL = 'dev.local';
-
-/**
- * Режим разработки локально
- */
-export const DEVELOPMENT_REMOTE = 'dev.remote';
-
-/**
- * Режим производства
+ * Режим боя
  */
 export const PRODUCTION = 'prodaction';

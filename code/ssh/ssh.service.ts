@@ -4,7 +4,7 @@ import { WinstonService } from 'code/logger/winston.service';
 import { exec } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
-import { DEVELOPMENT_LOCAL } from 'code/common/constants';
+import { DEVELOPMENT } from 'code/common/constants';
 
 @Injectable()
 export class SshService implements OnModuleInit {
@@ -19,7 +19,7 @@ export class SshService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    if (this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL)
+    if (this.configService.get<string>('NODE_ENV') == DEVELOPMENT)
       this.sshInit();
   }
 

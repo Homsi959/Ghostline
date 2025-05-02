@@ -12,8 +12,7 @@
   },
   "homepage": "https://github.com/Homsi959/Ghostline",
   "scripts": {
-    "start:dev:local": "NODE_ENV=dev.local nest start --watch",
-    "start:dev:remote": "nohup sh -c 'NODE_ENV=dev.remote nest start' &",
+    "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=prodaction nest build",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
     "gen:activity": "ts-node scripts/generateActivity.ts",

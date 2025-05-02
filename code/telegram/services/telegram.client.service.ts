@@ -399,6 +399,7 @@ export class TelegramService implements OnModuleInit {
       devicesLimit: 3,
     };
 
+    // TODO: убрать
     // @ts-ignore
     await this.vpnAccountsDao.create(vpnAccountPayload);
 

@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
-import { DEVELOPMENT_LOCAL } from 'code/common/constants';
+import { DEVELOPMENT } from 'code/common/constants';
 
 @Injectable()
 export class XrayHelperService {
@@ -21,7 +21,7 @@ export class XrayHelperService {
    */
   async restartXray(): Promise<boolean> {
     const xrayConfigPath = this.configService.get<string>('XRAY_CONFIG_PATH');
-    const isDevLocal = this.configService.get('NODE_ENV') === DEVELOPMENT_LOCAL;
+    const isDevLocal = this.configService.get('NODE_ENV') === DEVELOPMENT;
 
     if (!xrayConfigPath) {
       throw new Error('XRAY_CONFIG_PATH не задан');
@@ -71,7 +71,7 @@ export class XrayHelperService {
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
     const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
     const flow = this.configService.get<string>('XRAY_FLOW');
     const pbk = this.configService.get<string>('XRAY_PUBLIC_KEY');
     const host = this.configService.get<string>(
@@ -116,7 +116,7 @@ export class XrayHelperService {
   ): Promise<T> {
     const { asJson = false, encoding } = options;
     const isDevLocal =
-      this.configService.get<string>('NODE_ENV') == DEVELOPMENT_LOCAL;
+      this.configService.get<string>('NODE_ENV') == DEVELOPMENT;
     let content;
 
     if (isDevLocal) {
@@ -146,7 +146,7 @@ export class XrayHelperService {
    */
   async writeFile(xrayPath: string, config: XrayConfig): Promise<void> {
     const isDevLocal =
-      this.configService.get<string>('NODE_ENV') === DEVELOPMENT_LOCAL;
+      this.configService.get<string>('NODE_ENV') === DEVELOPMENT;
 
     const configPath = this.configService.get<string>('XRAY_CONFIG_PATH');
 
