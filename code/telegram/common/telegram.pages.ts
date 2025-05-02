@@ -209,14 +209,19 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
  * Ссылки на инструкции для подключения
  */
 export const CONNECTION_INSTRUCTIONS_LINKS = {
-  HOW_TO_CONNECT_IOS: 'https://teletype.in/@ghostline/iOS',
-  HOW_TO_CONNECT_ANDROID: 'https://teletype.in/@ghostline/Android',
-  HOW_TO_CONNECT_ANDROID_TV: 'https://teletype.in/@ghostline/android-tv',
-  HOW_TO_CONNECT_WINDOWS: 'https://teletype.in/@ghostline/Windows',
+  HOW_TO_CONNECT_IOS: 'https://telegra.ph/GhostlineVPN--Nastrojka-na-iOS-05-02',
+  HOW_TO_CONNECT_ANDROID:
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Android-05-02',
+  HOW_TO_CONNECT_ANDROID_TV:
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Android-TV-05-02',
+  HOW_TO_CONNECT_WINDOWS:
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Windows-05-02-2',
   HOW_TO_CONNECT_MACOS_APPLE_SILICON:
-    'https://teletype.in/@ghostline/MacOS-Apple_Silicon',
-  HOW_TO_CONNECT_MACOS_INTEL: 'https://teletype.in/@ghostline/MacOS-Intel',
-  HOW_TO_CONNECT_HUAWEI: 'https://teletype.in/@ghostline/Huawei',
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-MacOS-Apple-Silicon-05-02',
+  HOW_TO_CONNECT_MACOS_INTEL:
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-MacOS-Intel-05-02',
+  HOW_TO_CONNECT_HUAWEI:
+    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Huawei-05-02',
 } as const;
 
 /**
