@@ -12,8 +12,8 @@
   },
   "homepage": "https://github.com/Homsi959/Ghostline",
   "scripts": {
-    "start:dev": "NODE_ENV=development nest start --watch",
-    "start:prod": "NODE_ENV=prodaction nest build",
+"start:dev": "doppler run -- bash -c 'NODE_ENV=development nest start --watch'",
+    "build": "nest build",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
     "gen:activity": "ts-node scripts/generateActivity.ts",
     "clean:clients": "ts-node scripts/cleanupVpnClients.ts"

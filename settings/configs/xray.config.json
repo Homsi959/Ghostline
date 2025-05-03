@@ -1,6 +1,6 @@
 {
   "log": {
-    "loglevel": "info",
+    "loglevel": "debug",
     "access": "/usr/local/etc/xray/logs/access.log"
   },
   "inbounds": [
@@ -20,9 +20,9 @@
           "serverNames": [
             "www.microsoft.com"
           ],
-          "privateKey": "sEdWVwJzEw7YNPx_RHhT1u1pLu1vQ-B0aH_GymZ90HU",
+          "privateKey": "aO4SEW-nBtSI4HQqQtY5N0yUNJ4vxFyOlQ2irGLsEXM",
           "shortIds": [
-            "d6ffc901031065a5"
+            "a85b543a0cb8f72e"
           ],
           "xver": 0
         }
