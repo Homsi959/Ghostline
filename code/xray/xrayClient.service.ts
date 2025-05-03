@@ -39,7 +39,7 @@ export class XrayClientService implements OnModuleInit {
    * @param userIDs - список VPN-аккаунтов (uuid пользователей)
    * @returns список добавленных UUID
    */
-  async addVpnAccounts(userIDs: string[]): Promise<string[]> {
+  async addClients(userIDs: string[]): Promise<string[]> {
     const flow = this.config.xray.flow;
 
     try {
@@ -191,7 +191,7 @@ export class XrayClientService implements OnModuleInit {
 
       const vpnAccountsFiltered = vpnAccounts.map(({ userId }) => userId);
 
-      await this.addVpnAccounts(vpnAccountsFiltered);
+      await this.addClients(vpnAccountsFiltered);
       this.logger.log(
         `Загружено VPN-аккаунтов из БД в конфиг Xray: ${vpnAccounts.length}`,
         this,

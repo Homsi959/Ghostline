@@ -112,7 +112,7 @@ export class XrayMonitoringService implements OnModuleInit {
         this,
       );
       await this.vpnAccountsDao.toggleVpnAccountBlock(userId, false);
-      await this.xrayClientService.addVpnAccounts([userId]);
+      await this.xrayClientService.addClients([userId]);
     }
 
     if (logsText != '') {

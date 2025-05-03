@@ -50,6 +50,7 @@ export type TelegramSession = {
   payload: {
     vlessLink?: string;
     endDateSubscription?: string;
+    devicesLimit?: string;
     payment?: {
       paymentLink?: string;
       transactionId?: string;

@@ -3,6 +3,7 @@ export interface AppConfig {
   port: number;
   appDomain: string;
   isDev: boolean;
+  devicesLimit: number;
   telegram: {
     token: string;
     limitLengthButton: number;

@@ -266,6 +266,8 @@ export class TelegramService implements OnModuleInit {
       );
     }
 
+    context.session.payload.devicesLimit = String(this.config.devicesLimit);
+
     const subscription = await this.subscriptionDao.find({
       userId: telegramProfile.userId,
     });
@@ -360,7 +362,7 @@ export class TelegramService implements OnModuleInit {
       return existingLink;
     }
 
-    const vpnCreated = await this.xrayClientService.addVpnAccounts([userId]);
+    const vpnCreated = await this.xrayClientService.addClients([userId]);
 
     if (!vpnCreated) {
       this.logger.error(
@@ -390,7 +392,7 @@ export class TelegramService implements OnModuleInit {
       port: '443',
       isBlocked: false,
       flow,
-      devicesLimit: 3,
+      devicesLimit: this.config.devicesLimit,
     };
 
     // TODO: убрать

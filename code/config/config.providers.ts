@@ -12,6 +12,7 @@ export const CONFIG_PROVIDERS = [
       port: +(process.env.PORT ?? 3000),
       appDomain: process.env.APP_DOMAIN!,
       isDev: process.env.NODE_ENV! === DEVELOPMENT,
+      devicesLimit: Number(process.env.DEVICES_LIMIT!),
 
       telegram: {
         token: process.env.TELEGRAM_TOKEN!,
