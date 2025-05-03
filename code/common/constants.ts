@@ -21,7 +21,7 @@ export const DEVELOPMENT = 'development';
 /**
  * Режим боя
  */
-export const PRODUCTION = 'prodaction';
+export const PRODUCTION = 'production';
 
 /**
  * Токен сервиса конфигурации
