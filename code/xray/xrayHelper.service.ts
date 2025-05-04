@@ -65,7 +65,9 @@ export class XrayHelperService {
     const isDev = this.config.isDev;
     const flow = this.config.xray.flow;
     const pbk = this.config.xray.publicKey;
-    const host = isDev ? this.config.vpsDev.host : this.config.xray.listenIp;
+    const host = isDev
+      ? this.config.vpsDev.host
+      : this.config.xray.listenAddress;
     const tag = this.config.xray.linkTag;
 
     const query = [

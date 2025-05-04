@@ -38,7 +38,7 @@ export const CONFIG_PROVIDERS = [
         logsPath: process.env.XRAY_LOGS_PATH!,
         flow: process.env.XRAY_FLOW!,
         publicKey: process.env.XRAY_PUBLIC_KEY!,
-        listenIp: process.env.XRAY_LISTEN_IP!,
+        listenAddress: process.env.XRAY_LISTEN_ADDRESS!,
         linkTag: process.env.XRAY_LINK_TAG!,
         sni: process.env.XRAY_SNI!,
       },

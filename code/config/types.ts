@@ -26,7 +26,7 @@ export interface AppConfig {
     flow: string;
     publicKey: string;
     sni: string;
-    listenIp: string;
+    listenAddress: string;
     linkTag: string;
   };
   robokassa: {

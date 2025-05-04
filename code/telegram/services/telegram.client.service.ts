@@ -343,7 +343,7 @@ export class TelegramService implements OnModuleInit {
    * @throws Ошибка, если на любом этапе активация невозможна.
    */
   async createActiveVpnAccess({ userId }: { userId: string }): Promise<string> {
-    const listenIp = this.config.xray.listenIp;
+    const listenAddress = this.config.xray.listenAddress;
     const publicKey = this.config.xray.publicKey;
     const sni = this.config.xray.publicKey;
     const flow = this.config.xray.flow;
@@ -388,7 +388,7 @@ export class TelegramService implements OnModuleInit {
     const vpnAccountPayload = {
       userId,
       sni,
-      server: listenIp,
+      server: listenAddress,
       publicKey,
       port: 443,
       isBlocked: false,
