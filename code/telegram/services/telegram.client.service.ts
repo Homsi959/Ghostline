@@ -345,6 +345,7 @@ export class TelegramService implements OnModuleInit {
   async createActiveVpnAccess({ userId }: { userId: string }): Promise<string> {
     const listenIp = this.config.xray.listenIp;
     const publicKey = this.config.xray.publicKey;
+    const sni = this.config.xray.publicKey;
     const flow = this.config.xray.flow;
     const activeVpnAccount = await this.xrayClientService.findActiveOne(userId);
 
@@ -386,17 +387,15 @@ export class TelegramService implements OnModuleInit {
 
     const vpnAccountPayload = {
       userId,
-      sni: 'www.microsoft.com', // TODO: вынести в конфиг
+      sni,
       server: listenIp,
       publicKey,
-      port: '443',
+      port: 443,
       isBlocked: false,
       flow,
       devicesLimit: this.config.devicesLimit,
     };
 
-    // TODO: убрать
-    // @ts-ignore
     await this.vpnAccountsDao.create(vpnAccountPayload);
 
     this.logger.log(

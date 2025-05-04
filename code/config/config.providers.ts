@@ -40,6 +40,7 @@ export const CONFIG_PROVIDERS = [
         publicKey: process.env.XRAY_PUBLIC_KEY!,
         listenIp: process.env.XRAY_LISTEN_IP!,
         linkTag: process.env.XRAY_LINK_TAG!,
+        sni: process.env.XRAY_SNI!,
       },
 
       robokassa: {

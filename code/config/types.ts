@@ -25,6 +25,7 @@ export interface AppConfig {
     logsPath: string;
     flow: string;
     publicKey: string;
+    sni: string;
     listenIp: string;
     linkTag: string;
   };

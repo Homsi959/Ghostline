@@ -205,7 +205,6 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
 };
 
 /**
- * // TODO перекинуть в env
  * Ссылки на инструкции для подключения
  */
 export const CONNECTION_INSTRUCTIONS_LINKS = {
