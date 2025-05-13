@@ -102,6 +102,7 @@ export class SubscriptionService implements OnModuleInit {
         try {
           await this.subscriptionDao.markAsExpired(userId);
           await this.xrayClientService.removeClient(userId);
+          await this.vpnAccountsDao.removeVpnAccount(userId);
           await this.vpnAccountsDao.toggleVpnAccountBlock(userId, true);
 
           this.logger.warn(

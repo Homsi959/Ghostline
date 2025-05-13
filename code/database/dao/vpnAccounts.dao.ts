@@ -172,4 +172,46 @@ export class VpnAccountsDao {
       return false;
     }
   }
+
+  /**
+   * Удаляет VPN-аккаунт пользователя из базы данных.
+   *
+   * @param userId - Идентификатор пользователя, чей аккаунт нужно удалить.
+   * @returns true, если удаление прошло успешно, иначе false.
+   */
+  async removeVpnAccount(userId: string): Promise<boolean> {
+    const query = {
+      name: 'delete-vpn-account-by-userid',
+      text: `
+        DELETE FROM vpn_accounts
+        WHERE user_id = $1
+        RETURNING id;
+      `,
+      values: [userId],
+    };
+
+    try {
+      const { rows } = await this.db.query(query);
+
+      if (rows.length === 0) {
+        this.logger.warn(
+          `VPN-аккаунт для userId=${userId} не найден при удалении`,
+          this,
+        );
+        return false;
+      }
+
+      this.logger.log(`VPN-аккаунт удалён: userId=${userId}`, this);
+      return true;
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : 'Неизвестная ошибка';
+
+      this.logger.error(
+        `Ошибка при удалении VPN-аккаунта (userId=${userId}): ${errMsg}`,
+        this,
+      );
+      return false;
+    }
+  }
 }
