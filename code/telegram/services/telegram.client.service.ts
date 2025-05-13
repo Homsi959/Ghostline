@@ -345,7 +345,7 @@ export class TelegramService implements OnModuleInit {
   async createActiveVpnAccess({ userId }: { userId: string }): Promise<string> {
     const listenAddress = this.config.xray.listenAddress;
     const publicKey = this.config.xray.publicKey;
-    const sni = this.config.xray.publicKey;
+    const sni = this.config.xray.sni;
     const flow = this.config.xray.flow;
     const activeVpnAccount = await this.xrayClientService.findActiveOne(userId);
 
