@@ -22,12 +22,13 @@ export class XrayHelperService {
    */
   async restartXray(): Promise<boolean> {
     const isDev = this.config.isDev;
+    const restartXrayCommand = 'docker restart ghostline_xray';
 
     try {
       if (isDev) {
-        await this.sshService.runCommand('sudo systemctl restart xray');
+        await this.sshService.runCommand(restartXrayCommand);
       } else {
-        execSync('sudo systemctl restart xray');
+        execSync(restartXrayCommand);
       }
 
       this.logger.log(
