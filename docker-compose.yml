@@ -1,0 +1,19 @@
+services:
+  ghostline_app:
+    build: .
+    container_name: ghostline_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DOPPLER_TOKEN: ${DOPPLER_TOKEN}
+    volumes:
+      - ../infra/xray/config.json:/usr/local/etc/xray/config.json
+      - ../infra/xray/logs:/usr/local/etc/xray/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ghostline_net
+
+networks:
+  ghostline_net:
+    external: true

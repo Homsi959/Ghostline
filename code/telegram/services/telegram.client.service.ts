@@ -436,7 +436,8 @@ export class TelegramService implements OnModuleInit {
     const payment = await this.robokassaService.createPaymentTransaction({
       userId: telegramProfile.userId,
       description,
-      amount,
+      // 5783023904 - телеграм аккаунт Ghostline (для теста на проде)
+      amount: telegramId === 5783023904 ? 1 : amount,
     });
 
     if (payment) {
