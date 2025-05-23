@@ -10,7 +10,6 @@ export const CONFIG_PROVIDERS = [
     useFactory: (): AppConfig => ({
       logLevel: process.env.LOG_LEVEL_KEY ?? 'info',
       port: +(process.env.PORT ?? 3000),
-      appDomain: process.env.APP_DOMAIN!,
       isDev: process.env.NODE_ENV! === DEVELOPMENT,
       devicesLimit: Number(process.env.DEVICES_LIMIT!),
 

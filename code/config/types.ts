@@ -1,7 +1,6 @@
 export interface AppConfig {
   logLevel: string;
   port: number;
-  appDomain: string;
   isDev: boolean;
   devicesLimit: number;
   telegram: {
