@@ -12,7 +12,7 @@
   },
   "homepage": "https://github.com/Homsi959/Ghostline",
   "scripts": {
-    "start:dev": "doppler run -- nest start --watch",
+    "start:dev": "doppler run --project ghostline --config dev_personal -- nest start --watch",
     "build": "nest build",
     "gen:clients": "ts-node scripts/generateVpnClients.ts",
     "gen:activity": "ts-node scripts/generateActivity.ts",
