@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { WinstonService } from './logger/winston.service';
 
+console.log(process.env);
+
 /**
  * Запускает приложение NestJS.
  *
