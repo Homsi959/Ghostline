@@ -3,7 +3,10 @@ import { WinstonService } from 'code/logger/winston.service';
 import { exec } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
-import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import {
+  CONFIG_PROVIDER_TOKEN,
+  DEVELOPMENT_LOCAL,
+} from 'code/common/constants';
 import { AppConfig } from 'code/config/types';
 
 @Injectable()
@@ -20,7 +23,7 @@ export class SshService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    if (this.config.isDev) this.sshInit();
+    if (this.config.nodeEnv === DEVELOPMENT_LOCAL) this.sshInit();
   }
 
   private sshInit() {

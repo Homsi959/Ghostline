@@ -4,24 +4,34 @@ import { readFile, writeFile } from 'fs/promises';
 import { ReadFileOptions, XrayConfig } from './types';
 import { execSync } from 'child_process';
 import { SshService } from 'code/ssh/ssh.service';
-import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import {
+  CONFIG_PROVIDER_TOKEN,
+  DEVELOPMENT,
+  DEVELOPMENT_LOCAL,
+} from 'code/common/constants';
 import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class XrayHelperService {
+  private isDev: boolean;
+
   constructor(
     private readonly logger: WinstonService,
     @Inject(CONFIG_PROVIDER_TOKEN)
     private readonly config: AppConfig,
     private readonly sshService: SshService,
-  ) {}
+  ) {
+    const devVars = [DEVELOPMENT, DEVELOPMENT_LOCAL];
+
+    this.isDev = devVars.includes(config.nodeEnv);
+  }
 
   /**
    * Перезапускает Xray
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   async restartXray(): Promise<boolean> {
-    const isDev = this.config.isDev;
+    const isDev = this.isDev;
     const restartXrayCommand = 'docker restart ghostline_xray';
 
     try {
@@ -63,10 +73,9 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
-    const isDev = this.config.isDev;
     const flow = this.config.xray.flow;
     const pbk = this.config.xray.publicKey;
-    const host = isDev
+    const host = this.isDev
       ? this.config.vpsDev.host
       : this.config.xray.listenAddress;
     const tag = this.config.xray.linkTag;
@@ -99,10 +108,9 @@ export class XrayHelperService {
     options: ReadFileOptions = {},
   ): Promise<T> {
     const { asJson = false, encoding } = options;
-    const isDev = this.config.isDev;
     let content;
 
-    if (isDev) {
+    if (this.isDev) {
       content = await this.sshService.runCommand(`cat ${filePath}`);
     } else {
       content = await readFile(filePath, encoding ? { encoding } : undefined);
@@ -130,12 +138,11 @@ export class XrayHelperService {
    * @param config - JS-объект конфигурации Xray
    */
   async writeFile(xrayPath: string, config: XrayConfig): Promise<void> {
-    const isDev = this.config.isDev;
     const configPath = this.config.xray.configPath;
     const configContent = JSON.stringify(config, null, 2);
 
     try {
-      if (isDev) {
+      if (this.isDev) {
         // Экранируем JSON, чтобы безопасно передать через SSH
         const encoded = Buffer.from(configContent).toString('base64');
         const command = `echo "${encoded}" | base64 -d | sudo tee ${configPath} > /dev/null`;

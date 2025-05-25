@@ -39,7 +39,7 @@ import { AppConfig } from 'code/config/types';
     PaymentsModule,
     // Загрузка конфигурации из переменных окружения
     NestConfigModule.forRoot({
-      envFilePath: `settings/envs/.env.${process.env.NODE_ENV || 'development'}`,
+      envFilePath: `settings/envs/.env.${process.env.NODE_ENV}`,
     }),
     TelegrafModule.forRootAsync({
       inject: [CONFIG_PROVIDER_TOKEN],

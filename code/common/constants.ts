@@ -14,14 +14,19 @@ export const LOG_LEVEL_KEY = 'LOG_LEVEL_KEY';
 export const DATABASE_TOKEN = 'PG_CONNECTION';
 
 /**
+ * Режим боя
+ */
+export const PRODUCTION = 'production';
+
+/**
  * Режим разработки
  */
 export const DEVELOPMENT = 'development';
 
 /**
- * Режим боя
+ * Режим разработки локально
  */
-export const PRODUCTION = 'production';
+export const DEVELOPMENT_LOCAL = 'development_local';
 
 /**
  * Токен сервиса конфигурации

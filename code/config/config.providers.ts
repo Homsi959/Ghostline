@@ -1,4 +1,4 @@
-import { CONFIG_PROVIDER_TOKEN, DEVELOPMENT } from 'code/common/constants';
+import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
 import { AppConfig } from './types';
 
 /**
@@ -10,7 +10,7 @@ export const CONFIG_PROVIDERS = [
     useFactory: (): AppConfig => ({
       logLevel: process.env.LOG_LEVEL_KEY ?? 'info',
       port: +(process.env.PORT ?? 3000),
-      isDev: process.env.NODE_ENV! === DEVELOPMENT,
+      nodeEnv: process.env.NODE_ENV!,
       devicesLimit: Number(process.env.DEVICES_LIMIT!),
 
       telegram: {

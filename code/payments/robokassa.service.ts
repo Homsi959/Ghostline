@@ -13,16 +13,26 @@ import { WinstonService } from 'code/logger/winston.service';
 import { PaymentMethod, PaymentStatus } from 'code/database/common/enums';
 import { DateTime } from 'luxon';
 import { AppConfig } from 'code/config/types';
-import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import {
+  CONFIG_PROVIDER_TOKEN,
+  DEVELOPMENT,
+  DEVELOPMENT_LOCAL,
+} from 'code/common/constants';
 
 @Injectable()
 export class RobokassaService {
+  private isDev: boolean;
+
   constructor(
     @Inject(CONFIG_PROVIDER_TOKEN)
     private readonly config: AppConfig,
     private readonly paymentsDao: PaymentsDao,
     private readonly logger: WinstonService,
-  ) {}
+  ) {
+    const devVars = [DEVELOPMENT, DEVELOPMENT_LOCAL];
+
+    this.isDev = devVars.includes(this.config.nodeEnv);
+  }
 
   /**
    * Генерирует ссылку на оплату Robokassa по переданным данным.
@@ -34,9 +44,9 @@ export class RobokassaService {
   ): Promise<CreatedPaymentTransaction> {
     const { passwordCheck, culture, merchantLogin, paymentUrl } =
       this.config.robokassa;
-    const isDev = this.config.isDev;
+
     const { description, userId } = payload;
-    const amount = isDev
+    const amount = this.isDev
       ? String(payload.amount)
       : Number(payload.amount).toFixed(6);
     const invId = `${Date.now()}${Math.floor(Math.random() * 1000)}`.slice(
@@ -64,7 +74,7 @@ export class RobokassaService {
       InvId: invId,
       Description: description,
       Culture: culture,
-      IsTest: isDev ? '1' : '0',
+      IsTest: this.isDev ? '1' : '0',
       SignatureValue: signature,
       Receipt: encodedReceipt,
     });
@@ -100,7 +110,6 @@ export class RobokassaService {
   }: RobokassaResult): Promise<string | null> {
     const transaction = await this.paymentsDao.find({ transactionId: invId });
     const password = this.config.robokassa.passwordPay;
-    const isDev = this.config.isDev;
 
     if (!transaction) {
       this.logger.warn(`Транзакция не найдена: ${invId}`, this);
@@ -115,7 +124,7 @@ export class RobokassaService {
     const { amount, transactionId } = transaction;
     const expectedSignature = this.getSignature(
       {
-        outSum: isDev ? String(amount) : Number(amount).toFixed(6),
+        outSum: this.isDev ? String(amount) : Number(amount).toFixed(6),
         invId,
         password,
       },

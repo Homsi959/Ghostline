@@ -14,11 +14,16 @@ import { Cron } from '@nestjs/schedule';
 import { SshService } from 'code/ssh/ssh.service';
 import { execSync } from 'child_process';
 import { AppConfig } from 'code/config/types';
-import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import {
+  CONFIG_PROVIDER_TOKEN,
+  DEVELOPMENT,
+  DEVELOPMENT_LOCAL,
+} from 'code/common/constants';
 
 @Injectable()
 export class XrayMonitoringService implements OnModuleInit {
   public xrayConfig: XrayConfig;
+  private isDev: boolean;
 
   constructor(
     @Inject(CONFIG_PROVIDER_TOKEN)
@@ -28,7 +33,11 @@ export class XrayMonitoringService implements OnModuleInit {
     private readonly vpnAccountsDao: VpnAccountsDao,
     private readonly xrayClientService: XrayClientService,
     private readonly sshService: SshService,
-  ) {}
+  ) {
+    const devVars = [DEVELOPMENT, DEVELOPMENT_LOCAL];
+
+    this.isDev = devVars.includes(config.nodeEnv);
+  }
 
   async onModuleInit() {
     await this.processCheckConnectionLimits();
@@ -49,7 +58,6 @@ export class XrayMonitoringService implements OnModuleInit {
   async processCheckConnectionLimits() {
     const logsPath = this.config.xray.logsPath;
     const vpnAccounts = await this.vpnAccountsDao.findAll();
-    const isDevLocal = this.config.isDev;
     const commandCleanLogsFile = '> /usr/local/etc/xray/logs/access.log';
     if (!logsPath || !vpnAccounts) return;
 
@@ -116,7 +124,7 @@ export class XrayMonitoringService implements OnModuleInit {
     }
 
     if (logsText != '') {
-      if (isDevLocal) {
+      if (this.isDev) {
         await this.sshService.runCommand(commandCleanLogsFile);
       } else {
         execSync(commandCleanLogsFile);
