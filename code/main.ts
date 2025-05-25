@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { WinstonService } from './logger/winston.service';
 
-console.log(process.env);
-
 /**
  * Запускает приложение NestJS.
  *
@@ -23,6 +21,8 @@ async function bootstrap(): Promise<void> {
   const nest = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  console.log(process.env);
 
   nest.useLogger(nest.get(WinstonService));
   const PORT = Number(process.env.PORT) || 4000;
