@@ -35,7 +35,7 @@ export class XrayHelperService {
     const restartXrayCommand = 'docker restart ghostline_xray';
 
     try {
-      if (isDev) {
+      if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
         await this.sshService.runCommand(restartXrayCommand);
       } else {
         execSync(restartXrayCommand);
@@ -110,7 +110,7 @@ export class XrayHelperService {
     const { asJson = false, encoding } = options;
     let content;
 
-    if (this.isDev) {
+    if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
       content = await this.sshService.runCommand(`cat ${filePath}`);
     } else {
       content = await readFile(filePath, encoding ? { encoding } : undefined);
@@ -142,7 +142,7 @@ export class XrayHelperService {
     const configContent = JSON.stringify(config, null, 2);
 
     try {
-      if (this.isDev) {
+      if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
         // Экранируем JSON, чтобы безопасно передать через SSH
         const encoded = Buffer.from(configContent).toString('base64');
         const command = `echo "${encoded}" | base64 -d | sudo tee ${configPath} > /dev/null`;
