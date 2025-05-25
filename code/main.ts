@@ -22,8 +22,6 @@ async function bootstrap(): Promise<void> {
     bufferLogs: true,
   });
 
-  console.log(process.env);
-
   nest.useLogger(nest.get(WinstonService));
   const PORT = Number(process.env.PORT) || 4000;
   console.log(

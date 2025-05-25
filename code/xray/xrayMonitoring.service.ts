@@ -23,7 +23,6 @@ import {
 @Injectable()
 export class XrayMonitoringService implements OnModuleInit {
   public xrayConfig: XrayConfig;
-  private isDev: boolean;
 
   constructor(
     @Inject(CONFIG_PROVIDER_TOKEN)
@@ -33,11 +32,7 @@ export class XrayMonitoringService implements OnModuleInit {
     private readonly vpnAccountsDao: VpnAccountsDao,
     private readonly xrayClientService: XrayClientService,
     private readonly sshService: SshService,
-  ) {
-    const devVars = [DEVELOPMENT, DEVELOPMENT_LOCAL];
-
-    this.isDev = devVars.includes(config.nodeEnv);
-  }
+  ) {}
 
   async onModuleInit() {
     await this.processCheckConnectionLimits();
@@ -124,7 +119,7 @@ export class XrayMonitoringService implements OnModuleInit {
     }
 
     if (logsText != '') {
-      if (this.isDev) {
+      if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
         await this.sshService.runCommand(commandCleanLogsFile);
       } else {
         execSync(commandCleanLogsFile);
