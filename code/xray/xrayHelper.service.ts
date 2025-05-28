@@ -13,25 +13,20 @@ import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class XrayHelperService {
-  private isDev: boolean;
 
   constructor(
     private readonly logger: WinstonService,
     @Inject(CONFIG_PROVIDER_TOKEN)
     private readonly config: AppConfig,
     private readonly sshService: SshService,
-  ) {
-    const devVars = [DEVELOPMENT, DEVELOPMENT_LOCAL];
-
-    this.isDev = devVars.includes(config.nodeEnv);
-  }
+  ) {}
 
   /**
    * Перезапускает Xray
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   async restartXray(): Promise<boolean> {
-    const isDev = this.isDev;
+    const isDev = [DEVELOPMENT, DEVELOPMENT_LOCAL].includes(this.config.nodeEnv);
     const restartXrayCommand = 'docker restart ghostline_xray';
 
     try {
@@ -75,7 +70,7 @@ export class XrayHelperService {
 
     const flow = this.config.xray.flow;
     const pbk = this.config.xray.publicKey;
-    const host = this.isDev
+    const host = this.config.nodeEnv === DEVELOPMENT_LOCAL
       ? this.config.vpsDev.host
       : this.config.xray.listenAddress;
     const tag = this.config.xray.linkTag;
