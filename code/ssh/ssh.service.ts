@@ -11,7 +11,6 @@ import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class SshService implements OnModuleInit {
-  private sshKeyPath: string;
   private host: string;
   private username: string;
   private execAsync = promisify(exec);
@@ -27,11 +26,9 @@ export class SshService implements OnModuleInit {
   }
 
   private sshInit() {
-    const sshKeyPath = this.config.vpsDev.privateKeyPath;
     const host = this.config.db.host;
     const username = this.config.vpsDev.username;
 
-    this.sshKeyPath = path.resolve(process.cwd(), sshKeyPath);
     this.host = host;
     this.username = username;
     this.logger.log(
@@ -41,7 +38,7 @@ export class SshService implements OnModuleInit {
   }
 
   async runCommand(command: string): Promise<string> {
-    const fullCommand = `ssh -i "${this.sshKeyPath}" ${this.username}@${this.host} "${command}"`;
+    const fullCommand = `ssh -i "${this.config.vpsDev.privateKeyPath}" ${this.username}@${this.host} "${command}"`;
 
     try {
       const { stdout, stderr } = await this.execAsync(fullCommand);
