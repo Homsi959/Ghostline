@@ -20,10 +20,8 @@
           "serverNames": [
             "www.microsoft.com"
           ],
-          "privateKey": "aO4SEW-nBtSI4HQqQtY5N0yUNJ4vxFyOlQ2irGLsEXM",
-          "shortIds": [
-            "a85b543a0cb8f72e"
-          ],
+          "privateKey": "",
+          "shortIds": [],
           "xver": 0
         }
       }
