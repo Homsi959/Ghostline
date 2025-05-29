@@ -7,7 +7,7 @@ import { RobokassaResultDto } from './dto';
 export class RobokassaController {
   constructor(private readonly robokassaService: RobokassaService) {}
 
-  @Post('/api/robokassa/result')
+  @Post('/robokassa/result')
   async handleResult(
     @Body() body: RobokassaResultDto,
     @Res() response: Response,
