@@ -208,19 +208,16 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
  * Ссылки на инструкции для подключения
  */
 export const CONNECTION_INSTRUCTIONS_LINKS = {
-  HOW_TO_CONNECT_IOS: 'https://telegra.ph/GhostlineVPN--Nastrojka-na-iOS-05-02',
+  HOW_TO_CONNECT_IOS:
+    'https://apps.apple.com/ae/app/hiddify-proxy-vpn/id6596777532',
   HOW_TO_CONNECT_ANDROID:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Android-05-02',
+    'https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
   HOW_TO_CONNECT_ANDROID_TV:
     'https://telegra.ph/GhostlineVPN--Nastrojka-na-Android-TV-05-02',
   HOW_TO_CONNECT_WINDOWS:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Windows-05-02-2',
-  HOW_TO_CONNECT_MACOS_APPLE_SILICON:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-MacOS-Apple-Silicon-05-02',
-  HOW_TO_CONNECT_MACOS_INTEL:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-MacOS-Intel-05-02',
-  HOW_TO_CONNECT_HUAWEI:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Huawei-05-02',
+    'https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=en-US&gl=NL',
+  HOW_TO_CONNECT_MACOS:
+    'https://apps.apple.com/ae/app/hiddify-proxy-vpn/id6596777532',
 } as const;
 
 /**
@@ -303,13 +300,9 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '🖥️ Windows', // 9 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_WINDOWS,
   },
-  CONNECT_MACOS_INTEL: {
-    text: '🍏 MacOS Intel',
-    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS_INTEL,
-  },
-  CONNECT_MACOS_APPLE_SILICON: {
-    text: '🍏 MacOS Apple M', // 13 символов
-    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS_APPLE_SILICON,
+  CONNECT_MACOS: {
+    text: '🍏 MacOS',
+    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_MACOS,
   },
 };
 
@@ -370,9 +363,8 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_IOS,
         BUTTONS.CONNECT_ANDROID,
         BUTTONS.CONNECT_WINDOWS,
-        BUTTONS.CONNECT_ANDROID_TV,
-        BUTTONS.CONNECT_MACOS_INTEL,
-        BUTTONS.CONNECT_MACOS_APPLE_SILICON,
+        // BUTTONS.CONNECT_ANDROID_TV,
+        BUTTONS.CONNECT_MACOS,
         BUTTONS.HOME_PAGE,
       ],
       columns: 2,
