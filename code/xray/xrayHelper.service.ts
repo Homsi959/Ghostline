@@ -58,6 +58,7 @@ export class XrayHelperService {
    * @returns Сформированная строка VLESS-ссылки
    */
   async generateVlessLink(userId: string): Promise<string> {
+    const isDevLocal = this.config.nodeEnv === DEVELOPMENT_LOCAL;
     const xrayPath = this.config.xray.configPath;
     const config = await this.readFile<XrayConfig>(xrayPath, {
       asJson: true,
@@ -69,15 +70,16 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
+    const flow = this.config.xray.flow;
     const pbk = this.config.xray.publicKey;
-    const host =
-      this.config.nodeEnv === DEVELOPMENT_LOCAL
-        ? this.config.vpsDev.host
-        : this.config.xray.listenAddress;
+    const host = isDevLocal
+      ? this.config.vpsDev.host
+      : this.config.xray.listenAddress;
     const tag = this.config.xray.linkTag;
 
     const query = [
       `security=${security}`,
+      `flow=${flow}`,
       `pbk=${pbk}`,
       `sid=${shortId}`,
       `sni=${sni}`,

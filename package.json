@@ -13,10 +13,7 @@
   "homepage": "https://github.com/Homsi959/Ghostline",
   "scripts": {
     "start:dev": "doppler run --project ghostline --config dev_personal -- nest start --watch",
-    "build": "nest build",
-    "gen:clients": "ts-node scripts/generateVpnClients.ts",
-    "gen:activity": "ts-node scripts/generateActivity.ts",
-    "clean:clients": "ts-node scripts/cleanupVpnClients.ts"
+    "build": "nest build"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
