@@ -13,7 +13,6 @@ import { AppConfig } from 'code/config/types';
 
 @Injectable()
 export class XrayHelperService {
-
   constructor(
     private readonly logger: WinstonService,
     @Inject(CONFIG_PROVIDER_TOKEN)
@@ -26,8 +25,10 @@ export class XrayHelperService {
    * @return {boolean} - перезапуск прошел удачно или нет
    */
   async restartXray(): Promise<boolean> {
-    const isDev = [DEVELOPMENT, DEVELOPMENT_LOCAL].includes(this.config.nodeEnv);
-    const restartXrayCommand = 'docker restart ghostline_xray';
+    const isDev = [DEVELOPMENT, DEVELOPMENT_LOCAL].includes(
+      this.config.nodeEnv,
+    );
+    const restartXrayCommand = 'docker restart ghostline-xray';
 
     try {
       if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
@@ -68,16 +69,15 @@ export class XrayHelperService {
     const shortId = inbound.streamSettings.realitySettings.shortIds[0];
     const sni = inbound.streamSettings.realitySettings.serverNames[0];
 
-    const flow = this.config.xray.flow;
     const pbk = this.config.xray.publicKey;
-    const host = this.config.nodeEnv === DEVELOPMENT_LOCAL
-      ? this.config.vpsDev.host
-      : this.config.xray.listenAddress;
+    const host =
+      this.config.nodeEnv === DEVELOPMENT_LOCAL
+        ? this.config.vpsDev.host
+        : this.config.xray.listenAddress;
     const tag = this.config.xray.linkTag;
 
     const query = [
       `security=${security}`,
-      `flow=${flow}`,
       `pbk=${pbk}`,
       `sid=${shortId}`,
       `sni=${sni}`,
@@ -140,7 +140,7 @@ export class XrayHelperService {
       if (this.config.nodeEnv === DEVELOPMENT_LOCAL) {
         // Экранируем JSON, чтобы безопасно передать через SSH
         const encoded = Buffer.from(configContent).toString('base64');
-        const command = `echo "${encoded}" | base64 -d | sudo tee ${configPath} > /dev/null`;
+        const command = `echo "${encoded}" | base64 -d | tee ${configPath} > /dev/null`;
 
         await this.sshService.runCommand(command);
         this.logger.log(
