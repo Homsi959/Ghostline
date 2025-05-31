@@ -35,7 +35,7 @@ export const MESSAGES: Record<string, string> = {
 • Полный доступ к любимым сайтам
 • Ваша конфиденциальность под надёжной защитой
 • Работает на всех устройствах:
-  <b>iOS, Android, Huawei, Windows, macOS, Android TV</b>
+  <b>iOS, Android, Windows, macOS</b>
 
 📌 <i>Автопродление отключено по умолчанию — вы сами решаете, продлевать ли подписку</i>
   `,
@@ -216,8 +216,6 @@ export const CONNECTION_INSTRUCTIONS_LINKS = {
     'https://apps.apple.com/ae/app/hiddify-proxy-vpn/id6596777532',
   HOW_TO_CONNECT_ANDROID:
     'https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
-  HOW_TO_CONNECT_ANDROID_TV:
-    'https://telegra.ph/GhostlineVPN--Nastrojka-na-Android-TV-05-02',
   HOW_TO_CONNECT_WINDOWS:
     'https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=en-US&gl=NL',
   HOW_TO_CONNECT_MACOS:
@@ -296,10 +294,6 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '🤖 Android', // 9 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID,
   },
-  CONNECT_ANDROID_TV: {
-    text: '📺 Android TV', // 13 символов
-    url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_ANDROID_TV,
-  },
   CONNECT_WINDOWS: {
     text: '🖥️ Windows', // 9 символов
     url: CONNECTION_INSTRUCTIONS_LINKS.HOW_TO_CONNECT_WINDOWS,
@@ -367,7 +361,6 @@ export const telegramPages: TelegramPages = {
         BUTTONS.CONNECT_IOS,
         BUTTONS.CONNECT_ANDROID,
         BUTTONS.CONNECT_WINDOWS,
-        // BUTTONS.CONNECT_ANDROID_TV,
         BUTTONS.CONNECT_MACOS,
         BUTTONS.HOME_PAGE,
       ],
