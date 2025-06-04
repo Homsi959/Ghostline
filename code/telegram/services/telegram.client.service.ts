@@ -30,7 +30,11 @@ import { PAID_PLANS } from 'code/subscription/types';
 import { SubscriptionService } from 'code/subscription/subscription.service';
 import { DateTime } from 'luxon';
 import { AppConfig } from 'code/config/types';
-import { CONFIG_PROVIDER_TOKEN } from 'code/common/constants';
+import {
+  CONFIG_PROVIDER_TOKEN,
+  DEVELOPMENT,
+  DEVELOPMENT_LOCAL,
+} from 'code/common/constants';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -423,6 +427,12 @@ export class TelegramService implements OnModuleInit {
     context: Context;
   }): Promise<void> {
     const { description, amount } = PAID_PLANS[plan];
+    // Особый тариф для тестового Telegram-аккаунта Ghostline в проде
+    const isProd = ![DEVELOPMENT, DEVELOPMENT_LOCAL].includes(
+      this.config.nodeEnv,
+    );
+    const isTestAccount = telegramId === 5783023904;
+    const finalAmount = isProd && isTestAccount ? 1 : amount;
     const telegramProfile =
       await this.telegramProfilesDao.findTelegramProfileByTelegramId(
         telegramId,
@@ -436,8 +446,7 @@ export class TelegramService implements OnModuleInit {
     const payment = await this.robokassaService.createPaymentTransaction({
       userId: telegramProfile.userId,
       description,
-      // 5783023904 - телеграм аккаунт Ghostline (для теста на проде)
-      amount: telegramId === 5783023904 ? 1 : amount,
+      amount: finalAmount,
     });
 
     if (payment) {
