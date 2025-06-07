@@ -1,69 +1,67 @@
 # Ghostline
 
 <p align="center">
-  <img src="https://downloader.disk.yandex.ru/preview/bf689b0a73812d02514e1f368002e913a6ccb815cc51faa93fed13463582713b/67f178a6/Fu4uo8PRKLxPsZErg_0EMlp6KaOvtScnYN0H3ass1NwxaBv4fonP55VVJX9XFV2Q3_y2pLRjsnCfDihbdB5T-g%3D%3D?uid=0&filename=Ghostline%20logo%20%28PROD%29.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&owner_uid=0&tknv=v2&size=1048x1048" alt="Ghostline Logo" />
+  <img src="https://downloader.disk.yandex.ru/preview/bf689b0a73812d02514e1f368002e913a6ccb815cc51faa93fed13463582713b/67f178a6/Fu4uo8PRKLxPsZErg_0EMlp6KaOvtScnYN0H3ass1NwxaBv4fonP55VVJX9XFV2Q3_y2pLRjsnCfDihbdB5T-g%3D%3D?uid=0&filename=Ghostline%20logo%20(PROD).png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&owner_uid=0&tknv=v2&size=1048x1048" alt="Ghostline Logo" />
 </p>
 
-Ghostline — коммерческий проект, построенный на [NestJS](https://nestjs.com) с использованием чистого SQL (через [pg](https://node-postgres.com/)) и [PostgreSQL](https://www.postgresql.org). Проект включает функционал для создания защищённого VPN-соединения (на базе Xray с VLESS+Reality), а также интеграцию с Telegram для управления пользователями.
+Ghostline is a commercial VPN management system built with [NestJS](https://nestjs.com), raw SQL via [pg](https://node-postgres.com/) and [PostgreSQL](https://www.postgresql.org). It exposes a Telegram bot for user interaction and integrates with [Xray](https://github.com/XTLS/Xray-core) (VLESS + Reality) to provide secure VPN connections.
 
 ---
 
-## Основные возможности
+## Key Features
 
-- **Защищённое VPN-соединение:**  
-  Использование современных технологий для маскировки трафика и обхода ограничений.
-
-- **Telegram-бот для управления:**  
-  Вся работа с пользователем — через Telegram: покупка, продление, генерация ключа, статус подписки.
-
-- **Хранение и управление данными:**  
-  PostgreSQL для учёта пользователей, подписок, платежей и VPN-профилей.
-
-- **Минимальный стек:**  
-  Отказ от ORM в пользу прямых SQL-запросов через DAO (data access objects) для лучшего контроля и производительности.
+- **Secure VPN** – hides traffic and bypasses censorship using Xray with VLESS + Reality.
+- **Telegram Bot Control** – purchase, renewal and subscription status are handled via Telegram.
+- **Data Storage** – PostgreSQL stores users, subscriptions, payments and VPN profiles.
+- **Minimal Stack** – no ORM is used; all queries go through DAO classes for full control.
 
 ---
 
-## Технологии
+## Technology Stack
 
-- **NestJS** — прогрессивный фреймворк для серверных приложений.
-- **PostgreSQL** — надёжная реляционная СУБД.
-- **pg** — нативный драйвер PostgreSQL для Node.js.
-- **Xray (VLESS + Reality)** — технология для создания защищённых VPN-соединений.
-- **Telegram API** — бот для управления действиями пользователей.
-- **dotenv** — загрузка переменных окружения.
+- **NestJS** – backend framework for Node.js
+- **PostgreSQL** – reliable relational database
+- **pg** – Node.js PostgreSQL client
+- **Xray** – modern proxy/VPN software
+- **Telegram Bot API** – user management
+- **dotenv** – loads environment variables
 
 ---
 
-## Структура проекта
+## Project Structure
 
 ```plaintext
-├── src/
-│   ├── common/             # Утилиты, константы и типы
-│   ├── dao/                # DAO-слой для SQL-запросов (вместо ORM)
-│   ├── modules/            # Модули приложения (например, Telegram, VPN)
-│   ├── services/           # Бизнес-логика
-│   ├── database.module.ts  # Подключение и экспорт Pool (pg)
+├── code/
+│   ├── app/                 # Root application module
+│   ├── common/              # Utilities, constants and types
+│   ├── config/              # Environment configuration providers
+│   ├── database/            # Database module and DAO layer
+│   ├── payments/            # Payment handling
+│   ├── subscription/        # Subscription logic
+│   ├── telegram/            # Telegram bot controllers and services
+│   ├── xray/                # Xray client helpers and monitoring
 │   └── ...
-├── migrations/             # SQL- или pg-migrate миграции
-├── .env.development        # Переменные окружения для dev
-├── .env.production         # Переменные окружения для production
+├── settings/                # Xray config and environment files
+├── Dockerfile               # Production container
+├── docker-compose.yml       # Local development setup
 └── package.json
 ```
 
 ---
 
-## Конфигурация окружения
+## Environment Configuration
 
-**Файл `.env.example` (шаблон):**
+Create an `.env` file based on the template below and place it under `settings/envs/` (git ignored):
 
 ```ini
 # Telegram
 TELEGRAM_TOKEN=
 
-# Приложение
+# Application
 PORT=3000
 LOG_LEVEL_KEY=info
+DEVICES_LIMIT=1
+NODE_ENV=development
 
 # PostgreSQL
 DB_HOST=localhost
@@ -71,43 +69,62 @@ DB_PORT=5432
 DB_USER=vpn_admin
 DB_PASSWORD=your_password
 DB_NAME=vpn_service_dev
+
+# VPS for development
+VPS_DEV_HOST=127.0.0.1
+VPS_DEV_USERNAME=root
+VPS_DEV_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# Xray
+XRAY_CONFIG_PATH=/usr/local/etc/xray/config.json
+XRAY_LOGS_PATH=/usr/local/etc/xray/logs
+XRAY_FLOW=xtls-rprx-vision
+XRAY_PUBLIC_KEY=
+XRAY_SNI=
+XRAY_LISTEN_ADDRESS=vpn.example.com
+XRAY_LINK_TAG=Ghostline
+
+# Robokassa (payment system)
+ROBO_PAYMENT_URL=https://auth.robokassa.ru/Merchant/Index.aspx
+ROBO_MERCHANT_LOGIN=
+ROBO_CULTURE=ru
+ROBO_PASSWORD_CHECK=
+ROBO_PASSWORD_PAY=
 ```
 
-> `.env.*` файлы добавлены в `.gitignore`. Не коммитьте реальные значения.
+> **Note:** real environment values must never be committed to the repository.
 
 ---
 
-## Работа с БД
+## Database Access
 
-Проект использует `pg.Pool` и прямые SQL-запросы через DAO:
+The DAO layer uses `pg.Pool` with plain SQL queries:
 
 ```ts
 await this.db.query('SELECT * FROM users WHERE id = $1', [userId]);
 ```
 
-### Преимущества:
+Advantages:
 
-- Прозрачность SQL
-- Нет «магии» от ORM
-- Полный контроль над производительностью и индексами
+- Transparent SQL – no hidden logic from an ORM
+- Full control over performance and indexes
 
 ---
 
-## Миграции
+## Migrations
 
-Миграции можно вести вручную или через [node-pg-migrate](https://github.com/salsita/node-pg-migrate):
-
-### Пример команды:
+Database migrations can be handled manually or via [node-pg-migrate](https://github.com/salsita/node-pg-migrate).
+Example command:
 
 ```bash
 npx node-pg-migrate up
 ```
 
-> Конфигурация указывается в `migration.config.js` или в package.json
+Configuration can be provided either in `migration.config.js` or in `package.json`.
 
 ---
 
-## SQL-схема (упрощённая)
+## Simplified SQL Schema
 
 ```sql
 CREATE TABLE users (
@@ -133,27 +150,25 @@ CREATE TABLE telegram_profiles (
   language_code VARCHAR(10),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- и т.д.
 ```
 
 ---
 
-## Запуск проекта
+## Running the Project
 
-- **Dev-режим:**
+- **Development**
   ```bash
   yarn start:dev
   ```
-
-- **Prod-сборка:**
+- **Production build**
   ```bash
   yarn start:prod
   ```
 
+Alternatively, you can use `docker-compose up` to run the application alongside Xray in containers.
+
 ---
 
-## Заключение
+## Conclusion
 
-Проект Ghostline построен с упором на простоту, производительность и поддержку.  
-Использование SQL напрямую через DAO даёт разработчику полный контроль, прозрачность запросов и удобство отладки.
+Ghostline aims for simplicity and performance while remaining easy to support. Direct SQL via DAO gives developers complete control and visibility over database queries.
