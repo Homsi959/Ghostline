@@ -53,10 +53,9 @@ PlanetVPN — это платный доступ к быстрому VPN-сер�
 • 1 месяц — 190 ₽  
 • 6 месяцев — 990 ₽  
 
-<b>📞 Контакты:</b>  
+<b>📞 Контакты:</b>
 • Телефон: +7 (993) 909-19-98
 • Почта: planetvpn.official@gmail.com 
-• Telegram: @PlanetSupport
   `,
 
   SUBSCRIBING_PAGE: `
@@ -251,11 +250,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
   },
   POLICY: {
     text: '📝 Договор оферты',
-    url: 'https://disk.yandex.ru/i/S0YHz-BGWjY6sQ',
-  },
-  SUPPORT: {
-    text: '💬 Поддержка',
-    url: 'https://t.me/PlanetSupport',
+    url: 'https://disk.yandex.ru/i/_hH_O3-P0sEyyQ',
   },
   PAY: {
     text: '💳 Оплатить',
@@ -315,7 +310,6 @@ export const telegramPages: TelegramPages = {
         BUTTONS.BUY_SUBSCRIPTION,
         BUTTONS.ABOUT_SERVICE,
         BUTTONS.POLICY,
-        BUTTONS.SUPPORT,
       ],
       columns: 2,
     },
@@ -374,7 +368,6 @@ export const telegramPages: TelegramPages = {
         BUTTONS.HOW_TO_CONNECT,
         BUTTONS.ABOUT_SERVICE,
         BUTTONS.POLICY,
-        BUTTONS.SUPPORT,
       ],
       columns: 2,
     },
@@ -414,7 +407,6 @@ export const telegramPages: TelegramPages = {
         BUTTONS.BUY_SUBSCRIPTION,
         BUTTONS.ABOUT_SERVICE,
         BUTTONS.POLICY,
-        BUTTONS.SUPPORT,
       ],
       columns: 2,
     },
