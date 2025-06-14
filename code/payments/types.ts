@@ -5,7 +5,7 @@ export interface PaymentRoboPayload {
   /** Сумма платежа, например: 199.00 */
   amount: number;
 
-  /** Назначение платежа, например: "Подписка GhostlineVPN на 1 месяц" */
+  /** Назначение платежа, например: "Подписка PlanetVPN на 1 месяц" */
   description: string;
 
   /** uuid пользователя */

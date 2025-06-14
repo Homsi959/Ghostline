@@ -427,7 +427,7 @@ export class TelegramService implements OnModuleInit {
     context: Context;
   }): Promise<void> {
     const { description, amount } = PAID_PLANS[plan];
-    // Особый тариф для тестового Telegram-аккаунта Ghostline в проде
+    // Особый тариф для тестового Telegram-аккаунта Planet в проде
     const isProd = ![DEVELOPMENT, DEVELOPMENT_LOCAL].includes(
       this.config.nodeEnv,
     );
