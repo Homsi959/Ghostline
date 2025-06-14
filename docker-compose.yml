@@ -1,10 +1,10 @@
 services:
-  ghostline_app:
+  planetvpn_app:
     build: .
-    container_name: ghostline-app
+    container_name: planetvpn-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       DOPPLER_TOKEN: ${DOPPLER_TOKEN}
     volumes:
