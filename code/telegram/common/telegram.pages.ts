@@ -54,7 +54,7 @@ export const MESSAGES: Record<string, string> = {
 • 6 месяцев — 990 ₽  
 
 <b>📞 Поддержка:</b>  
-• Почта: planetvpn@proton.me  
+• Почта: planetvpn.official@gmail.com
   `,
 
   SUBSCRIBING_PAGE: `
