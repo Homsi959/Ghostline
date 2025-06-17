@@ -342,7 +342,7 @@ export const BUTTONS: Record<string, TelegramButton> = {
   },
   POLICY: {
     text: '📝 Договор оферты',
-    url: 'https://disk.yandex.ru/i/_hH_O3-P0sEyyQ',
+    action: PAGE_KEYS.OFERTA,
   },
   PAY: {
     text: '💳 Оплатить',
