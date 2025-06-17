@@ -74,6 +74,8 @@ export class SubscriptionService implements OnModuleInit {
     switch (plan) {
       case SubscriptionPlan.TRIAL:
         return startDate.plus({ days: 7 });
+      case SubscriptionPlan.ONE_DAY:
+        return startDate.plus({ days: 1 });
       case SubscriptionPlan.ONE_MONTH:
         return startDate.plus({ months: 1 });
       case SubscriptionPlan.SIX_MONTHS:
