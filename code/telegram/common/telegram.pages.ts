@@ -72,6 +72,9 @@ GhostlineVPN — это платный доступ к быстрому VPN-се
   PURCHASE_OF_SUBSCRIPTION_PAGE: `
 <b>💎 Наши тарифы — просто и понятно:</b>
 
+<b>1️⃣ 1 день — 10 ₽</b>  
+• Без рисков и обязательств — платите только за день
+
 <b>1️⃣ 1 месяц — 190 ₽</b>  
 • Удобно попробовать, если вы только начинаете  
 
@@ -275,6 +278,10 @@ export const BUTTONS: Record<string, TelegramButton> = {
     text: '💳 Купить доступ', // 15 символов
     action: PAGE_KEYS.PURCHASE_OF_SUBSCRIBING_PAGE,
   },
+  BUY_FOR_1_DAY: {
+    text: '📅 1 день — 10₽', // 15 символов
+    action: ACTIONS_KEYS.BUY_FOR_1_DAY,
+  },
   BUY_FOR_1_MONTH: {
     text: '📅 1 мес — 190₽', // 15 символов
     action: ACTIONS_KEYS.BUY_FOR_1_MONTH,
@@ -339,11 +346,12 @@ export const telegramPages: TelegramPages = {
     message: MESSAGES.PURCHASE_OF_SUBSCRIPTION_PAGE,
     keyboardConfig: {
       buttons: [
+        BUTTONS.BUY_FOR_1_DAY,
         BUTTONS.BUY_FOR_1_MONTH,
         BUTTONS.BUY_FOR_6_MONTHS,
         BUTTONS.HOME_PAGE,
       ],
-      columns: 2,
+      columns: 1,
     },
   },
   [PAGE_KEYS.GET_VPN_KEY_PAGE]: {
