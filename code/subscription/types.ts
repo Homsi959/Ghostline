@@ -9,6 +9,10 @@ export const PAID_PLANS: Record<
   Exclude<SubscriptionPlan, SubscriptionPlan.TRIAL>,
   PaidPlanInfo
 > = {
+  [SubscriptionPlan.ONE_DAY]: {
+    description: 'Подписка на 1 день',
+    amount: 10,
+  },
   [SubscriptionPlan.ONE_MONTH]: {
     description: 'Подписка на 1 месяц',
     amount: 190,
