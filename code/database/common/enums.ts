@@ -45,7 +45,6 @@ export enum PaymentMethod {
  */
 export enum SubscriptionPlan {
   TRIAL = 'trial',
-  ONE_DAY = '1_day',
   ONE_MONTH = '1_month',
   SIX_MONTHS = '6_months',
 }
@@ -54,7 +53,6 @@ export enum SubscriptionPlan {
  * Платные типы подписок (без триала).
  */
 export enum PaidSubscriptionPlan {
-  ONE_DAY = SubscriptionPlan.ONE_DAY,
   ONE_MONTH = SubscriptionPlan.ONE_MONTH,
   SIX_MONTHS = SubscriptionPlan.SIX_MONTHS,
 }

@@ -459,7 +459,6 @@ export class TelegramService implements OnModuleInit {
           amount: String(amount),
         },
       };
-
       await this.renderPage(context, PAGE_KEYS.PAYMENT_PAGE);
     }
   }
