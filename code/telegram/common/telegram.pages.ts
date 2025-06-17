@@ -6,7 +6,7 @@ import { ACTIONS_KEYS } from './telegram.actions';
  */
 export const PAGE_KEYS = {
   HOME_PAGE: 'homePage', // Главная страница
-  OFERTA: 'oferta', // Главная страница
+  OFERTA: 'ofertaPage', // Главная страница
   ACTIVE_USER_HOME_PAGE: 'activeUserHomePage', // Страница для клиента у которого уже есть актуальная подписка
   WITHOUT_TRIAL_HOME_PAGE: 'withoutTrialHomePage', // Главная страница для клиента который использовал уже использовал триал и подписка не активна
   ABOUT_SERVICE_PAGE: 'aboutServicePage', // Страница "О сервисе"
