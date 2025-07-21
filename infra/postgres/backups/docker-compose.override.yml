@@ -1,0 +1,10 @@
+services:
+  postgres:
+    volumes:
+      - ./backups/scripts:/backup-scripts:ro
+      - ./backups/data:/backups
+    entrypoint: >
+      bash -c "docker-entrypoint.sh postgres &
+      while true; do
+        sleep 86400 && echo '[INFO] Triggering daily backup' && /backup-scripts/backup.sh
+      done"

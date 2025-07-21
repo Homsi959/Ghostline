@@ -1,0 +1,7 @@
+tunnel: 75427941-2571-480a-a9c3-9447d15371f9
+credentials-file: /etc/cloudflared/75427941-2571-480a-a9c3-9447d15371f9.json
+
+ingress:
+  - hostname: api.ghostline.pro
+    service: http://ghostline-app:3000
+  - service: http_status:404

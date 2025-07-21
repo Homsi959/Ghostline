@@ -1,0 +1,200 @@
+{
+  "log": {
+    "loglevel": "debug",
+    "access": "/usr/local/etc/xray/logs/access.log",
+    "error": "/usr/local/etc/xray/logs/error.log"
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "email": "9aa14d90-48e7-4c69-9159-bb95ea0dde20",
+            "id": "9aa14d90-48e7-4c69-9159-bb95ea0dde20",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "46d6c9c5-c9b2-4826-b9a3-ffeca6fc56b7",
+            "email": "46d6c9c5-c9b2-4826-b9a3-ffeca6fc56b7",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "2cb535b0-1252-4abe-93c5-fae6adb0e1a8",
+            "email": "2cb535b0-1252-4abe-93c5-fae6adb0e1a8",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "b42f11df-0cca-4908-9ba7-8ed8e61cd308",
+            "email": "b42f11df-0cca-4908-9ba7-8ed8e61cd308",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "ea67920b-3840-444b-b10f-4de9fc0f4191",
+            "email": "ea67920b-3840-444b-b10f-4de9fc0f4191",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "392f428f-1e8b-4f71-9d8d-4f08daf7a8ca",
+            "email": "392f428f-1e8b-4f71-9d8d-4f08daf7a8ca",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "eef4e045-64ca-47dd-88a5-37a29de07efe",
+            "email": "eef4e045-64ca-47dd-88a5-37a29de07efe",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "c7b17b82-bc30-4bd0-ba16-d45a0ced0085",
+            "email": "c7b17b82-bc30-4bd0-ba16-d45a0ced0085",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "ad8f208f-dbb0-4431-847c-7d5998864db1",
+            "email": "ad8f208f-dbb0-4431-847c-7d5998864db1",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "645bdad0-db85-44d5-a86d-a89d19765f66",
+            "email": "645bdad0-db85-44d5-a86d-a89d19765f66",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "fd4f2829-2cac-4483-ab68-38df4fac1490",
+            "email": "fd4f2829-2cac-4483-ab68-38df4fac1490",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "724ac480-d297-4c22-a1c9-45c9702d66f3",
+            "email": "724ac480-d297-4c22-a1c9-45c9702d66f3",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "167738f9-911c-4740-8e44-0d1fb10c6c9c",
+            "email": "167738f9-911c-4740-8e44-0d1fb10c6c9c",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "a8bc9fc5-bb70-46c0-8098-54a25b1b4b6c",
+            "email": "a8bc9fc5-bb70-46c0-8098-54a25b1b4b6c",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "b24828b8-b5b7-4aec-b911-1744c626f8a5",
+            "email": "b24828b8-b5b7-4aec-b911-1744c626f8a5",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "df927b81-beae-4f9f-8af4-56785909bd8c",
+            "email": "df927b81-beae-4f9f-8af4-56785909bd8c",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "f2e76ded-a56d-4ebd-a16f-827b9f39cd46",
+            "email": "f2e76ded-a56d-4ebd-a16f-827b9f39cd46",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "b9d61914-3b25-4e93-adee-cbd7d8d95820",
+            "email": "b9d61914-3b25-4e93-adee-cbd7d8d95820",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "b217bdc3-c74e-44c2-8287-b26adcb65378",
+            "email": "b217bdc3-c74e-44c2-8287-b26adcb65378",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "5c8a3228-33e8-4f23-811a-d8534ed31593",
+            "email": "5c8a3228-33e8-4f23-811a-d8534ed31593",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "23bbfe97-4b65-4f48-859c-bcdfa5fc845c",
+            "email": "23bbfe97-4b65-4f48-859c-bcdfa5fc845c",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "10c49225-329d-4e6b-88ff-951a850be17a",
+            "email": "10c49225-329d-4e6b-88ff-951a850be17a",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "49820aa9-ae8b-44b3-a750-1131866b8889",
+            "email": "49820aa9-ae8b-44b3-a750-1131866b8889",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "a614b6ad-d056-48cc-a77b-23a6e473136b",
+            "email": "a614b6ad-d056-48cc-a77b-23a6e473136b",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "d657cede-e190-4f93-b7fc-5270cdabce35",
+            "email": "d657cede-e190-4f93-b7fc-5270cdabce35",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "2dae5995-510d-48d0-ac52-b750e59fad54",
+            "email": "2dae5995-510d-48d0-ac52-b750e59fad54",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "08864ea6-5c67-421b-acf6-c5d5217cd8a3",
+            "email": "08864ea6-5c67-421b-acf6-c5d5217cd8a3",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "6974447b-3be2-4738-bcfe-397691216e0a",
+            "email": "6974447b-3be2-4738-bcfe-397691216e0a",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "3f957b85-8913-4934-af72-32e9b06ccfae",
+            "email": "3f957b85-8913-4934-af72-32e9b06ccfae",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "4122b936-becc-4308-8e01-6296baf7433c",
+            "email": "4122b936-becc-4308-8e01-6296baf7433c",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "3b130fbb-4415-490a-afd1-e31511d5a79e",
+            "email": "3b130fbb-4415-490a-afd1-e31511d5a79e",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "c03544dc-5051-4bf4-ba93-416f98926b23",
+            "email": "c03544dc-5051-4bf4-ba93-416f98926b23",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.microsoft.com:443",
+          "serverNames": [
+            "www.microsoft.com"
+          ],
+          "privateKey": "aO4SEW-nBtSI4HQqQtY5N0yUNJ4vxFyOlQ2irGLsEXM",
+          "shortIds": [
+            "a85b543a0cb8f72e"
+          ],
+          "xver": 0
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    }
+  ]
+}

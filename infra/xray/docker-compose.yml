@@ -1,0 +1,17 @@
+services:
+  xray:
+    container_name: ghostline-xray
+    image: ghcr.io/xtls/xray-core:latest
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/usr/local/etc/xray/config.json
+      - ./logs:/usr/local/etc/xray/logs
+    ports:
+     - "443:443"
+    command: ["run", "-c", "/usr/local/etc/xray/config.json"]
+    networks:
+      - ghostline_net
+
+networks:
+  ghostline_net:
+    external: true
