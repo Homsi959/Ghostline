@@ -1,0 +1,14 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ghostline-cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    volumes:
+      - .:/etc/cloudflared
+    networks:
+      - ghostline_net
+
+networks:
+  ghostline_net:
+    external: true

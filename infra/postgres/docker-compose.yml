@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ghostline-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ghostline_prod
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mUzuJUlqNqKlFuVFjkJp
+    volumes:
+      - postgres_pgdata:/var/lib/postgresql/data
+    networks:
+      - ghostline_net
+
+volumes:
+  postgres_pgdata:
+
+networks:
+  ghostline_net:
+    external: true
