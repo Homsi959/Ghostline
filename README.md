@@ -1,9 +1,5 @@
 # Ghostline
 
-<p align="center">
-  <img src="https://downloader.disk.yandex.ru/preview/bf689b0a73812d02514e1f368002e913a6ccb815cc51faa93fed13463582713b/67f178a6/Fu4uo8PRKLxPsZErg_0EMlp6KaOvtScnYN0H3ass1NwxaBv4fonP55VVJX9XFV2Q3_y2pLRjsnCfDihbdB5T-g%3D%3D?uid=0&filename=Ghostline%20logo%20(PROD).png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&owner_uid=0&tknv=v2&size=1048x1048" alt="Ghostline Logo" />
-</p>
-
 Ghostline is a commercial VPN management system built with [NestJS](https://nestjs.com), raw SQL via [pg](https://node-postgres.com/) and [PostgreSQL](https://www.postgresql.org). It exposes a Telegram bot for user interaction and integrates with [Xray](https://github.com/XTLS/Xray-core) (VLESS + Reality) to provide secure VPN connections.
 
 ---
